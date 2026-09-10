@@ -1,18 +1,16 @@
 from fastapi import FastAPI
+from src.backend.app.core.config import settings
 
 app = FastAPI(
-    title="CareerForge API",
-    description="Backend API for the AI Career Mentorship System",
-    version="0.1.0"
+    title=settings.app_name,
+    version=settings.app_version
 )
-
 
 @app.get("/")
 def root():
     return {
-        "message": "CareerForge API is running"
+        "message": f"{settings.app_name} is running"
     }
-
 
 @app.get("/health")
 def health_check():
