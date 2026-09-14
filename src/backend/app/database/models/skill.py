@@ -1,18 +1,15 @@
-from sqlalchemy import Float, ForeignKey, String
+from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from src.backend.app.database.base import Base
 
-class UserSkill(Base):
-    __tablename__ = "user_skills"
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
-        primary_key=True
+class Skill(Base):
+    __tablename__ = "skills"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(
+        String(100),
+        unique=True,
+        index=True,
+        nullable=False
     )
-
-    skill_id: Mapped[int] = mapped_column(
-        ForeignKey("skills.id", ondelete="CASCADE"),
-        primary_key=True
-    )
-
-    source: Mapped[str] = mapped_column(String(50),default="resume",nullable=False)
-    confidence_score: Mapped[float | None] = mapped_column(Float,nullable=True)
+    category: Mapped[str | None] = mapped_column(String(100),nullable=True)
+    description: Mapped[str | None] = mapped_column(Text,nullable=True)
