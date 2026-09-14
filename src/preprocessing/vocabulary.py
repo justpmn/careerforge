@@ -1,9 +1,7 @@
 from collections import defaultdict
 from pathlib import Path
 import re
-
 import pandas as pd
-
 from src.preprocessing.loader import load_csv, load_csv_from_zip
 from src.preprocessing.paths import RAW_DATA_DIR, PROCESSED_DATA_DIR
 
@@ -32,6 +30,7 @@ MANUAL_ALIASES = {
     "Amazon Web Services (AWS)": [
         "aws",
         "amazon web services",
+        "amazon aws",
     ],
     "Microsoft Azure": [
         "azure",
@@ -55,6 +54,7 @@ MANUAL_ALIASES = {
     "Node.js": [
         "node.js",
         "nodejs",
+        "node",
     ],
     "Visual Studio Code": [
         "visual studio code",
@@ -65,7 +65,6 @@ MANUAL_ALIASES = {
 
 
 def normalize_text(value: str) -> str:
-    """Create a normalized comparison key."""
     value = str(value).strip()
     value = re.sub(r"\s+", " ", value)
 
@@ -73,7 +72,6 @@ def normalize_text(value: str) -> str:
 
 
 def clean_display_name(value: str) -> str:
-    """Clean whitespace while preserving original technology naming."""
     value = str(value).strip()
     value = re.sub(r"\s+", " ", value)
 
@@ -81,7 +79,6 @@ def clean_display_name(value: str) -> str:
 
 
 def split_multi_value(value: str) -> list[str]:
-    """Split Stack Overflow semicolon-delimited skill fields."""
     if pd.isna(value):
         return []
 
@@ -93,7 +90,6 @@ def split_multi_value(value: str) -> list[str]:
 
 
 def extract_onet_skills() -> list[dict]:
-    """Extract essential and software skills from O*NET."""
     records = []
 
     essential = load_csv_from_zip(
@@ -107,6 +103,8 @@ def extract_onet_skills() -> list[dict]:
                 "skill": clean_display_name(skill),
                 "category": "essential_skill",
                 "source": "onet",
+                "hot_technology": False,
+                "in_demand": False,
             }
         )
 
@@ -115,12 +113,25 @@ def extract_onet_skills() -> list[dict]:
         ONET_SOFTWARE_SKILLS
     )
 
-    for skill in software["Workplace Example"].dropna().unique():
+    for _, row in software.iterrows():
+        skill = row.get("Workplace Example")
+
+        if pd.isna(skill):
+            continue
+
         records.append(
             {
                 "skill": clean_display_name(skill),
                 "category": "software",
                 "source": "onet",
+                "hot_technology": (
+                    str(row.get("Hot Technology", "")).strip().upper()
+                    == "Y"
+                ),
+                "in_demand": (
+                    str(row.get("In Demand", "")).strip().upper()
+                    == "Y"
+                ),
             }
         )
 
@@ -128,7 +139,6 @@ def extract_onet_skills() -> list[dict]:
 
 
 def extract_stackoverflow_skills() -> list[dict]:
-    """Extract technologies reported in Stack Overflow survey responses."""
     dataframe = load_csv(STACKOVERFLOW_FILE)
 
     records = []
@@ -144,14 +154,15 @@ def extract_stackoverflow_skills() -> list[dict]:
                         "skill": skill,
                         "category": category,
                         "source": "stackoverflow",
+                        "hot_technology": False,
+                        "in_demand": False,
                     }
                 )
 
     return records
 
 
-def build_skill_vocabulary() -> pd.DataFrame:
-    """Build one normalized skill vocabulary from all sources."""
+def build_skill_catalog() -> pd.DataFrame:
     records = (
         extract_onet_skills()
         + extract_stackoverflow_skills()
@@ -162,17 +173,31 @@ def build_skill_vocabulary() -> pd.DataFrame:
             "names": [],
             "categories": set(),
             "sources": set(),
+            "hot_technology": False,
+            "in_demand": False,
         }
     )
-
     for record in records:
         key = normalize_text(record["skill"])
+
+        if not key:
+            continue
 
         grouped[key]["names"].append(record["skill"])
         grouped[key]["categories"].add(record["category"])
         grouped[key]["sources"].add(record["source"])
 
-    vocabulary_rows = []
+        grouped[key]["hot_technology"] = (
+            grouped[key]["hot_technology"]
+            or record["hot_technology"]
+        )
+
+        grouped[key]["in_demand"] = (
+            grouped[key]["in_demand"]
+            or record["in_demand"]
+        )
+
+    rows = []
 
     for normalized_key, data in grouped.items():
         canonical_skill = max(
@@ -180,7 +205,7 @@ def build_skill_vocabulary() -> pd.DataFrame:
             key=data["names"].count
         )
 
-        vocabulary_rows.append(
+        rows.append(
             {
                 "canonical_skill": canonical_skill,
                 "normalized_key": normalized_key,
@@ -193,34 +218,51 @@ def build_skill_vocabulary() -> pd.DataFrame:
                 "source_stackoverflow": int(
                     "stackoverflow" in data["sources"]
                 ),
+                "hot_technology": int(
+                    data["hot_technology"]
+                ),
+                "in_demand": int(
+                    data["in_demand"]
+                ),
             }
         )
+    catalog = pd.DataFrame(rows)
 
-    vocabulary = pd.DataFrame(vocabulary_rows)
-
-    vocabulary = vocabulary.sort_values(
+    return catalog.sort_values(
         "canonical_skill",
         key=lambda column: column.str.casefold()
     ).reset_index(drop=True)
 
-    return vocabulary
 
+def build_skill_vocabulary(
+    catalog: pd.DataFrame
+) -> pd.DataFrame:
+    mask = (
+        (catalog["source_stackoverflow"] == 1)
+        | (catalog["hot_technology"] == 1)
+        | (catalog["in_demand"] == 1)
+    )
 
+    vocabulary = catalog.loc[mask].copy()
+
+    return vocabulary.reset_index(drop=True)
 def build_skill_aliases(
     vocabulary: pd.DataFrame
 ) -> pd.DataFrame:
-    """Build aliases for canonical skill names."""
     aliases = []
-
-    for skill in vocabulary["canonical_skill"]:
+    canonical_skills = set(
+        vocabulary["canonical_skill"]
+    )
+    for skill in canonical_skills:
         aliases.append(
             {
                 "alias": normalize_text(skill),
                 "canonical_skill": skill,
             }
         )
-
     for canonical_skill, skill_aliases in MANUAL_ALIASES.items():
+        if canonical_skill not in canonical_skills:
+            continue
         for alias in skill_aliases:
             aliases.append(
                 {
@@ -228,51 +270,48 @@ def build_skill_aliases(
                     "canonical_skill": canonical_skill,
                 }
             )
-
     alias_dataframe = pd.DataFrame(aliases)
-
     alias_dataframe = alias_dataframe.drop_duplicates(
         subset=["alias", "canonical_skill"]
     )
-
     return alias_dataframe.sort_values(
         ["canonical_skill", "alias"]
     ).reset_index(drop=True)
-
-
-def save_skill_vocabulary() -> tuple[Path, Path]:
-    """Generate and save vocabulary and alias datasets."""
+def save_skill_datasets() -> tuple[Path, Path, Path]:
+    """Generate the catalog, matcher vocabulary, and aliases."""
     PROCESSED_DATA_DIR.mkdir(
         parents=True,
         exist_ok=True
     )
-
-    vocabulary = build_skill_vocabulary()
+    catalog = build_skill_catalog()
+    vocabulary = build_skill_vocabulary(catalog)
     aliases = build_skill_aliases(vocabulary)
-
+    catalog_path = (
+        PROCESSED_DATA_DIR / "skill_catalog.csv"
+    )
     vocabulary_path = (
         PROCESSED_DATA_DIR / "skill_vocabulary.csv"
     )
-
     aliases_path = (
         PROCESSED_DATA_DIR / "skill_aliases.csv"
     )
-
+    catalog.to_csv(
+        catalog_path,
+        index=False
+    )
     vocabulary.to_csv(
         vocabulary_path,
         index=False
     )
-
     aliases.to_csv(
         aliases_path,
         index=False
     )
-
-    return vocabulary_path, aliases_path
-
-
+    return catalog_path, vocabulary_path, aliases_path
 if __name__ == "__main__":
-    vocabulary_path, aliases_path = save_skill_vocabulary()
-
-    print(f"Vocabulary saved to: {vocabulary_path}")
-    print(f"Aliases saved to: {aliases_path}")
+    catalog_path, vocabulary_path, aliases_path = (
+        save_skill_datasets()
+    )
+    print(f"Skill catalog saved to: {catalog_path}")
+    print(f"Skill vocabulary saved to: {vocabulary_path}")
+    print(f"Skill aliases saved to: {aliases_path}")
