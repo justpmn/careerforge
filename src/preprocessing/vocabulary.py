@@ -233,7 +233,6 @@ def build_skill_catalog() -> pd.DataFrame:
         key=lambda column: column.str.casefold()
     ).reset_index(drop=True)
 
-
 def build_skill_vocabulary(
     catalog: pd.DataFrame
 ) -> pd.DataFrame:
@@ -246,46 +245,44 @@ def build_skill_vocabulary(
     vocabulary = catalog.loc[mask].copy()
 
     return vocabulary.reset_index(drop=True)
+
 def build_skill_aliases(
-    vocabulary: pd.DataFrame
+    catalog: pd.DataFrame
 ) -> pd.DataFrame:
-    aliases = []
-    canonical_skills = set(
-        vocabulary["canonical_skill"]
-    )
-    for skill in canonical_skills:
-        aliases.append(
-            {
-                "alias": normalize_text(skill),
-                "canonical_skill": skill,
-            }
-        )
-    for canonical_skill, skill_aliases in MANUAL_ALIASES.items():
-        if canonical_skill not in canonical_skills:
-            continue
-        for alias in skill_aliases:
-            aliases.append(
-                {
+    aliases = [] 
+    canonical_skills = set(catalog["canonical_skill"])
+    
+    for skill in canonical_skills: 
+        aliases.append({
+            "alias": normalize_text(skill),
+            "canonical_skill": skill,
+        })
+        
+        for  canonical_skill, skill_aliases in MANUAL_ALIASES.items():
+            if canonical_skill not in canonical_skills:
+                continue
+            
+            for alias in skill_aliases:
+                aliases.append({
                     "alias": normalize_text(alias),
-                    "canonical_skill": canonical_skill,
-                }
-            )
-    alias_dataframe = pd.DataFrame(aliases)
-    alias_dataframe = alias_dataframe.drop_duplicates(
-        subset=["alias", "canonical_skill"]
-    )
-    return alias_dataframe.sort_values(
-        ["canonical_skill", "alias"]
-    ).reset_index(drop=True)
+                    "canonical_skill" : canonical_skill,
+                })
+                alias_dataframe = pd.DataFrame(aliases)
+                alias_dataframe = alias_dataframe.drop_duplicates(subset=["alias", "canonical_skill"])
+                
+                return alias_dataframe.sort_values(["canonical_skill", "alias"]).reset_index(drop=True)
+
+            
+    
+
 def save_skill_datasets() -> tuple[Path, Path, Path]:
-    """Generate the catalog, matcher vocabulary, and aliases."""
     PROCESSED_DATA_DIR.mkdir(
         parents=True,
         exist_ok=True
     )
     catalog = build_skill_catalog()
     vocabulary = build_skill_vocabulary(catalog)
-    aliases = build_skill_aliases(vocabulary)
+    aliases = build_skill_aliases(catalog)
     catalog_path = (
         PROCESSED_DATA_DIR / "skill_catalog.csv"
     )
