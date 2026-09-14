@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = True
     
-    database_url = ( "postgresql+psycopg://careerforge:careerforge@localhost:5432/careerforge")
+    database_url: str = "postgresql+psycopg://careerforge:careerforge@localhost:5432/careerforge"
 
     model_config = SettingsConfigDict(
         env_file=".env",
