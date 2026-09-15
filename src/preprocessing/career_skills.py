@@ -1,10 +1,7 @@
 from collections import Counter, defaultdict
 from pathlib import Path
 import pandas as pd
-from src.preprocessing.careers import (
-    ONET_CAREER_MAP,
-    STACKOVERFLOW_CAREER_MAP,
-)
+from src.preprocessing.careers import (ONET_CAREER_MAP,STACKOVERFLOW_CAREER_MAP)
 from src.preprocessing.loader import load_csv, load_csv_from_zip
 from src.preprocessing.paths import RAW_DATA_DIR, PROCESSED_DATA_DIR
 from src.preprocessing.vocabulary import (
@@ -34,6 +31,7 @@ def get_canonical_skill_lookup() -> dict[str, str]:
         )
     )
 
+"""
 def get_skill_alias_lookup() -> dict[str, str]:
     aliases_path = PROCESSED_DATA_DIR / "skill_aliases.csv"
     if not aliases_path.exists():
@@ -49,6 +47,25 @@ def get_skill_alias_lookup() -> dict[str, str]:
                 aliases["canonical_skill"],
             )
         )
+        
+"""
+def get_skill_alias_lookup() -> dict[str, str]:
+    aliases_path = PROCESSED_DATA_DIR / "skill_aliases.csv"
+    if not aliases_path.exists():
+        raise FileNotFoundError(
+            "skill_aliases.csv does not exist. "
+            "Run vocabulary first to generate the file."
+        )
+    aliases = pd.read_csv(aliases_path)
+    alias_lookup = dict(
+        zip(
+            aliases["alias"],
+            aliases["canonical_skill"],
+        )
+    )
+    
+    return alias_lookup
+
 def canonicalize_skill(
     skill: str,
     catalog_lookup: dict[str, str],
