@@ -31,38 +31,90 @@ MANUAL_ALIASES = {
         "aws",
         "amazon web services",
         "amazon aws",
+        "amazon web services aws",
+        "amazon web services aws software",
     ],
+
     "Microsoft Azure": [
         "azure",
+        "microsoft azure software",
     ],
+
     "Google Cloud": [
         "gcp",
         "google cloud platform",
     ],
+
     "PostgreSQL": [
         "postgres",
         "postgresql",
     ],
+
     "JavaScript": [
         "javascript",
         "js",
     ],
+
     "TypeScript": [
         "typescript",
         "ts",
     ],
+
     "Node.js": [
         "node.js",
         "nodejs",
         "node",
     ],
+
     "Visual Studio Code": [
         "visual studio code",
         "vscode",
         "vs code",
     ],
-}
 
+    "SQL": [
+        "sql",
+        "structured query language",
+        "structured query language sql",
+    ],
+
+    "Bash/Shell (all shells)": [
+        "bash",
+        "bash shell",
+        "bash/shell",
+        "shell scripting",
+    ],
+
+    "Ansible": [
+        "ansible",
+        "ansible software",
+    ],
+
+    "Terraform": [
+        "terraform",
+        "ibm terraform",
+    ],
+
+    "Java": [
+        "java",
+        "oracle java",
+    ],
+
+    "PowerShell": [
+        "powershell",
+        "microsoft powershell",
+    ],
+
+    "Cassandra": [
+        "cassandra",
+        "apache cassandra",
+    ],
+
+    "Angular": [
+        "angular",
+        "google angular",
+    ],
+}
 
 def normalize_text(value: str) -> str:
     value = str(value).strip()
@@ -77,6 +129,16 @@ def clean_display_name(value: str) -> str:
 
     return value
 
+def build_manual_alias_lookup() -> dict[str, str]:
+    lookup = {}
+
+    for canonical_skill, aliases in MANUAL_ALIASES.items():
+        lookup[normalize_text(canonical_skill)] = canonical_skill
+
+        for alias in aliases:
+            lookup[normalize_text(alias)] = canonical_skill
+
+    return lookup
 
 def split_multi_value(value: str) -> list[str]:
     if pd.isna(value):
@@ -161,7 +223,7 @@ def extract_stackoverflow_skills() -> list[dict]:
 
     return records
 
-
+"""
 def build_skill_catalog() -> pd.DataFrame:
     records = (
         extract_onet_skills()
@@ -232,6 +294,113 @@ def build_skill_catalog() -> pd.DataFrame:
         "canonical_skill",
         key=lambda column: column.str.casefold()
     ).reset_index(drop=True)
+_summary_
+"""
+def build_skill_catalog() -> pd.DataFrame:
+    """
+    Build the complete CareerForge skill catalog.
+
+    Known aliases are resolved before skills are grouped so
+    equivalent O*NET and Stack Overflow technologies become
+    one canonical skill with combined source evidence.
+    """
+    records = (
+        extract_onet_skills()
+        + extract_stackoverflow_skills()
+    )
+
+    manual_alias_lookup = build_manual_alias_lookup()
+
+    grouped = defaultdict(
+        lambda: {
+            "names": [],
+            "categories": set(),
+            "sources": set(),
+            "hot_technology": False,
+            "in_demand": False,
+        }
+    )
+
+    for record in records:
+        raw_skill = clean_display_name(
+            record["skill"]
+        )
+
+        normalized_raw = normalize_text(
+            raw_skill
+        )
+
+        # Resolve known variants before grouping.
+        canonical_name = manual_alias_lookup.get(
+            normalized_raw,
+            raw_skill,
+        )
+
+        normalized_key = normalize_text(
+            canonical_name
+        )
+
+        if not normalized_key:
+            continue
+
+        grouped[normalized_key]["names"].append(
+            canonical_name
+        )
+
+        grouped[normalized_key]["categories"].add(
+            record["category"]
+        )
+
+        grouped[normalized_key]["sources"].add(
+            record["source"]
+        )
+
+        grouped[normalized_key]["hot_technology"] = (
+            grouped[normalized_key]["hot_technology"]
+            or record["hot_technology"]
+        )
+
+        grouped[normalized_key]["in_demand"] = (
+            grouped[normalized_key]["in_demand"]
+            or record["in_demand"]
+        )
+
+    rows = []
+
+    for normalized_key, data in grouped.items():
+        canonical_skill = max(
+            set(data["names"]),
+            key=data["names"].count,
+        )
+
+        rows.append(
+            {
+                "canonical_skill": canonical_skill,
+                "normalized_key": normalized_key,
+                "categories": ";".join(
+                    sorted(data["categories"])
+                ),
+                "source_onet": int(
+                    "onet" in data["sources"]
+                ),
+                "source_stackoverflow": int(
+                    "stackoverflow" in data["sources"]
+                ),
+                "hot_technology": int(
+                    data["hot_technology"]
+                ),
+                "in_demand": int(
+                    data["in_demand"]
+                ),
+            }
+        )
+
+    catalog = pd.DataFrame(rows)
+
+    return catalog.sort_values(
+        "canonical_skill",
+        key=lambda column: column.str.casefold(),
+    ).reset_index(drop=True)    
 
 def build_skill_vocabulary(
     catalog: pd.DataFrame
@@ -246,6 +415,7 @@ def build_skill_vocabulary(
 
     return vocabulary.reset_index(drop=True)
 
+"""
 def build_skill_aliases(
     catalog: pd.DataFrame
 ) -> pd.DataFrame:
@@ -272,9 +442,59 @@ def build_skill_aliases(
                 
                 return alias_dataframe.sort_values(["canonical_skill", "alias"]).reset_index(drop=True)
 
-            
-    
+"""
 
+def build_skill_aliases(
+    catalog: pd.DataFrame
+) -> pd.DataFrame:
+    aliases = []
+
+    canonical_skills = set(
+        catalog["canonical_skill"]
+    )
+
+    for skill in canonical_skills:
+        aliases.append(
+            {
+                "alias": normalize_text(skill),
+                "canonical_skill": skill,
+                "priority": 0,
+            }
+        )
+
+    for canonical_skill, skill_aliases in MANUAL_ALIASES.items():
+
+        if canonical_skill not in canonical_skills:
+            continue
+
+        for alias in skill_aliases:
+            aliases.append(
+                {
+                    "alias": normalize_text(alias),
+                    "canonical_skill": canonical_skill,
+                    "priority": 1,
+                }
+            )
+    alias_dataframe = pd.DataFrame(aliases)
+
+    alias_dataframe = alias_dataframe.sort_values(
+        "priority"
+    )
+
+    alias_dataframe = alias_dataframe.drop_duplicates(
+        subset=["alias"],
+        keep="last",
+    )
+
+    alias_dataframe = alias_dataframe.drop(
+        columns=["priority"]
+    )
+
+    return alias_dataframe.sort_values(
+        ["canonical_skill", "alias"]
+    ).reset_index(drop=True)
+          
+    
 def save_skill_datasets() -> tuple[Path, Path, Path]:
     PROCESSED_DATA_DIR.mkdir(
         parents=True,
