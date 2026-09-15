@@ -11,6 +11,8 @@ def main():
     build_career_skills()
     print("\n[3/3] Auditing skill graph...")
     audit_skill_graph()
+    print("\n____________________________________________________")
     print("\nPreprocessing pipeline complete.")
+    print("\n____________________________________________________")
 if __name__ == "__main__":
     main()
