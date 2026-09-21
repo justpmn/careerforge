@@ -23,6 +23,11 @@ STACKOVERFLOW_SKILL_COLUMNS = {
     "WebframeHaveWorkedWith": "web_framework",
     "DevEnvsHaveWorkedWith": "development_environment",
     "SOTagsHaveWorkedWith": "technology_tag",
+
+    # v2 feature groups
+    "OpSysProfessional use": "operating_system",
+    "OfficeStackAsyncHaveWorkedWith": "collaboration_tool",
+    "AIModelsHaveWorkedWith": "ai_model",
 }
 
 
