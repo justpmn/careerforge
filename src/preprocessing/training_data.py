@@ -18,6 +18,11 @@ TECH_COLUMNS = [
     "WebframeHaveWorkedWith",
     "DevEnvsHaveWorkedWith",
     "SOTagsHaveWorkedWith",
+    
+    # v2 feature groups
+    "OpSysProfessional use",
+    "OfficeStackAsyncHaveWorkedWith",
+    "AIModelsHaveWorkedWith",
 ]
 
 DEVTYPE_TO_CAREER = {
