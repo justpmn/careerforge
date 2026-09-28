@@ -8,6 +8,9 @@ STACKOVERFLOW_PATH = (RAW_DATA_DIR / "stackoverflow" / "results.txt")
 FINAL_VOCABULARY_PATH = (PROCESSED_DATA_DIR/ "final_skill_vocabulary.csv")
 FINAL_ALIASES_PATH = (PROCESSED_DATA_DIR/ "final_skill_aliases.csv")
 
+MODEL_VOCABULARY_PATH = (PROCESSED_DATA_DIR / "skill_vocabulary.csv")
+MODEL_ALIASES_PATH = (PROCESSED_DATA_DIR / "skill_aliases.csv")
+
 TECH_COLUMNS = [
     "LanguageHaveWorkedWith",
     "DatabaseHaveWorkedWith",
@@ -15,6 +18,11 @@ TECH_COLUMNS = [
     "WebframeHaveWorkedWith",
     "DevEnvsHaveWorkedWith",
     "SOTagsHaveWorkedWith",
+    
+    # v2 feature groups
+    "OpSysProfessional use",
+    "OfficeStackAsyncHaveWorkedWith",
+    "AIModelsHaveWorkedWith",
 ]
 
 DEVTYPE_TO_CAREER = {
@@ -125,7 +133,7 @@ def normalize_skill_key(value: str) -> str:
     )
 
     return value
-
+"""
 def load_skill_resources() -> tuple[
     list[str],
     dict[str, str],
@@ -162,7 +170,91 @@ def load_skill_resources() -> tuple[
 
     return (feature_names, alias_lookup)
 
+"""
+"""
+def load_skill_resources() -> tuple[
+    list[str],
+    dict[str, str],
+]:
+    # Load candidate model vocabulary
+    vocabulary = pd.read_csv(MODEL_VOCABULARY_PATH)
+    aliases = pd.read_csv(MODEL_ALIASES_PATH)
 
+    feature_names = (
+        vocabulary["canonical_skill"]
+        .dropna()
+        .astype(str)
+        .drop_duplicates()
+        .sort_values()
+        .tolist()
+    )
+
+    feature_set = set(feature_names)
+
+    # Keep only aliases belonging to model features
+    aliases = aliases[
+        aliases["canonical_skill"].isin(feature_set)
+    ].copy()
+
+    alias_lookup = {
+        normalize_skill_key(alias): canonical_skill
+        for alias, canonical_skill in zip(
+            aliases["alias"],
+            aliases["canonical_skill"],
+        )
+    }
+
+    # Always allow canonical skill names
+    # to match themselves.
+    for skill in feature_names:
+        alias_lookup.setdefault(
+            normalize_skill_key(skill),
+            skill,
+        )
+
+    return feature_names, alias_lookup
+"""
+def load_skill_resources() -> tuple[
+    list[str],
+    dict[str, str],
+]:
+    # Load candidate model vocabulary
+    vocabulary = pd.read_csv(MODEL_VOCABULARY_PATH)
+    aliases = pd.read_csv(MODEL_ALIASES_PATH)
+
+    feature_names = (
+        vocabulary["canonical_skill"]
+        .dropna()
+        .astype(str)
+        .drop_duplicates()
+        .sort_values()
+        .tolist()
+    )
+
+    feature_set = set(feature_names)
+
+    # Keep only aliases belonging to model features
+    aliases = aliases[
+        aliases["canonical_skill"].isin(feature_set)
+    ].copy()
+
+    alias_lookup = {
+        normalize_skill_key(alias): canonical_skill
+        for alias, canonical_skill in zip(
+            aliases["alias"],
+            aliases["canonical_skill"],
+        )
+    }
+
+    # Always allow canonical skill names
+    # to match themselves.
+    for skill in feature_names:
+        alias_lookup.setdefault(
+            normalize_skill_key(skill),
+            skill,
+        )
+
+    return feature_names, alias_lookup
 def split_technology_values(
     value,
 ) -> list[str]:
