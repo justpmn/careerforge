@@ -3,3 +3,6 @@ data/
 __pycache__/
 *.py[cod]
 .env
+models/*.pkl
+models/*.joblib
+models/*.zip
