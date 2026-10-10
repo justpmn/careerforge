@@ -1,12 +1,7 @@
 from fastapi import APIRouter
-
-from src.backend.app.api.routes.health import (
-    router as health_router,
-)
-from src.backend.app.api.routes.recommendations import (
-    router as recommendations_router,
-)
-
+from src.backend.app.api.routes.preferences import (router as preferences_router)
+from src.backend.app.api.routes.health import (router as health_router)
+from src.backend.app.api.routes.recommendations import (router as recommendations_router)
 
 api_router = APIRouter(
     prefix="/api"
@@ -18,4 +13,7 @@ api_router.include_router(
 
 api_router.include_router(
     recommendations_router
+)
+api_router.include_router(
+    preferences_router
 )
