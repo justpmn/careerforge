@@ -4,7 +4,7 @@ from src.backend.app.schemas.recommendation import (RecommendationRequest,Recomm
 from sqlalchemy.orm import Session
 from src.backend.app.database.session import (get_db)
 from src.backend.app.services.resume_persistence_service import (save_resume_analysis)
-from src.backend.app.services.recommendation_service import (analyze_career_text,)
+from src.backend.app.services.recommendation_service import (analyze_career_text, analyze_personalized_career_text)
 router = APIRouter(
     prefix="/recommendations",
     tags=["Recommendations"],
@@ -61,7 +61,9 @@ async def upload_resume(
             file_bytes=file_bytes,
         )
 
-        result = analyze_career_text(
+        result = analyze_personalized_career_text(
+            db=db,
+            user_id=user_id,
             text=text,
             top_k=top_k,
         )
