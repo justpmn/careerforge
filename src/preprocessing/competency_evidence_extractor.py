@@ -458,6 +458,292 @@ COMPETENCY_PATTERNS = {
         r"\bFlyway\b",
         r"\bLiquibase\b",
     ],
+    
+    # Cloud engineering
+    "cloud_infrastructure": [
+        r"\bcloud infrastructure provisioning\b",
+        r"\bprovisioned cloud resources?\b",
+        r"\bmanaged cloud infrastructure\b",
+        r"\bconfigured (?:cloud )?virtual machines?\b",
+        r"\bEC2 instances?\b",
+    ],
+
+    "cloud_networking": [
+        r"\bcloud networking\b",
+        r"\bvirtual private clouds?\b",
+        r"\bVPC configurations?\b",
+        r"\bsubnet configurations?\b",
+        r"\bsecurity group rules?\b",
+        r"\bcloud network architecture\b",
+    ],
+
+    "cloud_iam": [
+        r"\bIAM policies?\b",
+        r"\bAWS IAM\b",
+        r"\bcloud identity management\b",
+        r"\bconfigured IAM roles?\b",
+        r"\bcloud access policies?\b",
+        r"\bleast[- ]privilege access\b",
+    ],
+
+    "infrastructure_as_code": [
+        r"\binfrastructure as code\b",
+        r"\bIaC implementation\b",
+        r"\bTerraform modules?\b",
+        r"\bTerraform configurations?\b",
+        r"\bCloudFormation templates?\b",
+        r"\bautomated infrastructure provisioning\b",
+    ],
+
+    "cloud_deployment": [
+        r"\bcloud deployments?\b",
+        r"\bdeployed applications? to (?:AWS|Azure|Google Cloud|GCP)\b",
+        r"\bdeployed services? (?:on|to) (?:AWS|Azure|Google Cloud|GCP)\b",
+        r"\bmanaged cloud deployments?\b",
+    ],
+
+    "cloud_monitoring": [
+        r"\bcloud infrastructure monitoring\b",
+        r"\bcloud resource monitoring\b",
+        r"\bAmazon CloudWatch\b",
+        r"\bAzure Monitor\b",
+        r"\bcloud monitoring dashboards?\b",
+    ],
+
+    "cloud_reliability": [
+        r"\bcloud auto[- ]scaling\b",
+        r"\bconfigured auto[- ]scaling\b",
+        r"\bhigh availability architecture\b",
+        r"\bautomated failover\b",
+        r"\bdisaster recovery planning\b",
+        r"\bcloud disaster recovery\b",
+    ],
+
+    # DevOps and site reliability
+    "deployment_automation": [
+        r"\bautomated deployment pipelines?\b",
+        r"\bdeployment automation\b",
+        r"\brelease automation\b",
+        r"\bblue[- ]green deployments?\b",
+        r"\brolling deployments?\b",
+        r"\bcontinuous deployment pipelines?\b",
+    ],
+
+    "configuration_management": [
+        r"\bconfiguration management\b",
+        r"\bAnsible playbooks?\b",
+        r"\bautomated server configuration\b",
+        r"\binfrastructure configuration automation\b",
+    ],
+
+    "observability": [
+        r"\bobservability\b",
+        r"\bdistributed tracing\b",
+        r"\bapplication telemetry\b",
+        r"\bmetrics and logs\b",
+        r"\blog aggregation\b",
+        r"\bservice[- ]level indicators?\b",
+    ],
+
+    "incident_management": [
+        r"\bincident management\b",
+        r"\bon[- ]call rotations?\b",
+        r"\bproduction incident response\b",
+        r"\bincident postmortems?\b",
+        r"\broot cause analysis\b",
+        r"\bproduction outages?\b",
+    ],
+
+    "sre_reliability": [
+        r"\bsite reliability engineering\b",
+        r"\bservice[- ]level objectives?\b",
+        r"\berror budgets?\b",
+        r"\breliability engineering\b",
+        r"\bSLO monitoring\b",
+        r"\bdisaster recovery testing\b",
+    ],
+    
+    # Cybersecurity analysis
+    "security_monitoring": [
+        r"\bSIEM monitoring\b",
+        r"\bsecurity event monitoring\b",
+        r"\bmonitored security (?:alerts|logs|events)\b",
+        r"\bsecurity log analysis\b",
+    ],
+
+    "threat_detection": [
+        r"\bthreat detection\b",
+        r"\bthreat hunting\b",
+        r"\bdetected suspicious activity\b",
+        r"\bindicators? of compromise\b",
+    ],
+
+    "security_incident_response": [
+        r"\bsecurity incident response\b",
+        r"\bsecurity incident investigation\b",
+        r"\bsecurity incident triage\b",
+        r"\bincident containment\b",
+    ],
+
+    "vulnerability_assessment": [
+        r"\bvulnerability (?:assessment|scanning|management)\b",
+        r"\bpenetration testing\b",
+        r"\bCVE analysis\b",
+        r"\bvulnerability remediation\b",
+    ],
+
+    "security_controls": [
+        r"\bfirewall (?:rules|configuration|policies)\b",
+        r"\bendpoint detection and response\b",
+        r"\bEDR deployment\b",
+        r"\bsecurity hardening\b",
+    ],
+
+    "identity_access_security": [
+        r"\bidentity and access management\b",
+        r"\baccess control policies\b",
+        r"\bprivileged access management\b",
+        r"\bMFA enforcement\b",
+    ],
+
+    "network_security": [
+        r"\bnetwork security monitoring\b",
+        r"\bnetwork intrusion detection\b",
+        r"\bIDS/IPS\b",
+        r"\bpacket analysis\b",
+        r"\bnetwork traffic inspection\b",
+    ],
+
+    "security_risk": [
+        r"\bsecurity risk assessment\b",
+        r"\bsecurity risk analysis\b",
+        r"\bthreat model(?:ing|ling)\b",
+        r"\bsecurity audit findings\b",
+    ],
+
+    "security_compliance": [
+        r"\bISO 27001\b",
+        r"\bNIST CSF\b",
+        r"\bsecurity compliance audits?\b",
+        r"\bPCI DSS\b",
+    ],
+    
+    # Systems and network administration
+    "systems_administration": [
+        r"\bserver administration\b",
+        r"\bsystem administration\b",
+        r"\badministered (?:Linux|Windows) servers?\b",
+        r"\bmanaged (?:Linux|Windows) servers?\b",
+    ],
+
+    "network_configuration": [
+        r"\bconfigured routers?\b",
+        r"\bconfigured switches?\b",
+        r"\bVLAN configuration\b",
+        r"\bsubnetting\b",
+        r"\brouting configuration\b",
+    ],
+
+    "network_troubleshooting": [
+        r"\bnetwork troubleshooting\b",
+        r"\bDNS troubleshooting\b",
+        r"\bnetwork connectivity issues?\b",
+        r"\bdiagnosed (?:network|connectivity) issues?\b",
+    ],
+
+    "directory_management": [
+        r"\bActive Directory administration\b",
+        r"\bmanaged user accounts\b",
+        r"\bgroup policy management\b",
+        r"\bLDAP administration\b",
+    ],
+
+    "system_monitoring": [
+        r"\bmonitored system health\b",
+        r"\bsystem health checks?\b",
+        r"\bserver monitoring\b",
+        r"\bmonitored server performance\b",
+    ],
+
+    "system_backup_recovery": [
+        r"\bsystem backups?\b",
+        r"\bserver backups?\b",
+        r"\bsystem restores?\b",
+        r"\bserver disaster recovery\b",
+    ],
+
+    "patch_management": [
+        r"\bpatch management\b",
+        r"\bsecurity patch deployment\b",
+        r"\bserver patching\b",
+        r"\boperating system updates?\b",
+    ],
+
+    "access_permissions": [
+        r"\bfile permissions management\b",
+        r"\buser access provisioning\b",
+        r"\brole[- ]based access control\b",
+        r"\bpermission audits?\b",
+    ],
+    
+    # IT support
+    "end_user_support": [
+        r"\bIT support\b",
+        r"\bhelp[- ]?desk support\b",
+        r"\bprovided technical support to\b",
+        r"\bsupported (?:staff|employees|end users)\b",
+    ],
+
+    "hardware_support": [
+        r"\bhardware troubleshooting\b",
+        r"\bprinter (?:installation|troubleshooting|repair)\b",
+        r"\bcomputer hardware repair\b",
+        r"\bperipheral setup\b",
+    ],
+
+    "software_support": [
+        r"\bsoftware installation\b",
+        r"\bapplication troubleshooting\b",
+        r"\bsoftware configuration\b",
+        r"\bdesktop support\b",
+    ],
+
+    "connectivity_support": [
+        r"\bWi[- ]?Fi troubleshooting\b",
+        r"\bnetwork connectivity support\b",
+        r"\bVPN troubleshooting\b",
+        r"\binternet connection issues?\b",
+    ],
+
+    "account_support": [
+        r"\bpassword resets?\b",
+        r"\baccount provisioning\b",
+        r"\buser account support\b",
+        r"\baccount unlocks?\b",
+    ],
+
+    "ticket_management": [
+        r"\bhelp[- ]?desk tickets?\b",
+        r"\bservice desk tickets?\b",
+        r"\bticket triage\b",
+        r"\bresolved support tickets?\b",
+    ],
+
+    "customer_communication": [
+        r"\bexplained technical issues to (?:users|customers|staff)\b",
+        r"\buser communication\b",
+        r"\bwalked users through\b",
+        r"\bcommunicated resolutions?\b",
+    ],
+
+    "knowledge_documentation": [
+        r"\bknowledge base articles?\b",
+        r"\bsupport documentation\b",
+        r"\btroubleshooting guides?\b",
+        r"\bdocumented solutions?\b",
+    ],
+
+
 
 
 }
