@@ -302,6 +302,162 @@ COMPETENCY_PATTERNS = {
         r"\bGPU profiling\b",
         r"\brendering optimization\b",
     ],
+    
+    # Data science and machine learning
+    "statistics_inference": [
+        r"\bstatistical (?:analysis|inference|testing|modelling|modeling)\b",
+        r"\bhypothesis testing\b",
+        r"\bconfidence intervals?\b",
+        r"\bregression analysis\b",
+        r"\bA/B testing\b",
+    ],
+
+    "exploratory_analysis": [
+        r"\bexploratory data analysis\b",
+        r"\bEDA\b",
+        r"\bdata exploration\b",
+        r"\bdistribution analysis\b",
+    ],
+
+    "data_preparation": [
+        r"\bdata (?:cleaning|cleansing|preprocessing|wrangling)\b",
+        r"\bfeature engineering\b",
+        r"\bmissing[- ]value imputation\b",
+        r"\bdata transformation\b",
+    ],
+
+    "ml_training": [
+        r"\bmodel training\b",
+        r"\btrained (?:an? )?(?:ML |machine learning |deep learning )?models?\b",
+        r"\bhyperparameter tuning\b",
+        r"\bGridSearchCV\b",
+        r"\bmodel fine[- ]tuning\b",
+    ],
+
+    "model_evaluation": [
+        r"\bmodel evaluation\b",
+        r"\bmodel validation\b",
+        r"\bcross[- ]validation\b",
+        r"\bconfusion matrix\b",
+        r"\bF1[- ]score\b",
+        r"\bROC[- ]AUC\b",
+    ],
+
+    "data_communication": [
+        r"\bdata storytelling\b",
+        r"\bpresented (?:analysis|findings|insights)\b",
+        r"\bcommunicat(?:ed|ing) (?:the )?(?:findings|insights)\b",
+        r"\banalytical reporting\b",
+    ],
+
+    # Production ML engineering
+    "model_serving": [
+        r"\bmodel deployment\b",
+        r"\bmodel serving\b",
+        r"\bdeployed (?:an? )?(?:ML |machine learning )?models?\b",
+        r"\binference (?:API|endpoint|service|server)\b",
+        r"\bserved (?:an? )?(?:trained )?models?\b",
+    ],
+
+    "model_monitoring": [
+        r"\bmodel monitoring\b",
+        r"\bmodel drift\b",
+        r"\bdata drift\b",
+        r"\binference latency\b",
+        r"\bproduction model performance\b",
+    ],
+
+    "ml_workflows": [
+        r"\bMLOps\b",
+        r"\bmodel registry\b",
+        r"\bexperiment tracking\b",
+        r"\bMLflow\b",
+        r"\bautomated model retraining\b",
+    ],
+    
+    # Data and business analysis
+    "analysis_interpretation": [
+        r"\bdata analysis\b",
+        r"\banaly[sz]ed (?:the )?data\b",
+        r"\btrend analysis\b",
+        r"\bvariance analysis\b",
+        r"\binterpreted (?:the )?(?:data|results)\b",
+    ],
+
+    "requirements_analysis": [
+        r"\bbusiness requirements?\b",
+        r"\brequirements elicitation\b",
+        r"\bstakeholder interviews?\b",
+        r"\bprocess mapping\b",
+        r"\bbusiness process analysis\b",
+        r"\buser stor(?:y|ies)\b",
+    ],
+
+    "reporting_dashboards": [
+        r"\bdashboard development\b",
+        r"\b(?:built|developed|created) (?:an? )?(?:interactive )?dashboards?\b",
+        r"\binteractive dashboards?\b",
+        r"\bPower BI reports?\b",
+        r"\bautomated reporting\b",
+    ],
+
+    "business_metrics": [
+        r"\bkey performance indicators?\b",
+        r"\bKPIs?\b",
+        r"\bbusiness metrics?\b",
+        r"\boperational metrics?\b",
+        r"\bperformance reporting\b",
+    ],
+
+    # Database engineering
+    "query_optimization": [
+        r"\bquery optimi[sz]ation\b",
+        r"\bquery tuning\b",
+        r"\bSQL performance tuning\b",
+        r"\bexecution plans?\b",
+        r"\bEXPLAIN ANALYZE\b",
+        r"\bindex optimi[sz]ation\b",
+    ],
+
+    "database_administration": [
+        r"\bdatabase administration\b",
+        r"\bdatabase administrator\b",
+        r"\bdatabase replication\b",
+        r"\bindex maintenance\b",
+        r"\bdatabase maintenance\b",
+    ],
+
+    "backup_recovery": [
+        r"\bdatabase backups?\b",
+        r"\bdatabase restores?\b",
+        r"\bpoint[- ]in[- ]time recovery\b",
+        r"\bdisaster recovery\b",
+        r"\bbackup and recovery\b",
+    ],
+
+    "database_security": [
+        r"\bdatabase access control\b",
+        r"\bdatabase encryption\b",
+        r"\bdatabase auditing\b",
+        r"\brow[- ]level security\b",
+        r"\bdatabase permissions?\b",
+    ],
+
+    "database_monitoring": [
+        r"\bdatabase monitoring\b",
+        r"\bslow query logging\b",
+        r"\breplication lag\b",
+        r"\bdatabase performance monitoring\b",
+        r"\bdatabase health checks?\b",
+    ],
+
+    "database_migrations": [
+        r"\bdatabase migrations?\b",
+        r"\bschema migrations?\b",
+        r"\bAlembic migrations?\b",
+        r"\bFlyway\b",
+        r"\bLiquibase\b",
+    ],
 
 
 }
