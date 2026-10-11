@@ -13,28 +13,31 @@ VOCAB_PATH = (
 )
 
 
+
 EXPECTED_CAREERS = {
-    "backend_developer",
-    "frontend_developer",
-    "data_engineer",
     "software_engineer",
-    "full_stack_developer",
     "software_architect",
-    "qa_test_engineer",
+    "frontend_developer",
+    "backend_developer",
+    "full_stack_developer",
     "mobile_developer",
     "embedded_developer",
     "game_developer",
     "data_scientist",
+    "data_engineer",
     "ai_ml_engineer",
     "data_business_analyst",
-    "database_engineer",
+    "cybersecurity_analyst",
     "cloud_engineer",
     "devops_sre",
-    "cybersecurity_analyst",
+    "database_engineer",
+    "qa_test_engineer",
     "systems_network_admin",
     "it_support",
+    "ui_ux_designer",
+    "product_manager",
+    "it_project_manager",
 }
-
 
 
 def main():
