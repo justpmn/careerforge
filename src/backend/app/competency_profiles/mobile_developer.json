@@ -1,0 +1,72 @@
+
+{
+  "career_key": "mobile_developer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "mobile_app_development",
+      "name": "Mobile application development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "mobile_ui",
+      "name": "Mobile user interface development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "mobile_platform_integration",
+      "name": "Mobile platform APIs and integration",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "mobile_testing",
+      "name": "Mobile application testing",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "mobile_languages",
+      "name": "Programming foundation for mobile development",
+      "level": "supporting",
+      "any_of": [
+        "Kotlin", "Swift", "Dart", "Java",
+        "JavaScript", "TypeScript"
+      ]
+    },
+    {
+      "key": "mobile_tooling",
+      "name": "Mobile development environments",
+      "level": "supporting",
+      "any_of": ["Android Studio", "Xcode"]
+    },
+    {
+      "key": "mobile_storage",
+      "name": "Mobile data storage",
+      "level": "supporting",
+      "any_of": ["SQLite", "Firebase"]
+    },
+    {
+      "key": "mobile_api",
+      "name": "API integration foundations",
+      "level": "supporting",
+      "any_of": ["RESTful API", "GraphQL"]
+    },
+    {
+      "key": "mobile_release",
+      "name": "Mobile application distribution",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    }
+  ]
+}

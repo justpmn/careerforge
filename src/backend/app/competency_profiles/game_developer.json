@@ -1,0 +1,65 @@
+
+{
+  "career_key": "game_developer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "game_engine",
+      "name": "Game engine development experience",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "gameplay_programming",
+      "name": "Gameplay systems and mechanics",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "game_design",
+      "name": "Game design and implementation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "game_physics",
+      "name": "Game physics and collision systems",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "game_testing",
+      "name": "Game testing and playtesting",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "game_languages",
+      "name": "Programming foundation for game development",
+      "level": "supporting",
+      "any_of": ["C++", "C#", "Lua", "Rust", "Python"]
+    },
+    {
+      "key": "game_rendering",
+      "name": "Graphics and rendering",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "game_optimization",
+      "name": "Game performance optimization",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    }
+  ]
+}
