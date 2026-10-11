@@ -1,0 +1,67 @@
+
+{
+  "career_key": "software_architect",
+  "version": 1,
+  "groups": [
+    {
+      "key": "programming",
+      "name": "Software programming foundations",
+      "level": "core",
+      "any_of": [
+        "Python", "JavaScript", "TypeScript",
+        "Java", "Go", "C#", "PHP"
+      ]
+    },
+    {
+      "key": "software_design",
+      "name": "Software design principles",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "system_design",
+      "name": "System architecture and design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "scalability_reliability",
+      "name": "Scalability and reliability engineering",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database_architecture",
+      "name": "Database architecture and design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "security_architecture",
+      "name": "Secure system architecture",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "cloud_platform"
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "key": "technical_leadership",
+      "name": "Technical leadership and architectural decision-making",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    }
+  ]
+}
