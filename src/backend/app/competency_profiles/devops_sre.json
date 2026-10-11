@@ -1,0 +1,108 @@
+
+{
+  "career_key": "devops_sre",
+  "version": 1,
+  "groups": [
+    {
+      "key": "automation_scripting",
+      "name": "Programming and automation scripting foundations",
+      "level": "core",
+      "any_of": [
+        "Python",
+        "Bash/Shell (all shells)",
+        "PowerShell",
+        "Go"
+      ]
+    },
+    {
+      "key": "infrastructure_as_code",
+      "name": "Infrastructure as code implementation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "deployment_automation",
+      "name": "Build, release and deployment automation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "configuration_management",
+      "name": "Infrastructure configuration management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "observability",
+      "name": "Observability, metrics, logs and tracing",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "incident_management",
+      "name": "Operational incident management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "sre_reliability",
+      "name": "Service reliability engineering",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "iac_tooling",
+      "name": "Infrastructure provisioning tool familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Terraform",
+        "Amazon Web Services AWS CloudFormation"
+      ]
+    },
+    {
+      "key": "orchestration_tooling",
+      "name": "Container orchestration technology familiarity",
+      "level": "supporting",
+      "any_of": ["Kubernetes"]
+    },
+    {
+      "key": "observability_tooling",
+      "name": "Monitoring and observability tool familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Prometheus",
+        "Splunk",
+        "Splunk Enterprise",
+        "Grafana Labs Grafana Cloud"
+      ]
+    },
+    {
+      "key": "automation_platforms",
+      "name": "Configuration and delivery automation tools",
+      "level": "supporting",
+      "any_of": [
+        "Ansible",
+        "Jenkins CI",
+        "Microsoft Azure DevOps Services"
+      ]
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "template": "cloud_platform"
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

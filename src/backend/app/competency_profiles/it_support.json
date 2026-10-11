@@ -1,0 +1,92 @@
+
+{
+  "career_key": "it_support",
+  "version": 1,
+  "groups": [
+    {
+      "key": "debugging",
+      "name": "Technical troubleshooting and problem resolution",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "end_user_support",
+      "name": "End-user technical support",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "hardware_support",
+      "name": "Computer hardware and peripheral support",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "software_support",
+      "name": "Software installation and application support",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "connectivity_support",
+      "name": "Network and connectivity troubleshooting",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "account_support",
+      "name": "User account and access support",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "ticket_management",
+      "name": "Service desk and ticket management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "customer_communication",
+      "name": "Technical communication with users",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "knowledge_documentation",
+      "name": "Technical support documentation",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "os_familiarity",
+      "name": "Operating system familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft Windows",
+        "Linux",
+        "Microsoft Windows Server"
+      ]
+    },
+    {
+      "key": "support_ticketing_tooling",
+      "name": "Service desk software familiarity",
+      "level": "supporting",
+      "any_of": ["ServiceNow"]
+    },
+    {
+      "key": "directory_tooling",
+      "name": "Directory service tooling",
+      "level": "supporting",
+      "any_of": ["Microsoft Active Directory"]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+
+{
+  "career_key": "systems_network_admin",
+  "version": 1,
+  "groups": [
+    {
+      "key": "systems_administration",
+      "name": "Server and system administration",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "network_configuration",
+      "name": "Network configuration and management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "network_troubleshooting",
+      "name": "Network troubleshooting and diagnostics",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "directory_management",
+      "name": "Directory services and user management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "system_monitoring",
+      "name": "System health and performance monitoring",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "system_backup_recovery",
+      "name": "System backup and disaster recovery",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "patch_management",
+      "name": "Operating system patch management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "access_permissions",
+      "name": "System access and permissions management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "os_platforms",
+      "name": "Server operating system familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Linux",
+        "Microsoft Windows Server",
+        "Red Hat Enterprise Linux",
+        "Microsoft Windows"
+      ]
+    },
+    {
+      "key": "sys_scripting",
+      "name": "Administration and scripting tools",
+      "level": "supporting",
+      "any_of": [
+        "Python",
+        "Bash/Shell (all shells)",
+        "PowerShell",
+        "Ansible"
+      ]
+    },
+    {
+      "key": "directory_tooling",
+      "name": "Directory service tooling",
+      "level": "supporting",
+      "any_of": ["Microsoft Active Directory"]
+    },
+    {
+      "key": "firewall_tooling",
+      "name": "Firewall technology familiarity",
+      "level": "supporting",
+      "any_of": ["Firewall software"]
+    },
+    {
+      "template": "cloud_platform"
+    }
+  ]
+}
