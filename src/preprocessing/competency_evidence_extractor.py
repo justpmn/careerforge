@@ -742,9 +742,205 @@ COMPETENCY_PATTERNS = {
         r"\btroubleshooting guides?\b",
         r"\bdocumented solutions?\b",
     ],
+    
+    # UI/UX design
+    "user_research": [
+        r"\buser research\b",
+        r"\bUX research\b",
+        r"\buser interviews?\b",
+        r"\bcontextual inquiry\b",
+        r"\buser personas?\b",
+    ],
 
+    "information_architecture": [
+        r"\binformation architecture\b",
+        r"\bsite maps?\b",
+        r"\buser flows?\b",
+        r"\bnavigation structure\b",
+    ],
 
+    "wireframing": [
+        r"\bwireframes?\b",
+        r"\bwireframing\b",
+        r"\blow[- ]fidelity mockups?\b",
+    ],
 
+    "prototyping": [
+        r"\binteractive prototypes?\b",
+        r"\bclickable prototypes?\b",
+        r"\bhigh[- ]fidelity prototypes?\b",
+        r"\bprototyped user interfaces?\b",
+    ],
+
+    "interaction_design": [
+        r"\binteraction design\b",
+        r"\binteraction patterns?\b",
+        r"\buser journeys?\b",
+        r"\bUI interactions?\b",
+    ],
+
+    "usability_testing": [
+        r"\busability testing\b",
+        r"\busability tests?\b",
+        r"\busability studies\b",
+        r"\bmoderated user testing\b",
+    ],
+
+    "design_systems": [
+        r"\bdesign systems?\b",
+        r"\bcomponent librar(?:y|ies)\b",
+        r"\breusable UI components?\b",
+    ],
+
+    "ux_accessibility": [
+        r"\bWCAG\b",
+        r"\baccessibility audits?\b",
+        r"\baccessible interfaces?\b",
+        r"\binclusive design\b",
+        r"\baccessibility testing\b",
+    ],
+
+    "visual_design": [
+        r"\bvisual design\b",
+        r"\bvisual hierarchy\b",
+        r"\bUI design\b",
+        r"\btypography and color\b",
+    ],
+
+    "design_handoff": [
+        r"\bdesign handoff\b",
+        r"\bdeveloper handoff\b",
+        r"\bdesign specifications?\b",
+        r"\bFigma handoff\b",
+    ],
+    
+    # Product management
+    "product_strategy": [
+        r"\bproduct strategy\b",
+        r"\bproduct vision\b",
+        r"\bproduct positioning\b",
+        r"\bgo[- ]to[- ]market strategy\b",
+    ],
+
+    "product_discovery": [
+        r"\bproduct discovery\b",
+        r"\bcustomer discovery\b",
+        r"\bcustomer interviews?\b",
+        r"\bmarket research\b",
+    ],
+
+    "product_roadmap": [
+        r"\bproduct roadmaps?\b",
+        r"\broadmap planning\b",
+        r"\broadmap prioritization\b",
+    ],
+
+    "feature_prioritization": [
+        r"\bfeature prioritization\b",
+        r"\bbacklog prioritization\b",
+        r"\bRICE scoring\b",
+        r"\bMoSCoW prioritization\b",
+    ],
+
+    "stakeholder_management": [
+        r"\bstakeholder management\b",
+        r"\bstakeholder alignment\b",
+        r"\bstakeholder engagement\b",
+        r"\bcross[- ]functional coordination\b",
+    ],
+
+    "product_metrics": [
+        r"\bproduct metrics?\b",
+        r"\buser retention\b",
+        r"\bactivation rate\b",
+        r"\bchurn rate\b",
+        r"\bproduct KPIs?\b",
+    ],
+    "product_launch": [
+        r"\bproduct launch(?:es)?\b",
+        r"\blaunch coordination\b",
+        r"\bgo[- ]to[- ]market execution\b",
+        r"\bfeature rollout\b",
+    ],
+
+    "product_experimentation": [
+        r"\bA/B testing\b",
+        r"\bproduct experiments?\b",
+        r"\bfeature experiments?\b",
+        r"\bexperimentation roadmap\b",
+    ],
+    
+    # IT project management
+    "project_planning": [
+        r"\bproject planning\b",
+        r"\bproject plans?\b",
+        r"\bproject charters?\b",
+        r"\bwork breakdown structures?\b",
+    ],
+
+    "scope_management": [
+        r"\bscope management\b",
+        r"\bscope creep\b",
+        r"\bscope baseline\b",
+        r"\bscope control\b",
+    ],
+
+    "project_scheduling": [
+        r"\bproject schedules?\b",
+        r"\bGantt charts?\b",
+        r"\bcritical path method\b",
+        r"\bmilestone planning\b",
+    ],
+
+    "budget_management": [
+        r"\bproject budgets?\b",
+        r"\bbudget forecasting\b",
+        r"\bcost tracking\b",
+        r"\bearned value management\b",
+    ],
+
+    "project_risk_management": [
+        r"\brisk registers?\b",
+        r"\bproject risk assessments?\b",
+        r"\bproject risks?\b",
+        r"\brisk mitigation plans?\b",
+    ],
+
+    "project_delivery": [
+        r"\bproject delivery\b",
+        r"\bproject execution\b",
+        r"\bproject closure\b",
+        r"\bmilestone delivery\b",
+    ],
+
+    "project_communication": [
+        r"\bproject status reports?\b",
+        r"\bproject communication plans?\b",
+        r"\bsteering committee meetings?\b",
+        r"\bproject progress reporting\b",
+    ],
+
+    "project_change_management": [
+        r"\bchange requests?\b",
+        r"\bchange control\b",
+        r"\bproject change management\b",
+        r"\bchange advisory board\b",
+    ],
+
+    "project_quality_management": [
+        r"\bproject quality assurance\b",
+        r"\bquality management plans?\b",
+        r"\bacceptance criteria\b",
+        r"\bquality gates?\b",
+    ],
+
+    "delivery_methodologies": [
+        r"\bAgile methodologies?\b",
+        r"\bScrum ceremonies?\b",
+        r"\bKanban boards?\b",
+        r"\bwaterfall methodology\b",
+        r"\bsprint planning\b",
+    ],
 
 }
 
