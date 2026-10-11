@@ -84,6 +84,87 @@ COMPETENCY_PATTERNS = {
         r"\bdata integrity\b",
         r"\bdata profiling\b",
     ],
+    "software_design": [
+        r"\bsoftware design\b",
+        r"\bsoftware architecture\b",
+        r"\bdesign patterns?\b",
+        r"\bobject[- ]oriented design\b",
+        r"\bSOLID principles?\b",
+        r"\bclean architecture\b",
+        r"\bmodular architecture\b",
+    ],
+    
+    "system_design": [
+        r"\bsystem design\b",
+        r"\bsystem architecture\b",
+        r"\bdistributed systems?\b",
+        r"\bmicroservices architecture\b",
+        r"\barchitectural design\b",
+    ],
+
+    "scalability_reliability": [
+        r"\bscalab(?:le|ility)\b",
+        r"\bhigh availability\b",
+        r"\bfault toleran(?:ce|t)\b",
+        r"\bload balancing\b",
+        r"\breliability engineering\b",
+    ],
+
+    "database_architecture": [
+        r"\bdatabase architecture\b",
+        r"\bdatabase design\b",
+        r"\bdatabase schema design\b",
+        r"\bdata architecture\b",
+        r"\bdatabase normalization\b",
+    ],
+
+    "security_architecture": [
+        r"\bsecurity architecture\b",
+        r"\bthreat model(?:ing|ling)\b",
+        r"\bsecure system design\b",
+        r"\bzero trust architecture\b",
+        r"\bsecurity by design\b",
+    ],
+
+    "technical_leadership": [
+        r"\btechnical lead(?:er)?\b",
+        r"\barchitecture decisions?\b",
+        r"\bmentored developers?\b",
+        r"\bled (?:the )?development team\b",
+        r"\btechnical leadership\b",
+    ],
+
+    "test_strategy": [
+        r"\btest plans?\b",
+        r"\btest cases?\b",
+        r"\btest strateg(?:y|ies)\b",
+        r"\btest scenarios?\b",
+        r"\bacceptance testing\b",
+    ],
+
+    "defect_management": [
+        r"\bdefect tracking\b",
+        r"\bbug tracking\b",
+        r"\bbug reports?\b",
+        r"\bdefect triage\b",
+        r"\bissue tracking\b",
+    ],
+
+    "api_testing": [
+        r"\bAPI tests?\b",
+        r"\bAPI testing\b",
+        r"\bPostman collections?\b",
+        r"\bREST API testing\b",
+    ],
+
+    "performance_testing": [
+        r"\bperformance testing\b",
+        r"\bload testing\b",
+        r"\bstress testing\b",
+        r"\bApache JMeter\b",
+        r"\bk6 load tests?\b",
+    ],
+
 }
 
 
