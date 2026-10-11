@@ -12,11 +12,24 @@ VOCAB_PATH = (
     ROOT / "data/processed/final_skill_vocabulary.csv"
 )
 
+
 EXPECTED_CAREERS = {
     "backend_developer",
     "frontend_developer",
     "data_engineer",
+    "software_engineer",
+    "full_stack_developer",
+    "software_architect",
+    "qa_test_engineer",
+    "mobile_developer",
+    "embedded_developer",
+    "game_developer",
+    "data_scientist",
+    "ai_ml_engineer",
+    "data_business_analyst",
+    "database_engineer",
 }
+
 
 
 def main():
