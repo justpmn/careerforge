@@ -28,6 +28,11 @@ EXPECTED_CAREERS = {
     "ai_ml_engineer",
     "data_business_analyst",
     "database_engineer",
+    "cloud_engineer",
+    "devops_sre",
+    "cybersecurity_analyst",
+    "systems_network_admin",
+    "it_support",
 }
 
 
