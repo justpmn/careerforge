@@ -1,0 +1,64 @@
+
+{
+  "career_key": "embedded_developer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "embedded_firmware",
+      "name": "Firmware development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_microcontrollers",
+      "name": "Microcontroller programming",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_interfaces",
+      "name": "Hardware interfaces and peripherals",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_real_time",
+      "name": "Real-time and resource-constrained systems",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_debugging",
+      "name": "Firmware and hardware debugging",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_testing",
+      "name": "Embedded systems testing",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "embedded_languages",
+      "name": "Embedded programming foundations",
+      "level": "supporting",
+      "any_of": ["C", "C++", "Assembly", "Rust"]
+    },
+    {
+      "key": "embedded_build_tools",
+      "name": "Build tooling",
+      "level": "supporting",
+      "any_of": ["Make", "Ninja"]
+    },
+    {
+      "template": "version_control"
+    }
+  ]
+}

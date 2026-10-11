@@ -1,0 +1,57 @@
+
+{
+  "career_key": "software_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "programming",
+      "name": "Software programming",
+      "level": "core",
+      "any_of": [
+        "Python", "JavaScript", "TypeScript",
+        "Java", "Go", "C#", "PHP"
+      ]
+    },
+    {
+      "key": "software_design",
+      "name": "Software design and engineering principles",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database",
+      "name": "Database and data management",
+      "level": "supporting",
+      "any_of": [
+        "SQL", "PostgreSQL", "MySQL",
+        "Microsoft SQL Server", "SQLite"
+      ]
+    },
+    {
+      "key": "api",
+      "name": "API development",
+      "level": "supporting",
+      "any_of": ["RESTful API", "GraphQL"]
+    },
+    {
+      "key": "debugging",
+      "name": "Debugging and troubleshooting",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "testing"
+    },
+    {
+      "template": "ci_cd"
+    },
+    {
+      "template": "containers"
+    }
+  ]
+}

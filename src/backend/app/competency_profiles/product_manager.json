@@ -1,0 +1,89 @@
+
+{
+  "career_key": "product_manager",
+  "version": 1,
+  "groups": [
+    {
+      "key": "product_strategy",
+      "name": "Product strategy and vision",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_discovery",
+      "name": "Customer discovery and market understanding",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_roadmap",
+      "name": "Product roadmap planning",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "feature_prioritization",
+      "name": "Feature and backlog prioritization",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "requirements_analysis",
+      "name": "Product requirements and user needs analysis",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "stakeholder_management",
+      "name": "Stakeholder management and alignment",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_metrics",
+      "name": "Product metrics and performance measurement",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_launch",
+      "name": "Product launch and release coordination",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_experimentation",
+      "name": "Product experimentation and iterative improvement",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "product_management_tools",
+      "name": "Product planning and collaboration tools",
+      "level": "supporting",
+      "any_of": [
+        "Atlassian JIRA",
+        "Atlassian Confluence"
+      ]
+    },
+    {
+      "key": "product_analytics_tools",
+      "name": "Product analytics and reporting tools",
+      "level": "supporting",
+      "any_of": [
+        "Google Analytics",
+        "Microsoft Power BI",
+        "Tableau"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+
+{
+  "career_key": "data_scientist",
+  "version": 1,
+  "groups": [
+    {
+      "key": "data_science_programming",
+      "name": "Programming foundation for data science",
+      "level": "core",
+      "any_of": ["Python", "R"]
+    },
+    {
+      "key": "statistics_inference",
+      "name": "Statistics and statistical inference",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "exploratory_analysis",
+      "name": "Exploratory data analysis",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_preparation",
+      "name": "Data cleaning and feature engineering",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "ml_training",
+      "name": "Machine learning model development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "model_evaluation",
+      "name": "Model evaluation and validation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_science_libraries",
+      "name": "Familiarity with scientific computing and ML libraries",
+      "level": "supporting",
+      "any_of": [
+        "pandas", "NumPy", "Scikit-learn",
+        "PyTorch", "TensorFlow"
+      ]
+    },
+    {
+      "key": "sql",
+      "name": "SQL querying foundation",
+      "level": "supporting",
+      "any_of": ["SQL"]
+    },
+    {
+      "key": "visualization_tools",
+      "name": "Data visualization tools",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft Power BI",
+        "Tableau",
+        "Google Looker Analytics"
+      ]
+    },
+    {
+      "key": "data_communication",
+      "name": "Communicating analytical findings",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "notebook_tooling",
+      "name": "Interactive analysis environments",
+      "level": "supporting",
+      "any_of": ["Jupyter Notebook/JupyterLab"]
+    },
+    {
+      "template": "version_control"
+    }
+  ]
+}

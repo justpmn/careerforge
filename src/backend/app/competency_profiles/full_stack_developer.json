@@ -1,0 +1,72 @@
+
+{
+  "career_key": "full_stack_developer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "web_programming",
+      "name": "Frontend programming",
+      "level": "core",
+      "any_of": ["JavaScript", "TypeScript"]
+    },
+    {
+      "key": "web_fundamentals",
+      "name": "Web structure and styling",
+      "level": "core",
+      "any_of": ["HTML/CSS"]
+    },
+    {
+      "key": "frontend_framework",
+      "name": "Frontend framework or library",
+      "level": "core",
+      "any_of": [
+        "React", "Angular", "Vue.js", "Next.js"
+      ]
+    },
+    {
+      "key": "backend_runtime",
+      "name": "Backend framework or runtime",
+      "level": "core",
+      "any_of": [
+        "Node.js", "Express", "FastAPI",
+        "Django", "Flask", "Spring Boot",
+        "ASP.NET Core"
+      ]
+    },
+    {
+      "key": "database",
+      "name": "Database technology",
+      "level": "core",
+      "any_of": [
+        "PostgreSQL", "MySQL",
+        "Microsoft SQL Server",
+        "SQLite", "MongoDB"
+      ]
+    },
+    {
+      "key": "api",
+      "name": "API development",
+      "level": "core",
+      "any_of": ["RESTful API", "GraphQL"]
+    },
+    {
+      "key": "authentication_security",
+      "name": "Authentication and application security",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "testing"
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

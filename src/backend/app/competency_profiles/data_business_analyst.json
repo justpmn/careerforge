@@ -1,0 +1,92 @@
+
+{
+  "career_key": "data_business_analyst",
+  "version": 1,
+  "groups": [
+    {
+      "key": "analysis_interpretation",
+      "name": "Data analysis and interpretation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "requirements_analysis",
+      "name": "Business requirements and process analysis",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "reporting_dashboards",
+      "name": "Reporting and dashboard development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "business_metrics",
+      "name": "Business metrics and KPI analysis",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_communication",
+      "name": "Communicating findings and recommendations",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_quality",
+      "name": "Data quality and validation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "sql",
+      "name": "SQL querying foundation",
+      "level": "supporting",
+      "any_of": [
+        "SQL", "Transact-SQL", "Oracle PL/SQL"
+      ]
+    },
+    {
+      "key": "spreadsheet_tools",
+      "name": "Spreadsheet tooling",
+      "level": "supporting",
+      "any_of": ["Microsoft Excel"]
+    },
+    {
+      "key": "bi_tools",
+      "name": "Business intelligence and reporting tools",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft Power BI",
+        "Tableau",
+        "Google Looker Analytics",
+        "Microsoft SQL Server Reporting Services SSRS"
+      ]
+    },
+    {
+      "key": "analysis_programming",
+      "name": "Analytical programming foundation",
+      "level": "supporting",
+      "any_of": ["Python", "R"]
+    },
+    {
+      "key": "analytical_databases",
+      "name": "Database and analytical storage familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft SQL Server",
+        "PostgreSQL",
+        "MySQL",
+        "BigQuery",
+        "Snowflake"
+      ]
+    }
+  ]
+}

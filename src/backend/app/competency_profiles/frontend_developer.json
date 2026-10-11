@@ -1,0 +1,60 @@
+{
+  "career_key": "frontend_developer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "web_programming",
+      "name": "Frontend programming language",
+      "level": "core",
+      "any_of": [
+        "JavaScript",
+        "TypeScript"
+      ]
+    },
+    {
+      "key": "web_fundamentals",
+      "name": "Web structure and styling",
+      "level": "core",
+      "any_of": [
+        "HTML/CSS"
+      ]
+    },
+    {
+      "key": "frontend_framework",
+      "name": "Frontend framework or library",
+      "level": "supporting",
+      "any_of": [
+        "React",
+        "Angular",
+        "Vue.js",
+        "Next.js"
+      ]
+    },
+    {
+      "key": "build_tools",
+      "name": "Frontend build tooling",
+      "level": "supporting",
+      "any_of": [
+        "Vite",
+        "Webpack",
+        "npm"
+      ]
+    },
+    {
+      "key": "web_accessibility",
+      "name": "Web accessibility and responsive design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "testing"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

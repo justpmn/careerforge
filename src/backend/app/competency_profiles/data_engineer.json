@@ -1,0 +1,67 @@
+{
+  "career_key": "data_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "data_programming",
+      "name": "Data engineering programming language",
+      "level": "core",
+      "any_of": [
+        "Python",
+        "Java"
+      ]
+    },
+    {
+      "key": "sql_querying",
+      "name": "SQL querying",
+      "level": "core",
+      "any_of": [
+        "SQL"
+      ]
+    },
+    {
+      "key": "data_storage",
+      "name": "Database or analytical storage technology",
+      "level": "core",
+      "any_of": [
+        "PostgreSQL",
+        "MySQL",
+        "Microsoft SQL Server",
+        "BigQuery"
+      ]
+    },
+    {
+      "key": "pipeline_design",
+      "name": "Data pipeline design and orchestration",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_modeling",
+      "name": "Data modeling and transformation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "data_quality",
+      "name": "Data quality and validation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "cloud_platform"
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

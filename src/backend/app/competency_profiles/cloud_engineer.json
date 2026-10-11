@@ -1,0 +1,101 @@
+
+{
+  "career_key": "cloud_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "cloud_platform_familiarity",
+      "name": "Cloud platform technology familiarity",
+      "level": "core",
+      "any_of": [
+        "Amazon Web Services (AWS)",
+        "Microsoft Azure",
+        "Google Cloud"
+      ]
+    },
+    {
+      "key": "cloud_infrastructure",
+      "name": "Cloud infrastructure provisioning and management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "cloud_networking",
+      "name": "Cloud networking and connectivity",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "cloud_iam",
+      "name": "Cloud identity and access management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "infrastructure_as_code",
+      "name": "Infrastructure as code implementation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "cloud_deployment",
+      "name": "Application and service deployment in cloud environments",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "cloud_monitoring",
+      "name": "Cloud infrastructure monitoring",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "cloud_reliability",
+      "name": "Cloud availability, scaling and recovery",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "iac_tooling",
+      "name": "Infrastructure provisioning tool familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Terraform",
+        "Amazon Web Services AWS CloudFormation"
+      ]
+    },
+    {
+      "key": "orchestration_tooling",
+      "name": "Container orchestration technology familiarity",
+      "level": "supporting",
+      "any_of": ["Kubernetes"]
+    },
+    {
+      "key": "automation_scripting",
+      "name": "Infrastructure scripting foundations",
+      "level": "supporting",
+      "any_of": [
+        "Python",
+        "Bash/Shell (all shells)",
+        "PowerShell",
+        "Go"
+      ]
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

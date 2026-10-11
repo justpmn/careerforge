@@ -18,6 +18,10 @@ AMBIGUOUS_ALIASES = {
     "cursor",
     "bun",
 }
+SINGLE_LETTER_ALIASES = {
+    "c",
+    "r",
+}
 TECH_CONTEXT_TERMS = {
     "skill",
     "skills",
@@ -41,7 +45,14 @@ TECH_CONTEXT_TERMS = {
     "tools",
     "stack",
 }
-
+MANUAL_SKILL_ALIASES = {
+    "express.js": "Express",
+    "expressjs": "Express",
+    "rest api": "RESTful API",
+    "rest apis": "RESTful API",
+    "restful api": "RESTful API",
+    "restful apis": "RESTful API",
+}
 def load_final_aliases() -> pd.DataFrame:
     """
     Load aliases used by resume matcher.
@@ -63,6 +74,31 @@ def load_final_aliases() -> pd.DataFrame:
         .astype(str)
         .str.strip()
         .str.casefold()
+    )
+    manual_aliases = pd.DataFrame(
+        [
+            {
+                "alias": alias,
+                "canonical_skill": canonical_skill,
+            }
+            for alias, canonical_skill
+            in MANUAL_SKILL_ALIASES.items()
+        ]
+    )
+
+    aliases = pd.concat(
+        [
+            aliases,
+            manual_aliases,
+        ],
+        ignore_index=True,
+    )
+
+    aliases = aliases.drop_duplicates(
+        subset=[
+            "alias",
+            "canonical_skill",
+        ]
     )
     return aliases
 
@@ -152,19 +188,71 @@ def has_technical_context(
         context_words
         & TECH_CONTEXT_TERMS
     )
+def is_spaced_letter_sequence(
+    text: str,
+    start: int,
+    end: int,
+    window: int = 30,
+) -> bool:
+    """
+    Detect whether a single-letter alias is part of
+    spaced-out text such as:
 
+        P E T E R  N Y A M U
+
+    This prevents letters such as R or C from being
+    incorrectly detected as programming languages.
+    """
+
+    context_start = max(
+        0,
+        start - window,
+    )
+
+    context_end = min(
+        len(text),
+        end + window,
+    )
+
+    context = text[
+        context_start:context_end
+    ]
+
+    for match in re.finditer(
+        r"(?<![a-z])(?:[a-z]\s+){2,}[a-z](?![a-z])",
+        context,
+    ):
+        absolute_start = (
+            context_start
+            + match.start()
+        )
+
+        absolute_end = (
+            context_start
+            + match.end()
+        )
+
+        if (
+            absolute_start <= start
+            and absolute_end >= end
+        ):
+            return True
+
+    return False
 
 def extract_skill_matches(
     text: str,
 ) -> pd.DataFrame:
     """
     Extract canonical skills from resume text.
+
     Returns detailed matching evidence including:
     - canonical skill
     - matched alias
     - number of occurrences
     - matching rule
     """
+
     if not text or not str(text).strip():
         return pd.DataFrame(
             columns=[
@@ -193,6 +281,7 @@ def extract_skill_matches(
 
     for _, row in aliases.iterrows():
         alias = row["alias"]
+
         canonical_skill = row[
             "canonical_skill"
         ]
@@ -210,17 +299,33 @@ def extract_skill_matches(
         if not occurrences:
             continue
 
-        # Ambiguous names require technical context.
+        # Ambiguous aliases need extra checks.
         if alias in AMBIGUOUS_ALIASES:
-            valid_occurrences = [
-                match
-                for match in occurrences
+            valid_occurrences = []
+
+            for match in occurrences:
+
+                # Reject single letters that are part
+                # of spaced-out text such as:
+                # P E T E R
+                if (
+                    alias in SINGLE_LETTER_ALIASES
+                    and is_spaced_letter_sequence(
+                        normalized_text,
+                        match.start(),
+                        match.end(),
+                    )
+                ):
+                    continue
+
                 if has_technical_context(
                     normalized_text,
                     match.start(),
                     match.end(),
-                )
-            ]
+                ):
+                    valid_occurrences.append(
+                        match
+                    )
 
             if not valid_occurrences:
                 continue
@@ -262,8 +367,10 @@ def extract_skill_matches(
             ]
         )
 
-    match_dataframe = pd.DataFrame(matches)
-    # Multiple aliases may point to the same skill. Eg, aws and amazon web services both become Amazon Web Services (AWS).
+    match_dataframe = pd.DataFrame(
+        matches
+    )
+
     aggregated = (
         match_dataframe
         .groupby(
@@ -275,7 +382,9 @@ def extract_skill_matches(
                 "matched_alias",
                 lambda values:
                     ";".join(
-                        sorted(set(values))
+                        sorted(
+                            set(values)
+                        )
                     ),
             ),
             match_count=(
@@ -286,7 +395,8 @@ def extract_skill_matches(
                 "match_rule",
                 lambda values:
                     "contextual"
-                    if "contextual" in set(values)
+                    if "contextual"
+                    in set(values)
                     else "direct",
             ),
         )
@@ -294,8 +404,9 @@ def extract_skill_matches(
 
     return aggregated.sort_values(
         "canonical_skill"
-    ).reset_index(drop=True)
-
+    ).reset_index(
+        drop=True
+    )
 def extract_skills(
     text: str,
 ) -> list[str]:

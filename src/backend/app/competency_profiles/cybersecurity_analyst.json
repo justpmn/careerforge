@@ -1,0 +1,103 @@
+
+{
+  "career_key": "cybersecurity_analyst",
+  "version": 1,
+  "groups": [
+    {
+      "key": "security_monitoring",
+      "name": "Security event and log monitoring",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "threat_detection",
+      "name": "Threat detection and investigation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "security_incident_response",
+      "name": "Security incident response",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "vulnerability_assessment",
+      "name": "Vulnerability assessment and management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "security_controls",
+      "name": "Security controls and system hardening",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "identity_access_security",
+      "name": "Identity and access security",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "network_security",
+      "name": "Network security analysis",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "security_risk",
+      "name": "Security risk assessment",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "siem_tooling",
+      "name": "SIEM tool familiarity",
+      "level": "supporting",
+      "any_of": ["Splunk", "Splunk Enterprise"]
+    },
+    {
+      "key": "firewall_tooling",
+      "name": "Firewall technology familiarity",
+      "level": "supporting",
+      "any_of": ["Firewall software"]
+    },
+    {
+      "key": "security_scripting",
+      "name": "Security scripting foundations",
+      "level": "supporting",
+      "any_of": [
+        "Python", "Bash/Shell (all shells)", "PowerShell"
+      ]
+    },
+    {
+      "key": "security_os",
+      "name": "Operating system familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Linux",
+        "Microsoft Windows Server",
+        "Red Hat Enterprise Linux"
+      ]
+    },
+    {
+      "key": "security_compliance",
+      "name": "Security compliance and standards",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "cloud_platform"
+    }
+  ]
+}

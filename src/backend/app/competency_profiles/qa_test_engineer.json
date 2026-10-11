@@ -1,0 +1,60 @@
+
+{
+  "career_key": "qa_test_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "template": "testing"
+    },
+    {
+      "key": "test_strategy",
+      "name": "Test planning and test-case design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "defect_management",
+      "name": "Defect tracking and management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "test_programming",
+      "name": "Programming foundation for test automation",
+      "level": "supporting",
+      "any_of": [
+        "Python", "JavaScript", "TypeScript",
+        "Java", "C#"
+      ]
+    },
+    {
+      "key": "debugging",
+      "name": "Debugging and troubleshooting",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "api_testing",
+      "name": "API testing",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "performance_testing",
+      "name": "Performance and load testing",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}
