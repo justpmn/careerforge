@@ -1,0 +1,81 @@
+
+{
+  "career_key": "ai_ml_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "ml_programming",
+      "name": "Programming foundation for ML engineering",
+      "level": "core",
+      "any_of": ["Python", "Java", "R"]
+    },
+    {
+      "key": "ml_training",
+      "name": "Model training and development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "model_evaluation",
+      "name": "Model evaluation and validation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "pipeline_design",
+      "name": "Data and ML pipeline development",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "model_serving",
+      "name": "Model deployment and inference serving",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "model_monitoring",
+      "name": "Production model monitoring",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "ml_libraries",
+      "name": "Machine learning framework familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Scikit-learn", "PyTorch", "TensorFlow"
+      ]
+    },
+    {
+      "key": "model_api_tooling",
+      "name": "API framework and interface familiarity",
+      "level": "supporting",
+      "any_of": ["FastAPI", "Flask", "RESTful API"]
+    },
+    {
+      "key": "ml_workflows",
+      "name": "MLOps and experiment management",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "template": "version_control"
+    },
+    {
+      "template": "containers"
+    },
+    {
+      "template": "cloud_platform"
+    },
+    {
+      "template": "ci_cd"
+    }
+  ]
+}

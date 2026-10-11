@@ -1,0 +1,97 @@
+
+{
+  "career_key": "database_engineer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "sql",
+      "name": "SQL and database querying",
+      "level": "core",
+      "any_of": [
+        "SQL", "Transact-SQL", "Oracle PL/SQL"
+      ]
+    },
+    {
+      "key": "db_platform",
+      "name": "Relational database platform familiarity",
+      "level": "core",
+      "any_of": [
+        "PostgreSQL",
+        "MySQL",
+        "Microsoft SQL Server",
+        "Oracle",
+        "MariaDB"
+      ]
+    },
+    {
+      "key": "database_architecture",
+      "name": "Database design and schema architecture",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "query_optimization",
+      "name": "Query optimization and indexing",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database_administration",
+      "name": "Database administration",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "backup_recovery",
+      "name": "Database backup and recovery",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database_security",
+      "name": "Database security and access control",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database_monitoring",
+      "name": "Database performance and reliability monitoring",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "database_migrations",
+      "name": "Database migrations and schema changes",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "db_automation",
+      "name": "Database automation and scripting foundations",
+      "level": "supporting",
+      "any_of": [
+        "Python",
+        "Bash/Shell (all shells)",
+        "PowerShell"
+      ]
+    },
+    {
+      "key": "nosql_db",
+      "name": "NoSQL database familiarity",
+      "level": "supporting",
+      "any_of": [
+        "MongoDB", "Redis", "NoSQL"
+      ]
+    },
+    {
+      "template": "version_control"
+    }
+  ]
+}
