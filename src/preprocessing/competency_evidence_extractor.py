@@ -51,6 +51,39 @@ COMPETENCY_PATTERNS = {
         r"\bjenkins\b",
         r"\bazure pipelines\b",
     ],
+        "web_accessibility": [
+        r"\bweb accessibility\b",
+        r"\baccessible (?:websites?|interfaces?|UI)\b",
+        r"\bWCAG\b",
+        r"\bresponsive (?:web )?design\b",
+        r"\bmobile[- ]first design\b",
+    ],
+
+    "pipeline_design": [
+        r"\bETL\b",
+        r"\bELT\b",
+        r"\bdata pipelines?\b",
+        r"\bApache Airflow\b",
+        r"\bworkflow orchestration\b",
+        r"\bdata ingestion\b",
+    ],
+
+    "data_modeling": [
+        r"\bdata model(?:ing|ling)\b",
+        r"\bdimensional model(?:ing|ling)\b",
+        r"\bstar schema\b",
+        r"\bdatabase schema design\b",
+        r"\bdatabase design\b",
+    ],
+
+    "data_quality": [
+        r"\bdata quality\b",
+        r"\bdata validation\b",
+        r"\bdata cleansing\b",
+        r"\bdata cleaning\b",
+        r"\bdata integrity\b",
+        r"\bdata profiling\b",
+    ],
 }
 
 
