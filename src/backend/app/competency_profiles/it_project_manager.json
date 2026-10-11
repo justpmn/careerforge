@@ -1,0 +1,105 @@
+
+{
+  "career_key": "it_project_manager",
+  "version": 1,
+  "groups": [
+    {
+      "key": "project_planning",
+      "name": "Project initiation and planning",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "scope_management",
+      "name": "Project scope management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_scheduling",
+      "name": "Project scheduling and milestone tracking",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "budget_management",
+      "name": "Project budgeting and cost management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_risk_management",
+      "name": "Project risk assessment and mitigation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "stakeholder_management",
+      "name": "Stakeholder engagement and coordination",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_delivery",
+      "name": "Project execution and delivery management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_communication",
+      "name": "Project reporting and communication",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_change_management",
+      "name": "Project change and issue management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_quality_management",
+      "name": "Project quality and acceptance management",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "delivery_methodologies",
+      "name": "Project delivery methodologies",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "project_management_tools",
+      "name": "Project planning and tracking tools",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft Project",
+        "Atlassian JIRA",
+        "Atlassian Confluence",
+        "Microsoft Visio"
+      ]
+    },
+    {
+      "key": "project_reporting_tools",
+      "name": "Project reporting and documentation tools",
+      "level": "supporting",
+      "any_of": [
+        "Microsoft Excel",
+        "Google Sheets",
+        "Microsoft Power BI"
+      ]
+    }
+  ]
+}

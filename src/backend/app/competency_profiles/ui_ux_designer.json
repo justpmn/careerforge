@@ -1,0 +1,99 @@
+
+{
+  "career_key": "ui_ux_designer",
+  "version": 1,
+  "groups": [
+    {
+      "key": "user_research",
+      "name": "User research and understanding user needs",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "information_architecture",
+      "name": "Information architecture and user flows",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "wireframing",
+      "name": "Wireframing and interface planning",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "prototyping",
+      "name": "Interactive prototyping",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "interaction_design",
+      "name": "Interaction and user experience design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "usability_testing",
+      "name": "Usability testing and design evaluation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "design_systems",
+      "name": "Design systems and reusable components",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "ux_accessibility",
+      "name": "Accessibility and inclusive interface design",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "visual_design",
+      "name": "Visual design and interface presentation",
+      "level": "core",
+      "assessment": "manual_review",
+      "any_of": []
+    },
+    {
+      "key": "design_tooling",
+      "name": "Interface design tool familiarity",
+      "level": "supporting",
+      "any_of": ["Figma", "Adobe XD"]
+    },
+    {
+      "key": "graphics_tooling",
+      "name": "Visual and graphics tool familiarity",
+      "level": "supporting",
+      "any_of": [
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "Adobe Creative Cloud software"
+      ]
+    },
+    {
+      "key": "frontend_fundamentals",
+      "name": "Frontend implementation awareness",
+      "level": "supporting",
+      "any_of": ["HTML/CSS"]
+    },
+    {
+      "key": "design_handoff",
+      "name": "Design documentation and developer handoff",
+      "level": "supporting",
+      "assessment": "manual_review",
+      "any_of": []
+    }
+  ]
+}
