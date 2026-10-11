@@ -164,6 +164,145 @@ COMPETENCY_PATTERNS = {
         r"\bApache JMeter\b",
         r"\bk6 load tests?\b",
     ],
+    
+    # Mobile development
+    "mobile_app_development": [
+        r"\bmobile app(?:lication)? development\b",
+        r"\b(?:developed|built|published) (?:an? )?(?:Android|iOS|mobile) app\b",
+        r"\bReact Native\b",
+        r"\bFlutter\b",
+    ],
+
+    "mobile_ui": [
+        r"\bmobile UI\b",
+        r"\bmobile user interface\b",
+        r"\bJetpack Compose\b",
+        r"\bSwiftUI\b",
+        r"\bmobile navigation\b",
+    ],
+
+    "mobile_platform_integration": [
+        r"\bAndroid SDK\b",
+        r"\biOS SDK\b",
+        r"\bmobile platform APIs?\b",
+        r"\bAndroid permissions?\b",
+        r"\bpush notifications?\b",
+    ],
+
+    "mobile_testing": [
+        r"\bmobile app testing\b",
+        r"\bEspresso testing\b",
+        r"\bXCTest\b",
+        r"\bAndroid UI tests?\b",
+        r"\biOS UI tests?\b",
+    ],
+
+    "mobile_release": [
+        r"\bGoogle Play Console\b",
+        r"\bApp Store Connect\b",
+        r"\bTestFlight\b",
+        r"\bapp store submission\b",
+        r"\bpublished (?:an? )?(?:Android|iOS|mobile) app\b",
+    ],
+
+    # Embedded systems
+    "embedded_firmware": [
+        r"\bfirmware development\b",
+        r"\bembedded firmware\b",
+        r"\bbootloaders?\b",
+        r"\bfirmware updates?\b",
+    ],
+
+    "embedded_microcontrollers": [
+        r"\bmicrocontrollers?\b",
+        r"\bSTM32\b",
+        r"\bESP32\b",
+        r"\bARM Cortex[- ]M\b",
+        r"\bArduino\b",
+    ],
+
+    "embedded_interfaces": [
+        r"\bI2C\b",
+        r"\bSPI\b",
+        r"\bUART\b",
+        r"\bGPIO\b",
+        r"\bCAN bus\b",
+        r"\bperipheral drivers?\b",
+    ],
+
+    "embedded_real_time": [
+        r"\bRTOS\b",
+        r"\bFreeRTOS\b",
+        r"\breal[- ]time operating systems?\b",
+        r"\binterrupt service routines?\b",
+    ],
+
+    "embedded_debugging": [
+        r"\bJTAG\b",
+        r"\bSWD debugging\b",
+        r"\blogic analy[sz]er\b",
+        r"\bfirmware debugging\b",
+    ],
+
+    "embedded_testing": [
+        r"\bhardware[- ]in[- ]the[- ]loop\b",
+        r"\bHIL testing\b",
+        r"\bfirmware tests?\b",
+        r"\bembedded system testing\b",
+    ],
+
+    # Game development
+    "game_engine": [
+        r"\bUnity(?: Engine)?\b",
+        r"\bUnreal Engine\b",
+        r"\bGodot\b",
+        r"\bGameMaker\b",
+    ],
+
+    "gameplay_programming": [
+        r"\bgameplay programming\b",
+        r"\bgame mechanics\b",
+        r"\bgame logic\b",
+        r"\bplayer controller\b",
+        r"\bgame AI\b",
+    ],
+
+    "game_design": [
+        r"\bgame design\b",
+        r"\blevel design\b",
+        r"\bgame design document\b",
+        r"\bgame balancing\b",
+    ],
+
+    "game_physics": [
+        r"\bgame physics\b",
+        r"\bcollision detection\b",
+        r"\brigid[- ]body physics\b",
+        r"\bphysics engines?\b",
+    ],
+
+    "game_testing": [
+        r"\bplaytesting\b",
+        r"\bgameplay testing\b",
+        r"\bgame QA\b",
+        r"\bautomated game testing\b",
+    ],
+
+    "game_rendering": [
+        r"\bshaders?\b",
+        r"\bgraphics programming\b",
+        r"\brendering pipelines?\b",
+        r"\bOpenGL\b",
+        r"\bVulkan\b",
+    ],
+
+    "game_optimization": [
+        r"\bframe[- ]rate optimi[sz]ation\b",
+        r"\bgame performance optimi[sz]ation\b",
+        r"\bGPU profiling\b",
+        r"\brendering optimization\b",
+    ],
+
 
 }
 
