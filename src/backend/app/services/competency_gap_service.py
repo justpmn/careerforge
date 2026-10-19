@@ -9,6 +9,7 @@ from src.backend.app.database.models.resume import Resume
 from src.preprocessing.competency_evidence_extractor import (extract_competency_evidence)
 from src.backend.app.services.career_competency_profiles import (CAREER_COMPETENCY_PROFILES)
 from src.backend.app.database.models.competency_evidence import (CompetencyEvidence)
+from src.backend.app.services.learning_resource_service import (get_resources_for_skills)
 
 
 def analyze_competency_gaps(
@@ -190,7 +191,59 @@ def analyze_competency_gaps(
                 [],
             ),
         })
+    
+    for item in results:
 
+        if item["status"] == "evidenced":
+            next_action = "no_immediate_action"
+
+        elif item["submitted_evidence"]:
+            next_action = "review_submitted_evidence"
+
+        elif item["status"] == "evidence_found":
+            next_action = "review_resume_evidence"
+
+        elif item["status"] == "not_assessed":
+            next_action = "assess_competency"
+
+        else:
+            next_action = "confirm_skill_experience"
+
+        item["next_action"] = next_action
+
+
+    # Collect skills for competencies that may benefit
+    # from optional learning resources.
+    resource_skill_names = set()
+
+    for item in results:
+        if item["next_action"] == "confirm_skill_experience":
+            resource_skill_names.update(
+                item["possible_skills"]
+            )
+
+    # Retrieve matching resources in one database query.
+    available_resources = get_resources_for_skills(
+        db,
+        list(resource_skill_names),
+    )
+
+    # Associate resources with relevant competencies.
+    for item in results:
+        item["learning_resources"] = []
+
+        if item["next_action"] != "confirm_skill_experience":
+            continue
+
+        possible_skills = set(item["possible_skills"])
+
+        item["learning_resources"] = [
+            resource
+            for resource in available_resources
+            if possible_skills.intersection(
+                resource["matched_skills"]
+            )
+        ]
 
     core = [
         item
