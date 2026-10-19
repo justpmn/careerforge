@@ -957,6 +957,93 @@ RESOURCES = [
     },
 
 
+    {
+        "title": "Getting Started with pytest",
+        "provider": "pytest",
+        "resource_type": "tutorial",
+        "url": "https://docs.pytest.org/en/stable/getting-started.html",
+        "description": (
+            "Learn automated Python testing using pytest, "
+            "including writing tests and running test suites."
+        ),
+        "skills": [],
+    },
+    {
+        "title": "Get Started with GitHub Actions",
+        "provider": "GitHub",
+        "resource_type": "tutorial",
+        "url": "https://docs.github.com/en/actions/get-started",
+        "description": (
+            "Learn continuous integration and delivery using "
+            "automated GitHub Actions workflows."
+        ),
+        "skills": [],
+    },
+    {
+        "title": "Debugging in Visual Studio Code",
+        "provider": "Visual Studio Code",
+        "resource_type": "tutorial",
+        "url": "https://code.visualstudio.com/docs/debugtest/debugging",
+        "description": (
+            "Learn practical debugging techniques using "
+            "breakpoints, variable inspection, and step execution."
+        ),
+        "skills": [],
+    },
+
+    {
+        "title": "Vitest Getting Started",
+        "provider": "Vitest",
+        "resource_type": "tutorial",
+        "url": "https://vitest.dev/guide/",
+        "description": (
+            "Learn automated JavaScript and TypeScript "
+            "testing using Vitest."
+        ),
+        "skills": [],
+    },
+    {
+        "title": "Playwright Testing",
+        "provider": "Playwright",
+        "resource_type": "tutorial",
+        "url": "https://playwright.dev/docs/intro",
+        "description": (
+            "Learn end-to-end browser testing, "
+            "test assertions, and automation."
+        ),
+        "skills": [],
+    },
+
+
+    {
+        "title": "Testing API Responses with Postman",
+        "provider": "Postman",
+        "resource_type": "tutorial",
+        "url": (
+            "https://learning.postman.com/docs/"
+            "tests-and-scripts/write-scripts/test-scripts"
+        ),
+        "description": (
+            "Learn API testing, response validation, "
+            "assertions and automated test scripts using Postman."
+        ),
+        "skills": [],
+    },
+    {
+        "title": "Write Your First k6 Test",
+        "provider": "Grafana Labs",
+        "resource_type": "tutorial",
+        "url": (
+            "https://grafana.com/docs/k6/latest/"
+            "get-started/write-your-first-test/"
+        ),
+        "description": (
+            "Learn performance and load testing by writing "
+            "and running HTTP test scripts using Grafana k6."
+        ),
+        "skills": [],
+    },
+
 ]
 
 

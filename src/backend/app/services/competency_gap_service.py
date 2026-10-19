@@ -9,8 +9,7 @@ from src.backend.app.database.models.resume import Resume
 from src.preprocessing.competency_evidence_extractor import (extract_competency_evidence)
 from src.backend.app.services.career_competency_profiles import (CAREER_COMPETENCY_PROFILES)
 from src.backend.app.database.models.competency_evidence import (CompetencyEvidence)
-from src.backend.app.services.learning_resource_service import (get_resources_for_skills)
-
+from src.backend.app.services.learning_resource_service import (get_resources_for_skills, get_resources_for_competencies)
 
 def analyze_competency_gaps(
     db: Session,
@@ -244,6 +243,43 @@ def analyze_competency_gaps(
                 resource["matched_skills"]
             )
         ]
+    
+    # Find competency-level resources for items that
+    # may require further assessment or development.
+    competency_keys = [
+        item["competency_key"]
+        for item in results
+        if item["next_action"] != "no_immediate_action"
+    ]
+
+    competency_resources = get_resources_for_competencies(
+        db,
+        competency_keys,
+        career_key,
+    )
+
+    # Combine skill-based and competency-based resources.
+    for item in results:
+
+        if item["next_action"] == "no_immediate_action":
+            continue
+
+        matched_resources = competency_resources.get(
+            item["competency_key"],
+            [],
+        )
+
+        existing_ids = {
+            resource["id"]
+            for resource in item["learning_resources"]
+        }
+
+        for resource in matched_resources:
+            if resource["id"] in existing_ids:
+                continue
+
+            item["learning_resources"].append(resource)
+            existing_ids.add(resource["id"])
 
     core = [
         item
