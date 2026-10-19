@@ -8,6 +8,8 @@ from src.backend.app.database.models.career_skill import CareerSkill
 from src.backend.app.database.models.resume import Resume
 from src.preprocessing.competency_evidence_extractor import (extract_competency_evidence)
 from src.backend.app.services.career_competency_profiles import (CAREER_COMPETENCY_PROFILES)
+from src.backend.app.database.models.competency_evidence import (CompetencyEvidence)
+
 
 def analyze_competency_gaps(
     db: Session,
@@ -84,6 +86,33 @@ def analyze_competency_gaps(
         resume_evidence = extract_competency_evidence(
             resume.extracted_text
         )
+        
+    # Retrieve previously submitted competency evidence.
+    submitted_records = db.scalars(
+        select(CompetencyEvidence)
+        .where(
+            CompetencyEvidence.user_id == user_id,
+            CompetencyEvidence.career_id == career.id,
+        )
+        .order_by(
+            CompetencyEvidence.created_at.desc(),
+            CompetencyEvidence.id.desc(),
+        )
+    ).all()
+
+    submitted_evidence = {}
+
+    for record in submitted_records:
+        submitted_evidence.setdefault(
+            record.competency_key,
+            [],
+        ).append({
+            "id": record.id,
+            "evidence_type": record.evidence_type,
+            "description": record.description,
+            "verification_status": record.verification_status,
+        })
+
 
     results = []
 
@@ -102,7 +131,9 @@ def analyze_competency_gaps(
                 else "not_assessed"
             )
 
+            
             results.append({
+                "competency_key": group["key"],
                 "competency": group["name"],
                 "level": group["level"],
                 "status": status,
@@ -110,7 +141,12 @@ def analyze_competency_gaps(
                 "possible_skills": [],
                 "graph_supported_skills": [],
                 "evidence": evidence,
+                "submitted_evidence": submitted_evidence.get(
+                    group["key"],
+                    [],
+                ),
             })
+
 
             continue
         alternatives = [
@@ -136,7 +172,9 @@ def analyze_competency_gaps(
             if skill in graph_skills
         ]
 
+
         results.append({
+            "competency_key": group["key"],
             "competency": group["name"],
             "level": group["level"],
             "status": (
@@ -147,7 +185,12 @@ def analyze_competency_gaps(
             "matched_skills": matched,
             "possible_skills": alternatives,
             "graph_supported_skills": supported_by_graph,
+            "submitted_evidence": submitted_evidence.get(
+                group["key"],
+                [],
+            ),
         })
+
 
     core = [
         item
@@ -164,6 +207,7 @@ def analyze_competency_gaps(
         }
     ]
 
+    
     covered = sum(
         item["status"] == "evidenced"
         for item in assessed_core
@@ -173,12 +217,6 @@ def analyze_competency_gaps(
         item["status"] == "evidence_found"
         for item in core
     )
-
-    covered = sum(
-        item["status"] == "evidenced"
-        for item in assessed_core
-    )
-
     return {
         "user_id": user_id,
         "career_key": career_key,
