@@ -9,6 +9,7 @@ from src.backend.app.database.models.skill import Skill
 from src.backend.app.database.models.skill_gap import SkillGap
 from src.backend.app.database.models.user import User
 from src.backend.app.database.models.user_skill import UserSkill
+from src.backend.app.database.models.competency_evidence import CompetencyEvidence
 
 __all__ = [
     "User",
