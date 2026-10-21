@@ -5,6 +5,7 @@ from src.backend.app.api.routes.recommendations import (router as recommendation
 from src.backend.app.api.routes.skill_gaps import (router as skill_gaps_router)
 from src.backend.app.api.routes.competency_evidence import (router as competency_evidence_router)
 from src.backend.app.api.routes.learning_roadmaps import (router as learning_roadmaps_router)
+from src.backend.app.api.routes.ai_mentor import (router as ai_mentor_router)
 
 api_router = APIRouter(
     prefix="/api"
@@ -27,5 +28,10 @@ api_router.include_router(
 )
 api_router.include_router(
     learning_roadmaps_router
+)
+api_router.include_router(
+    ai_mentor_router,
+    prefix="/ai-mentor",
+    tags=["AI Mentor"],
 )
    
