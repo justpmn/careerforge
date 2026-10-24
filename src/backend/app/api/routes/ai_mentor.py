@@ -7,7 +7,8 @@ from src.backend.app.services.llm_service import (
     LLMServiceError,
     generate_mentor_response,
 )
-from src.backend.app.services.assessment_mentor_service import (generate_assessment_mentor_response)
+
+from src.backend.app.services.assessment_mentor_service import (generate_assessment_mentor_response, generate_persistent_assessment_mentor_response,)
 from typing import Literal
 from typing import Annotated
 from pydantic import BaseModel, Field, StringConstraints
@@ -24,7 +25,6 @@ class HistoryMessage(BaseModel):
             max_length=1000,
         ),
     ]
-
 
 class MentorChatRequest(BaseModel):
     message: str = Field(
@@ -49,6 +49,16 @@ class AssessmentMentorRequest(BaseModel):
 class MentorChatResponse(BaseModel):
     response: str
 
+
+class PersistentAssessmentMentorRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=2000)
+    career_key: str = Field(min_length=1, max_length=100)
+    conversation_id: int | None = Field(default=None, gt=0)
+
+
+class PersistentAssessmentMentorResponse(BaseModel):
+    conversation_id: int
+    response: str
 
 @router.post(
     "/chat",
@@ -120,3 +130,45 @@ async def chat_with_assessment(
             status_code=503,
             detail="AI mentor is temporarily unavailable.",
         ) from exc
+
+
+
+@router.post(
+    "/chat/assessment/persistent",
+    response_model=PersistentAssessmentMentorResponse,
+)
+async def persistent_assessment_chat(
+    request: PersistentAssessmentMentorRequest,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        result = await generate_persistent_assessment_mentor_response(
+            db=db,
+            user_id=user_id,
+            career_key=request.career_key,
+            message=request.message.strip(),
+            conversation_id=request.conversation_id,
+        )
+
+        db.commit()
+
+        return result
+
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+
+    except LLMServiceError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail=str(exc),
+        ) from exc
+
+    except Exception:
+        db.rollback()
+        raise
