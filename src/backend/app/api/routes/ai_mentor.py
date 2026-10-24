@@ -7,18 +7,34 @@ from src.backend.app.services.llm_service import (
     LLMServiceError,
     generate_mentor_response,
 )
-from src.backend.app.services.assessment_mentor_service import (
-    generate_assessment_mentor_response,
-)
+from src.backend.app.services.assessment_mentor_service import (generate_assessment_mentor_response)
+from typing import Literal
+from typing import Annotated
+from pydantic import BaseModel, Field, StringConstraints
 
 router = APIRouter()
+
+class HistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True,
+            min_length=1,
+            max_length=1000,
+        ),
+    ]
+
 
 class MentorChatRequest(BaseModel):
     message: str = Field(
         min_length=1,
         max_length=2000,
     )
-
+    history: list[HistoryMessage] = Field(
+        default_factory=list,
+        max_length=6,
+    )
 
 class AssessmentMentorRequest(BaseModel):
     message: str = Field(
@@ -49,8 +65,13 @@ async def chat_with_mentor(
         )
 
     try:
+
         answer = await generate_mentor_response(
-            request.message.strip()
+            message=request.message.strip(),
+            history=[
+                item.model_dump()
+                for item in request.history
+            ],
         )
 
         return MentorChatResponse(response=answer)
