@@ -1,4 +1,5 @@
 from typing import Any
+from collections import Counter
 
 MAX_COMPETENCIES = 15
 MAX_SKILLS_PER_GROUP = 4
@@ -72,6 +73,27 @@ def build_mentor_context(assessment: dict[str, Any]) -> dict:
                 item.get("learning_resources", [])
             ),
         })
+        status_counts = dict(
+        Counter(
+            item["status"]
+            for item in competencies
+        )
+    )
+        
+    status_counts_by_level = {
+        level: dict(
+            Counter(
+                item["status"]
+                for item in competencies
+                if item["level"] == level
+            )
+        )
+        for level in sorted({
+            item["level"]
+            for item in competencies
+        })
+    }
+
     context = {
         "source": "careerforge_competency_assessment",
 
@@ -93,6 +115,9 @@ def build_mentor_context(assessment: dict[str, Any]) -> dict:
             "core_competencies_not_assessed": assessment.get(
                 "core_competencies_not_assessed", 0
             ),
+            "status_counts": status_counts,
+            "status_counts_by_level": status_counts_by_level,
+
         },
 
         "competencies": simplified_competencies,
