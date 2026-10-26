@@ -8,3 +8,6 @@ models/*.joblib
 models/*.zip
 .codex-tmp-psycopg/
 white  Simple Resume.pdf
+node_modules/
+dist/
+*.tsbuildinfo

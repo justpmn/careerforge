@@ -1,9 +1,16 @@
 
-from fastapi import Depends, HTTPException, status
+import hashlib
+import hmac
+import secrets
+
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from src.backend.app.core.tokens import decode_access_token
+from src.backend.app.core.tokens import (
+    decode_access_token,
+    get_jwt_secret,
+)
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
 
@@ -11,8 +18,65 @@ from src.backend.app.database.session import get_db
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
+def create_csrf_token(session_token: str) -> str:
+    nonce = secrets.token_hex(16)
+    signature = _csrf_signature(session_token, nonce)
+    return f"{nonce}.{signature}"
+
+
+def _csrf_signature(session_token: str, nonce: str) -> str:
+    fingerprint = hashlib.sha256(
+        session_token.encode("utf-8")
+    ).hexdigest()
+
+    message = f"{fingerprint}.{nonce}".encode("utf-8")
+
+    return hmac.new(
+        get_jwt_secret().encode("utf-8"),
+        message,
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def validate_csrf_token(
+    request: Request,
+    session_token: str,
+) -> None:
+    cookie_token = request.cookies.get("csrf_token")
+    header_token = request.headers.get("X-CSRF-Token")
+
+    forbidden = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Invalid or missing CSRF token.",
+    )
+
+    if not cookie_token or not header_token:
+        raise forbidden
+
+    if not hmac.compare_digest(cookie_token, header_token):
+        raise forbidden
+
+    nonce, separator, signature = cookie_token.partition(".")
+
+    if (
+        not separator
+        or len(nonce) != 32
+        or len(signature) != 64
+        or any(c not in "0123456789abcdef" for c in nonce + signature)
+    ):
+        raise forbidden
+
+    expected = _csrf_signature(session_token, nonce)
+
+    if not hmac.compare_digest(signature, expected):
+        raise forbidden
+
+
 def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(
+        bearer_scheme
+    ),
     db: Session = Depends(get_db),
 ) -> int:
 
@@ -22,13 +86,19 @@ def get_current_user_id(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    if credentials is None:
+    # Existing API clients can continue using Bearer tokens.
+    if credentials is not None:
+        token = credentials.credentials
+        cookie_auth = False
+    else:
+        token = request.cookies.get("careerforge_session")
+        cookie_auth = True
+
+    if not token:
         raise unauthorized
 
     try:
-        user_id = decode_access_token(
-            credentials.credentials
-        )
+        user_id = decode_access_token(token)
     except ValueError as exc:
         raise unauthorized from exc
 
@@ -36,5 +106,11 @@ def get_current_user_id(
 
     if user is None:
         raise unauthorized
+
+    # Cookie-authenticated writes require a CSRF token.
+    if cookie_auth and request.method.upper() not in {
+        "GET", "HEAD", "OPTIONS"
+    }:
+        validate_csrf_token(request, token)
 
     return user.id
