@@ -23,6 +23,16 @@ class MentorConversation(Base):
         nullable=True,
         index=True
     )
+    
+    career_id: Mapped[int | None] = mapped_column(
+        ForeignKey(
+            "careers.id",
+            name="fk_mentor_conversations_career_id",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+        index=True,
+    )
     title: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True
