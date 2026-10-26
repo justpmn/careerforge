@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from datetime import datetime
 from sqlalchemy.orm import Session
 from src.backend.app.api.auth import get_current_user_id
 from src.backend.app.database.session import get_db
@@ -7,11 +7,10 @@ from src.backend.app.services.llm_service import (
     LLMServiceError,
     generate_mentor_response,
 )
-
+from src.backend.app.services.mentor_conversation_service import (list_owned_mentor_conversations, list_owned_mentor_messages)
 from src.backend.app.services.assessment_mentor_service import (generate_assessment_mentor_response, generate_persistent_assessment_mentor_response,)
-from typing import Literal
-from typing import Annotated
-from pydantic import BaseModel, Field, StringConstraints
+from typing import Literal, Annotated
+from pydantic import BaseModel, Field, StringConstraints, ConfigDict
 
 router = APIRouter()
 
@@ -59,6 +58,24 @@ class PersistentAssessmentMentorRequest(BaseModel):
 class PersistentAssessmentMentorResponse(BaseModel):
     conversation_id: int
     response: str
+
+
+class MentorConversationSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str | None
+    career_id: int | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class MentorConversationMessage(BaseModel):
+    id: int
+    role: Literal["user", "assistant"]
+    content: str
+    created_at: datetime
+
 
 @router.post(
     "/chat",
@@ -172,3 +189,40 @@ async def persistent_assessment_chat(
     except Exception:
         db.rollback()
         raise
+
+
+@router.get(
+    "/conversations",
+    response_model=list[MentorConversationSummary],
+)
+def get_mentor_conversations(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    return list_owned_mentor_conversations(
+        db=db,
+        user_id=user_id,
+    )
+
+
+@router.get(
+    "/conversations/{conversation_id}/messages",
+    response_model=list[MentorConversationMessage],
+)
+def get_mentor_conversation_messages(
+    conversation_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        return list_owned_mentor_messages(
+            db=db,
+            user_id=user_id,
+            conversation_id=conversation_id,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        ) from exc

@@ -48,7 +48,6 @@ def get_owned_conversation(
 
     return conversation
 
-
 def save_mentor_message(
     db: Session,
     user_id: int,
@@ -86,7 +85,6 @@ def save_mentor_message(
     db.flush()
 
     return message
-
 
 def get_recent_mentor_history(
     db: Session,
@@ -126,4 +124,106 @@ def get_recent_mentor_history(
             "content": message.content,
         }
         for message in reversed(messages)
+    ]
+
+
+def list_owned_mentor_conversations(
+    db: Session,
+    user_id: int,
+    limit: int = 50,
+) -> list[MentorConversation]:
+
+    if not 1 <= limit <= 50:
+        raise ValueError("Invalid conversation limit.")
+
+    return list(
+        db.scalars(
+            select(MentorConversation)
+            .where(MentorConversation.user_id == user_id)
+            .order_by(
+                MentorConversation.updated_at.desc(),
+                MentorConversation.id.desc(),
+            )
+            .limit(limit)
+        ).all()
+    )
+
+
+def list_owned_mentor_messages(
+    db: Session,
+    user_id: int,
+    conversation_id: int,
+    limit: int = 50,
+) -> list[dict]:
+
+    get_owned_conversation(
+        db=db,
+        user_id=user_id,
+        conversation_id=conversation_id,
+    )
+
+    if not 1 <= limit <= 50:
+        raise ValueError("Invalid message limit.")
+
+    messages = db.scalars(
+        select(MentorMessage)
+        .where(
+            MentorMessage.conversation_id == conversation_id
+        )
+        .order_by(MentorMessage.id.desc())
+        .limit(limit)
+    ).all()
+
+    return [
+        {
+            "id": item.id,
+            "role": (
+                "assistant"
+                if item.role == "mentor"
+                else "user"
+            ),
+            "content": item.content,
+            "created_at": item.created_at,
+        }
+        for item in reversed(messages)
+    ]
+
+
+def list_owned_mentor_messages(
+    db: Session,
+    user_id: int,
+    conversation_id: int,
+    limit: int = 50,
+) -> list[dict]:
+
+    get_owned_conversation(
+        db=db,
+        user_id=user_id,
+        conversation_id=conversation_id,
+    )
+
+    if not 1 <= limit <= 50:
+        raise ValueError("Invalid message limit.")
+
+    messages = db.scalars(
+        select(MentorMessage)
+        .where(
+            MentorMessage.conversation_id == conversation_id
+        )
+        .order_by(MentorMessage.id.desc())
+        .limit(limit)
+    ).all()
+
+    return [
+        {
+            "id": item.id,
+            "role": (
+                "assistant"
+                if item.role == "mentor"
+                else "user"
+            ),
+            "content": item.content,
+            "created_at": item.created_at,
+        }
+        for item in reversed(messages)
     ]
