@@ -24,6 +24,12 @@ from src.backend.app.services.llm_service import LLMServiceError
 
 @pytest.fixture
 def conversation_api(monkeypatch):
+    
+    if engine.url.database != "careerforge_test":
+        raise RuntimeError(
+            "Conversation tests require careerforge_test."
+        )
+
     monkeypatch.setattr(
         settings,
         "jwt_secret_key",

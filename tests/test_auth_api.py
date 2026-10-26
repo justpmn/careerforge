@@ -22,6 +22,12 @@ TEST_PASSWORD = "CareerForge-Secure-Test-2026!"
 
 @pytest.fixture
 def api_context(monkeypatch):
+    
+    if engine.url.database != "careerforge_test":
+        raise RuntimeError(
+            "Authentication API tests require careerforge_test."
+        )
+
     monkeypatch.setattr(
         settings,
         "jwt_secret_key",
