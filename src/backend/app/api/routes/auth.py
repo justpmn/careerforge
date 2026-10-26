@@ -143,10 +143,19 @@ def login_user(
         )
     )
 
-    if user is None or not verify_password(
-        request.password,
-        user.password_hash,
+    if (
+        user is None
+        or user.password_hash is None
+        or not verify_password(
+            request.password,
+            user.password_hash,
+        )
     ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",

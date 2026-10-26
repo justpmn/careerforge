@@ -83,9 +83,10 @@ export function postAuthRoute(user: User): string {
   return user.onboarding_completed ? '/dashboard' : '/onboarding';
 }
 
-export function oauthStartPath(provider: 'google' | 'github'): string | null {
-  const path = provider === 'google'
-    ? import.meta.env.VITE_GOOGLE_OAUTH_START_PATH
-    : import.meta.env.VITE_GITHUB_OAUTH_START_PATH;
-  return typeof path === 'string' && /^\/api\/[a-zA-Z0-9/_-]+$/.test(path) ? path : null;
+export function oauthStartPath(provider: 'google' | 'github'): string {
+  if (provider === 'google') {
+    return '/api/auth/oauth/google/start';
+  }
+
+  return '/api/auth/oauth/github/start';
 }
