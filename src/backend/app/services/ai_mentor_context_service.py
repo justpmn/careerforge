@@ -73,7 +73,7 @@ def build_mentor_context(assessment: dict[str, Any]) -> dict:
                 item.get("learning_resources", [])
             ),
         })
-        status_counts = dict(
+    status_counts = dict(
         Counter(
             item["status"]
             for item in competencies
