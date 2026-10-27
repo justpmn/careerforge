@@ -79,10 +79,9 @@ export const authApi = {
   },
 };
 
-export function postAuthRoute(user: User): string {
-  return user.onboarding_completed ? '/dashboard' : '/onboarding';
+export function postAuthRoute(_user: User): string {
+  return '/dashboard';
 }
-
 export function oauthStartPath(provider: 'google' | 'github'): string {
   if (provider === 'google') {
     return '/api/auth/oauth/google/start';

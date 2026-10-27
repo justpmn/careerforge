@@ -106,7 +106,11 @@ a { color: inherit; }
 .inside-header { display: flex; justify-content: space-between; align-items: center; padding: 24px 6vw; border-bottom: 1px solid var(--line); background: var(--paper); }
 .inside-actions { display: flex; gap: 26px; align-items: center; }
 .sign-out { border: 1px solid var(--line); padding: 9px 17px; font-size: 12px; border-radius: 6px; background: var(--paper); color: var(--text); }
-.inside-content { width: min(890px, 88vw); margin: 70px auto; }
+.inside-content {
+  width: 100%;
+  margin: 0;
+  padding: 0 clamp(16px, 2.5vw, 36px);
+}
 .greeting { font-size: 14px; color: var(--muted); }
 .workspace-panel { margin-top: 30px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: clamp(25px, 5vw, 56px); }
 .stage-marker { color: var(--accent); }
@@ -134,6 +138,389 @@ a { color: inherit; }
   .auth-card { max-width: 430px; padding: 60px 0 40px; }
   .inside-header { padding: 20px 23px; }
   .inside-actions { gap: 13px; }
-  .inside-content { margin: 38px auto; }
+  .inside-content { padding-inline: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Dashboard */
+
+.cf-dashboard {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 0 60px;
+}
+
+.cf-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.cf-dashboard-header h1 {
+  margin: 10px 0 6px;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.cf-dashboard-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.cf-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cf-dashboard-card {
+  min-width: 0;
+  padding: 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cf-career-card {
+  grid-column: 1 / -1;
+}
+
+.cf-dashboard-card h2 {
+  margin: 12px 0 8px;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+}
+
+.cf-dashboard-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0 0 14px;
+}
+
+.cf-eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.cf-card-heading,
+.cf-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+}
+
+.cf-card-symbol,
+.cf-muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 15px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cf-button-outline {
+  color: var(--text);
+  background: transparent;
+}
+
+.cf-button-primary {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.cf-button:hover {
+  border-color: var(--accent);
+}
+
+.cf-button-primary:hover {
+  background: var(--accent-hover);
+}
+
+.cf-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Skills assessment */
+
+.cf-career-search {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--field);
+  color: var(--text);
+}
+
+.cf-input-label {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cf-career-options {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit, minmax(190px, 1fr)
+  );
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 16px 0;
+}
+
+.cf-career-option {
+  padding: 14px;
+  text-align: left;
+  background: var(--paper);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.cf-career-option strong {
+  display: block;
+  font-size: 13px;
+}
+
+.cf-career-option span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cf-career-selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.cf-feature-status {
+  display: block;
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-selected-career {
+  font-size: 13px;
+}
+
+.cf-error {
+  color: var(--error-text) !important;
+}
+
+.cf-success {
+  color: #438b60 !important;
+}
+
+/* Dashboard tutorial */
+
+.cf-dashboard-card[data-tour-active="true"] {
+  position: relative;
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.cf-tour {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  width: min(360px, calc(100vw - 32px));
+  padding: 22px;
+  background: var(--paper);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 35px #0003;
+}
+
+.cf-tour h3 {
+  margin: 12px 0 8px;
+  font-size: 17px;
+}
+
+.cf-tour p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cf-tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+@media (max-width: 900px) {
+  .cf-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-career-card {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-dashboard-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cf-dashboard-card {
+    padding: 18px;
+  }
+
+  .cf-tour {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+
+/* Authenticated workspace layout */
+
+.cf-workspace-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px 0 48px;
+}
+
+.cf-workspace-sidebar {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  padding: 16px 12px 16px 0;
+  border-right: 1px solid rgba(128, 115, 100, 0.25);
+}
+
+.cf-sidebar-label {
+  display: block;
+  margin: 0 12px 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.55;
+}
+
+.cf-workspace-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cf-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  color: inherit;
+  font-size: 0.85rem;
+  text-decoration: none;
+  opacity: 0.75;
+  transition: background 150ms ease, opacity 150ms ease;
+}
+
+.cf-nav-link:hover {
+  background: rgba(166, 92, 53, 0.08);
+  opacity: 1;
+}
+
+.cf-nav-active {
+  background: rgba(166, 92, 53, 0.12);
+  color: #a65c35;
+  opacity: 1;
+  font-weight: 650;
+}
+
+html[data-theme="dark"] .cf-nav-active {
+  color: #e4a274;
+  background: rgba(228, 162, 116, 0.12);
+}
+
+.cf-nav-number {
+  font-family: monospace;
+  font-size: 0.72rem;
+  opacity: 0.65;
+}
+
+.cf-workspace-content {
+  min-width: 0;
+}
+
+.cf-dashboard .cf-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  margin-top: 14px;
+}
+
+.cf-assessment-sections {
+  display: grid;
+  gap: 18px;
+}
+
+.cf-selected-career {
+  margin-top: 16px;
+}
+
+.cf-feature-placeholder {
+  margin-top: 28px;
+}
+
+@media (max-width: 850px) {
+  .cf-workspace-layout {
+    display: block;
+  }
+
+  .cf-workspace-sidebar {
+    position: static;
+    padding: 8px 0 16px;
+    margin-bottom: 16px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(128, 115, 100, 0.25);
+  }
+
+  .cf-workspace-nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .cf-nav-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
