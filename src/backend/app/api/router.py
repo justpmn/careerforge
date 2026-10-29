@@ -7,7 +7,9 @@ from src.backend.app.api.routes.competency_evidence import (router as competency
 from src.backend.app.api.routes.learning_roadmaps import (router as learning_roadmaps_router)
 from src.backend.app.api.routes.ai_mentor import (router as ai_mentor_router)
 from src.backend.app.api.routes.auth import router as auth_router
-from src.backend.app.api.routes import oauth, onboarding
+from src.backend.app.api.routes import oauth, onboarding, skill_evidence, learning_progress
+
+
 
 
 api_router = APIRouter(
@@ -41,5 +43,6 @@ api_router.include_router(
 api_router.include_router(auth_router)
 api_router.include_router(oauth.router)
 api_router.include_router(onboarding.router)
-
+api_router.include_router(skill_evidence.router)
+api_router.include_router(learning_progress.router)
    
