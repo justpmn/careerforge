@@ -1,0 +1,453 @@
+.cf-roadmap {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 0 45px;
+}
+.cf-roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.cf-roadmap-eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+.cf-roadmap-header h1 {
+  margin: 8px 0;
+  color: var(--text);
+  font-size: clamp(26px, 3vw, 35px);
+  letter-spacing: -0.8px;
+}
+
+.cf-roadmap-header p,
+.cf-roadmap-info,
+.cf-roadmap-state {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cf-roadmap-step-count {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cf-roadmap-map {
+  --orb-face: #fffdfa;
+  --orb-icon: #292c31;
+
+  position: relative;
+  height: min(76vh, 800px);
+  min-height: 530px;
+  overflow: hidden;
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 30%,
+      rgba(209, 127, 84, 0.11),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 15% 90%,
+      rgba(88, 145, 120, 0.06),
+      transparent 40%
+    ),
+    var(--paper);
+}
+
+[data-theme='dark'] .cf-roadmap-map {
+  --orb-face: #24272a;
+  --orb-icon: #f2eee9;
+}
+
+.cf-roadmap-map .react-flow {
+  background: transparent;
+}
+
+.cf-roadmap-map-hint {
+  position: absolute;
+  z-index: 5;
+  top: 16px;
+  left: 16px;
+
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--muted);
+
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.cf-roadmap-map .react-flow__controls {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.cf-roadmap-map .react-flow__controls-button {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+
+.cf-roadmap-map .react-flow__controls-button:hover {
+  background: var(--soft);
+}
+
+.cf-roadmap-map .react-flow__controls-button svg {
+  fill: var(--text);
+}
+
+
+.cf-roadmap-map .react-flow__node-skill {
+  width: 126px;
+  height: 112px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+
+.cf-orb-node {
+  position: relative;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  width: 126px;
+  height: 112px;
+  padding-top: 6px;
+
+  text-align: center;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.cf-orb-circle {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+
+  border: 2px solid #a3a09e;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 20%,
+      rgba(214, 150, 112, 0.09),
+      transparent 70%
+    ),
+    var(--orb-face);
+
+  box-shadow:
+    inset 0 0 0 4px rgba(127, 123, 118, 0.05),
+    0 5px 14px rgba(0, 0, 0, 0.12);
+
+  color: var(--orb-icon);
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.cf-orb-circle svg {
+  display: block;
+  width: 27px;
+  height: 27px;
+}
+
+.cf-orb-circle .cf-python-icon {
+  color: #3776ab;
+}
+
+.cf-orb-glyph {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 20px;
+  font-weight: 650;
+}
+
+.cf-orb-label {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+
+  max-width: 126px;
+  color: var(--text);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cf-orb-node--evidenced .cf-orb-circle {
+  border-color: #64b38b;
+}
+
+.cf-orb-node--evidence_found .cf-orb-circle {
+  border-color: #d6b16b;
+}
+
+.cf-orb-node--not_assessed .cf-orb-circle {
+  border-color: #d48a67;
+}
+
+.cf-orb-node--not_evidenced .cf-orb-circle {
+  border-color: #9297a0;
+}
+
+.cf-orb-node--unlinked .cf-orb-circle {
+  border-color: #8e969e;
+  border-style: dashed;
+}
+
+.cf-orb-node:hover .cf-orb-circle {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.cf-orb-node.is-selected .cf-orb-circle {
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 0 5px rgba(212, 138, 103, 0.14),
+    0 0 22px rgba(212, 138, 103, 0.28);
+}
+
+
+.cf-orb-node .cf-orb-handle {
+  width: 5px;
+  height: 5px;
+  border: 0;
+  opacity: 0;
+  background: transparent;
+}
+
+
+.cf-orb-node .cf-orb-handle--left {
+  left: 29px;
+  right: auto;
+  top: 40px;
+  transform: translate(-50%, -50%);
+}
+
+.cf-orb-node .cf-orb-handle--right {
+  right: 29px;
+  left: auto;
+  top: 40px;
+  transform: translate(50%, -50%);
+}
+
+.cf-skill-inspector {
+  position: absolute;
+  z-index: 20;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+
+  width: min(340px, calc(100% - 32px));
+  box-sizing: border-box;
+  padding: 22px;
+  overflow-y: auto;
+
+  border: 1px solid var(--line);
+  border-radius: 11px;
+
+  background: var(--paper);
+  color: var(--text);
+
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
+}
+
+.cf-skill-inspector-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cf-skill-inspector-close {
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+
+  background: var(--soft);
+  color: var(--text);
+
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.cf-skill-inspector h2 {
+  margin: 18px 0 15px;
+  font-size: 23px;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+}
+
+.cf-skill-inspector-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 22px;
+}
+
+.cf-skill-inspector-tags span {
+  padding: 7px 10px;
+
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--soft);
+
+  color: var(--text);
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.cf-skill-inspector-section {
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.cf-skill-inspector-section h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.cf-skill-inspector-section p,
+.cf-skill-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.cf-skill-description {
+  margin-bottom: 18px;
+}
+
+.cf-skill-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cf-skill-resource {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cf-skill-resource a {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.cf-skill-resource a:hover {
+  text-decoration: underline;
+}
+
+.cf-skill-resource strong {
+  font-size: 12px;
+}
+
+.cf-skill-resource small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+/* Unmapped competencies */
+
+.cf-roadmap-unmapped {
+  margin-top: 18px;
+  padding: 18px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.cf-roadmap-unmapped h3 {
+  margin: 0 0 15px;
+  font-size: 13px;
+}
+
+.cf-roadmap-unmapped h3 span {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.cf-roadmap-unmapped-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cf-roadmap-unmapped-list button {
+  padding: 9px 12px;
+
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--soft);
+
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cf-roadmap-unmapped-list button:hover {
+  border-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .cf-roadmap-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+.cf-roadmap-map {
+  height: min(82vh, 850px);
+  min-height: 560px;
+}
+
+  .cf-skill-inspector {
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    max-height: 65%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-orb-circle {
+    transition: none;
+  }
+}
