@@ -1,0 +1,67 @@
+
+.cf-global-notice {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  width: min(350px, calc(100vw - 32px));
+  padding: 16px;
+
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--text);
+
+  box-shadow: 0 12px 35px #0003;
+}
+
+.cf-global-notice-dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.cf-global-notice-error {
+  background: var(--error-text);
+}
+
+.cf-global-notice-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf-global-notice-body strong {
+  font-size: 13px;
+}
+
+.cf-global-notice-body p {
+  margin: 5px 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cf-global-notice-body button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cf-global-notice-close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+}

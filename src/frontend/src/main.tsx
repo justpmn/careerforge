@@ -5,6 +5,8 @@ import App from './App';
 
 import './styles.css';
 import './dashboard.css';
+import './cv.css';
+import './notifications.css';
 
 ReactDOM.createRoot(
   document.getElementById('root')!

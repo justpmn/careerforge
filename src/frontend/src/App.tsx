@@ -19,6 +19,10 @@ import FeaturePlaceholderPage from './pages/featureplaceholder';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import SkillsAssessmentPage from './pages/skillassessment';
+import CvPage from './pages/cvpage';
+import MentorPage from './pages/mentorpage';
+import { MentorJobsProvider } from './context/mentorjobscontext';
+import RoadmapPage from './pages/roadmappage';
 
 type Theme = 'light' | 'dark';
 
@@ -84,104 +88,82 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route index element={<StartingPage />} />
+        <MentorJobsProvider>
+          <Routes>
+            <Route index element={<StartingPage />} />
 
-          <Route element={<GuestOnly />}>
-            <Route element={<AuthLayout {...layoutProps} />}>
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
+            <Route element={<GuestOnly />}>
+              <Route element={<AuthLayout {...layoutProps} />}>
+                <Route path="login" element={<LoginPage />} />
+                <Route path="signup" element={<SignupPage />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route
-            path="auth/callback"
-            element={<AuthLayout {...layoutProps} />}
-          >
-            <Route index element={<AuthCallbackPage />} />
-          </Route>
-
-          <Route element={<Protected />}>
             <Route
-              element={
-                <AppShell {...layoutProps}>
-                  <WorkspaceLayout />
-                </AppShell>
-              }
+              path="auth/callback"
+              element={<AuthLayout {...layoutProps} />}
             >
-              <Route
-                path="dashboard"
-                element={<DashboardPage />}
-              />
-
-              <Route
-                path="skills-assessment"
-                element={<SkillsAssessmentPage />}
-              />
-              <Route
-                path="profile"
-                element={
-                  <FeaturePlaceholderPage
-                    category="MY PROFILE"
-                    title="Your career profile."
-                    description="Manage your information, interests, and professional experience."
-                  />
-                }
-              />
-
-              <Route
-                path="cv"
-                element={
-                  <FeaturePlaceholderPage
-                    category="MY CV"
-                    title="Your resume."
-                    description="Upload and manage the CV used for career analysis."
-                  />
-                }
-              />
-
-              <Route
-                path="settings"
-                element={
-                  <FeaturePlaceholderPage
-                    category="SETTINGS"
-                    title="Account settings."
-                    description="Manage your preferences and connected accounts."
-                  />
-                }
-              />
-
-              <Route
-                path="roadmap"
-                element={
-                  <FeaturePlaceholderPage
-                    category="LEARNING ROADMAP"
-                    title="Your learning journey."
-                    description="Your interactive skill tree, learning resources, and career milestones will live here."
-                  />
-                }
-              />
-
-              <Route
-                path="mentor"
-                element={
-                  <FeaturePlaceholderPage
-                    category="AI MENTOR"
-                    title="Start a conversation."
-                    description="This is where you'll talk to your AI mentor about careers, skills, and recommendations."
-                  />
-                }
-              />
-
-              <Route
-                path="onboarding"
-                element={<Navigate to="/dashboard" replace />}
-              />
+              <Route index element={<AuthCallbackPage />} />
             </Route>
-          </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route element={<Protected />}>
+              <Route
+                element={
+                  <AppShell {...layoutProps}>
+                    <WorkspaceLayout />
+                  </AppShell>
+                }
+              >
+                <Route
+                  path="dashboard"
+                  element={<DashboardPage />}
+                />
+
+                <Route
+                  path="skills-assessment"
+                  element={<SkillsAssessmentPage />}
+                />
+                <Route
+                  path="profile"
+                  element={
+                    <FeaturePlaceholderPage
+                      category="MY PROFILE"
+                      title="Your career profile."
+                      description="Manage your information, interests, and professional experience."
+                    />
+                  }
+                />
+
+                <Route
+                  path="cv"
+                  element={<CvPage />}
+                />
+
+                <Route
+                  path="settings"
+                  element={
+                    <FeaturePlaceholderPage
+                      category="SETTINGS"
+                      title="Account settings."
+                      description="Manage your preferences and connected accounts."
+                    />
+                  }
+                />
+
+                <Route path="roadmap" element={<RoadmapPage />} />
+
+                <Route path="mentor" element={<MentorPage />} />
+
+                <Route
+                  path="onboarding"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </MentorJobsProvider>
       </BrowserRouter>
     </AuthProvider>
   );
