@@ -6,11 +6,17 @@ import '@xyflow/react/dist/style.css';
 import '../roadmap.css';
 import { useAuth } from '../context/AuthContext';
 import { onboardingApi } from '../lib/onboarding';
-import { getCareerRoadmap } from '../lib/roadmap';
+import { getCareerRoadmap, getRecordedSkills } from '../lib/roadmap';
 import { buildSkillTree } from '../lib/skilltreetemplates';
-import type { CareerRoadmap } from '../lib/roadmap';
+import type { CareerRoadmap, RecordedSkill } from '../lib/roadmap';
 import type { SkillTreeItem } from '../lib/skilltreetemplates';
 import SkillMapNode from '../components/skillmapnode';
+import {
+  getLearningProgress,
+  updateLearningProgress,
+} from '../lib/learningprogress';
+import { resourcesForSkill } from '../lib/skillresourcecatalog';
+import '../roadmapprogress.css';
 
 const NODE_WIDTH = 126;
 const NODE_HEIGHT = 112;
@@ -139,7 +145,7 @@ function layoutSkillGraph(
 
   const ids = new Set(items.map((item) => item.id));
   const statuses = new Map(
-    items.map((item) => [item.id, item.step?.status ?? 'unlinked'])
+    items.map((item) => [item.id, item.step?.status ?? item.status ?? 'unlinked'])
   );
 
   const nodes: Node[] = items.map((item) => {
@@ -218,6 +224,10 @@ export default function RoadmapPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [needsCareer, setNeedsCareer] = useState(false);
+  const [recordedSkills, setRecordedSkills] = useState<RecordedSkill[]>([]);
+  const [learnedByKey, setLearnedByKey] = useState<Record<string, boolean>>({});
+  const [savingLearned, setSavingLearned] = useState(false);
+  const [learningError, setLearningError] = useState('');
 
   useEffect(() => {
     if (!userId) {
@@ -242,14 +252,20 @@ export default function RoadmapPage() {
           return;
         }
 
-        const result = await getCareerRoadmap(
-          userId!,
-          career.career_key
-        );
+        const [result, skills, progress] = await Promise.all([
+          getCareerRoadmap(userId!, career.career_key),
+          getRecordedSkills(),
+          getLearningProgress(career.career_key),
+        ]);
 
         if (!active) return;
 
         setRoadmap(result);
+        setRecordedSkills(skills);
+        setLearnedByKey(Object.fromEntries(
+          progress.map((item) => [item.skill_key, item.learned])
+        ));
+        setLearningError('');
         setSelectedId(null);
       } catch (err) {
         if (!active) return;
@@ -272,8 +288,8 @@ export default function RoadmapPage() {
   }, [userId]);
 
   const tree = useMemo(
-    () => (roadmap ? buildSkillTree(roadmap) : null),
-    [roadmap]
+    () => (roadmap ? buildSkillTree(roadmap, recordedSkills) : null),
+    [roadmap, recordedSkills]
   );
 
   // Calculate graph positions only when roadmap data changes.
@@ -305,11 +321,16 @@ export default function RoadmapPage() {
     );
 
     const statusById = new Map(
-      items.map((item) => [item.id, item.step?.status ?? 'unlinked'])
+      items.map((item) => [item.id, item.step?.status ?? item.status ?? 'unlinked'])
+    );
+
+    const skillKeyByNodeId = new Map(
+      items.map((item) => [item.id, item.step?.competency_key ?? item.id])
     );
 
     const nodes = baseGraph.nodes.map((node) => {
       const related = upstream.has(node.id) || nextSkills.has(node.id);
+      const skillKey = skillKeyByNodeId.get(node.id) ?? node.id;
 
       return {
         ...node,
@@ -318,6 +339,7 @@ export default function RoadmapPage() {
           ...node.data,
           related: hasSelection && related,
           dimmed: hasSelection && !related,
+          learned: Boolean(learnedByKey[skillKey]),
         },
       };
     });
@@ -355,7 +377,7 @@ export default function RoadmapPage() {
     });
 
     return { nodes, edges };
-  }, [tree, baseGraph, selectedId]);
+  }, [tree, baseGraph, selectedId, learnedByKey]);
 
   const selectedItem = [
     ...(tree?.connected ?? []),
@@ -363,7 +385,39 @@ export default function RoadmapPage() {
   ].find((item) => item.id === selectedId);
 
   const step = selectedItem?.step;
-  const resources = step?.suggested_resources ?? [];
+  const selectedStatus = step?.status ?? selectedItem?.status ?? 'unlinked';
+  const selectedSkillKey = step?.competency_key ?? selectedItem?.id;
+  const isLearned = Boolean(selectedSkillKey && learnedByKey[selectedSkillKey]);
+  const resourceInfo = resourcesForSkill(
+    roadmap?.career_key ?? '',
+    selectedSkillKey ?? '',
+    step?.suggested_resources ?? []
+  );
+  const resources = resourceInfo.resources;
+
+  async function toggleLearned() {
+    if (!roadmap || !selectedSkillKey || savingLearned) return;
+
+    setSavingLearned(true);
+    setLearningError('');
+    try {
+      const saved = await updateLearningProgress(
+        roadmap.career_key,
+        selectedSkillKey,
+        !isLearned
+      );
+      setLearnedByKey((previous) => ({
+        ...previous,
+        [saved.skill_key]: saved.learned,
+      }));
+    } catch (cause) {
+      setLearningError(
+        cause instanceof Error ? cause.message : 'Could not save learning progress.'
+      );
+    } finally {
+      setSavingLearned(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -481,10 +535,10 @@ export default function RoadmapPage() {
               )}
 
               <span>
-                {step
-                  ? statusLabels[step.status] ??
-                    readable(step.status)
-                  : 'Assessment not linked'}
+                {statusLabels[selectedStatus] ??
+                  (selectedStatus === 'unlinked'
+                    ? 'Assessment not linked'
+                    : readable(selectedStatus))}
               </span>
             </div>
 
@@ -518,7 +572,11 @@ export default function RoadmapPage() {
                 {step
                   ? actionLabels[step.next_action] ??
                     readable(step.next_action)
-                  : 'This foundation has not been linked to an assessed competency yet.'}
+                  : selectedItem?.source === 'resume'
+                    ? 'This skill was identified in your uploaded CV. Review your experience to confirm proficiency; this does not represent independently verified mastery.'
+                    : selectedItem?.source
+                      ? 'This skill is recorded in your profile. Review its supporting evidence to confirm proficiency.'
+                      : 'No matching skill record was found. You can assess or document your experience.'}
               </p>
             </div>
 
@@ -532,6 +590,11 @@ export default function RoadmapPage() {
 
             <div className="cf-skill-inspector-section">
               <h3>Learning resources</h3>
+              {resourceInfo.starter && resources.length > 0 && (
+                <p className="cf-learning-helper">
+                  Starter resource · not yet mapped in the CareerForge database.
+                </p>
+              )}
 
               {resources.length > 0 ? (
                 <div className="cf-skill-resources">
@@ -576,6 +639,36 @@ export default function RoadmapPage() {
                 <p>
                   No learning resources are linked
                   to this skill yet.
+                </p>
+              )}
+            </div>
+
+            <div className="cf-skill-inspector-section cf-learning-section">
+              <h3>Your learning progress</h3>
+              <p className="cf-learning-helper">
+                When you've finished studying, mark this skill as learned.
+                This is self-reported and does not verify proficiency.
+              </p>
+              <button
+                type="button"
+                className={`cf-learning-toggle ${isLearned ? 'is-learned' : ''}`}
+                aria-pressed={isLearned}
+                disabled={savingLearned}
+                onClick={() => void toggleLearned()}
+              >
+                {savingLearned
+                  ? 'Saving…'
+                  : isLearned
+                    ? '✓ Learned · Undo'
+                    : 'Mark as learned'}
+              </button>
+              {learningError && (
+                <p className="cf-learning-error" role="alert">{learningError}</p>
+              )}
+              {isLearned && (
+                <p className="cf-learning-helper">
+                  Next: build something using this skill, then update and upload
+                  your CV so CareerForge can identify supporting evidence.
                 </p>
               )}
             </div>

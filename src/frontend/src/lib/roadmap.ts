@@ -58,3 +58,36 @@ export async function getCareerRoadmap(
 
   return data as CareerRoadmap;
 }
+
+
+export type RecordedSkill = {
+  name: string;
+  source: string | null;
+  status: 'evidenced';
+};
+
+export async function getRecordedSkills(): Promise<RecordedSkill[]> {
+  const response = await fetch(
+    '/api/roadmaps/skill-evidence/me',
+    { credentials: 'include' }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not retrieve recorded skills (HTTP ${response.status}).`
+    );
+  }
+
+  const data: unknown = await response.json();
+
+  if (
+    typeof data !== 'object' ||
+    data === null ||
+    !('skills' in data) ||
+    !Array.isArray(data.skills)
+  ) {
+    throw new Error('Unexpected skill-evidence response.');
+  }
+
+  return data.skills as RecordedSkill[];
+}

@@ -4,28 +4,26 @@ import type { IconType } from 'react-icons';
 import { SiPython } from 'react-icons/si';
 import {
   FiBarChart2,
+  FiBookOpen,
+  FiCheck,
   FiCheckCircle,
   FiCpu,
   FiDatabase,
+  FiLayers,
+  FiMessageSquare,
   FiPieChart,
-  FiBookOpen,
-    FiLayers,
-    FiMessageSquare,
-    FiTrendingUp,
-    FiCheck,
+  FiTrendingUp,
 } from 'react-icons/fi';
 
-export type SkillMapNodeType = Node<
-  {
-    title: string;
-    label: string;
-    glyph: string;
-    status: string;
-    related?: boolean;
-    dimmed?: boolean;
-  },
-  'skill'
->;
+export type SkillMapNodeType = Node<{
+  title: string;
+  label: string;
+  glyph: string;
+  status: string;
+  related?: boolean;
+  dimmed?: boolean;
+  learned?: boolean;
+}, 'skill'>;
 
 const skillIcons: Record<string, IconType> = {
   python: SiPython,
@@ -55,7 +53,6 @@ export default function SkillMapNode({
   selected,
 }: NodeProps<SkillMapNodeType>) {
   const Icon = skillIcons[id];
-
   const status = Object.hasOwn(statusLabels, data.status)
     ? data.status
     : 'unlinked';
@@ -63,56 +60,53 @@ export default function SkillMapNode({
   return (
     <div
       className={[
-    'cf-orb-node',
-    `cf-orb-node--${status}`,
-    selected ? 'is-selected' : '',
-    data.related ? 'is-related' : '',
-    data.dimmed ? 'is-dimmed' : '',
-    ].join(' ')}
-      title={`${data.title} — ${statusLabels[status]}`}
+        'cf-orb-node',
+        `cf-orb-node--${status}`,
+        selected ? 'is-selected' : '',
+        data.related ? 'is-related' : '',
+        data.dimmed ? 'is-dimmed' : '',
+        data.learned ? 'is-learned' : '',
+      ].filter(Boolean).join(' ')}
+      title={`${data.title} — ${statusLabels[status]}${data.learned ? ' · Marked learned' : ''}`}
     >
-        <Handle
+      <Handle
         type="target"
         position={Position.Left}
         className="cf-orb-handle cf-orb-handle--left"
         isConnectable={false}
-        />
+      />
 
+      <div className="cf-orb-circle">
+        {Icon ? (
+          <Icon
+            className={id === 'python' ? 'cf-python-icon' : ''}
+            aria-hidden="true"
+          />
+        ) : (
+          <span className="cf-orb-glyph" aria-hidden="true">
+            {data.glyph}
+          </span>
+        )}
+        {status === 'evidenced' && (
+          <span className="cf-orb-achieved" title="Evidence recorded" aria-label="Evidence recorded">
+            <FiCheck aria-hidden="true" />
+          </span>
+        )}
+        {data.learned && status !== 'evidenced' && (
+          <span className="cf-orb-learned-mark" title="Marked learned" aria-label="Marked learned">
+            <FiCheck aria-hidden="true" />
+          </span>
+        )}
+      </div>
 
-    <div className="cf-orb-circle">
-    {Icon ? (
-        <Icon
-        className={id === 'python' ? 'cf-python-icon' : ''}
-        aria-hidden="true"
-        />
-    ) : (
-        <span className="cf-orb-glyph" aria-hidden="true">
-        {data.glyph}
-        </span>
-    )}
+      <span className="cf-orb-label">{data.label}</span>
 
-    {status === 'evidenced' && (
-        <span
-        className="cf-orb-achieved"
-        title="Evidence recorded"
-        aria-label="Evidence recorded"
-        >
-        <FiCheck aria-hidden="true" />
-        </span>
-    )}
-    </div>
-
-
-      <span className="cf-orb-label">
-        {data.label}
-      </span>
-
-        <Handle
+      <Handle
         type="source"
         position={Position.Right}
         className="cf-orb-handle cf-orb-handle--right"
         isConnectable={false}
-        />
+      />
     </div>
   );
 }
