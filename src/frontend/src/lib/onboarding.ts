@@ -3,6 +3,7 @@ export type Career = {
   career_key: string;
   name: string;
   description: string | null;
+  id: number;
 };
 
 type CareerSelection = {

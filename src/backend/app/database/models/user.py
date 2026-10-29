@@ -1,6 +1,5 @@
-
 from datetime import datetime
-
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, false, func
 from sqlalchemy import Boolean, DateTime, Index, String, false, func
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -43,6 +42,10 @@ class User(Base):
         DateTime,
         default=datetime.utcnow,
         nullable=False,
+    )
+    target_career_id: Mapped[int | None] = mapped_column(
+    ForeignKey("careers.id", ondelete="SET NULL"),
+    nullable=True,
     )
 
 
