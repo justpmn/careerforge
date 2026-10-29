@@ -451,3 +451,244 @@
     transition: none;
   }
 }
+
+
+/* Evidenced / achieved skill appearance */
+
+.cf-orb-node--evidenced .cf-orb-circle {
+  border: 2px solid #31966b;
+
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(255, 255, 255, 0.65),
+      transparent 65%
+    ),
+    linear-gradient(145deg, #e2f6e9, #b8e5ca);
+
+  color: #206347;
+
+  box-shadow:
+    0 0 0 4px rgba(54, 165, 115, 0.12),
+    0 0 22px rgba(54, 165, 115, 0.18),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* Dark mode: a more luminous achieved node */
+
+[data-theme='dark']
+.cf-orb-node--evidenced .cf-orb-circle {
+  background:
+    radial-gradient(
+      circle at 35% 25%,
+      rgba(112, 220, 160, 0.25),
+      transparent 70%
+    ),
+    linear-gradient(145deg, #294e3b, #192d24);
+
+  color: #c1f5d4;
+
+  border-color: #71d7a1;
+
+  box-shadow:
+    0 0 0 4px rgba(91, 204, 143, 0.1),
+    0 0 24px rgba(91, 204, 143, 0.25),
+    inset 0 0 10px rgba(91, 204, 143, 0.08);
+}
+
+/* Small completion badge */
+
+.cf-orb-achieved {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+
+  display: grid;
+  place-items: center;
+
+  width: 23px;
+  height: 23px;
+
+  background: #269367;
+  color: #ffffff;
+
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+
+  box-shadow: 0 2px 9px rgba(25, 120, 75, 0.35);
+}
+
+.cf-orb-circle .cf-orb-achieved svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 3;
+}
+
+/* Evidenced skill labels stand out slightly */
+
+.cf-orb-node--evidenced .cf-orb-label {
+  font-weight: 700;
+}
+
+/* Preserve achieved styling when selected */
+
+.cf-orb-node--evidenced.is-selected .cf-orb-circle {
+  border-color: #74dca5;
+
+  box-shadow:
+    0 0 0 5px rgba(91, 204, 143, 0.2),
+    0 0 30px rgba(91, 204, 143, 0.3);
+}
+
+/* Interactive skill-path highlighting */
+
+.cf-orb-node {
+  transition: opacity 180ms ease;
+}
+
+.cf-orb-node.is-dimmed {
+  opacity: 0.48;
+}
+
+.cf-orb-node.is-related:not(.is-selected)
+.cf-orb-circle {
+  box-shadow:
+    0 0 0 4px rgba(212, 138, 103, 0.1),
+    0 0 18px rgba(212, 138, 103, 0.16);
+}
+
+.cf-orb-node--evidenced.is-related
+.cf-orb-circle,
+.cf-orb-node--evidenced.is-selected
+.cf-orb-circle {
+  border-color: #70dba2;
+
+  box-shadow:
+    0 0 0 5px rgba(87, 200, 148, 0.16),
+    0 0 26px rgba(87, 200, 148, 0.3);
+}
+
+/* Completed links receive a green energy trail */
+
+.cf-roadmap-map
+.react-flow__edge.cf-edge-achieved
+.react-flow__edge-path {
+  filter: drop-shadow(
+    0 0 4px rgba(87, 200, 148, 0.55)
+  );
+}
+
+/* Smooth transitions between focused paths */
+
+.cf-roadmap-map .react-flow__edge-path {
+  transition:
+    stroke 180ms ease,
+    stroke-width 180ms ease,
+    opacity 180ms ease;
+}
+
+/* Respect users who prefer reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-orb-node,
+  .cf-roadmap-map .react-flow__edge-path {
+    transition: none;
+  }
+
+  .cf-roadmap-map
+  .react-flow__edge.animated
+  .react-flow__edge-path {
+    animation: none !important;
+  }
+}
+
+/* Smooth skill-tree interactions */
+
+.cf-orb-node {
+  transition: opacity 220ms ease;
+}
+
+.cf-orb-circle {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.cf-roadmap-map .react-flow__edge-path {
+  transition:
+    stroke 220ms ease,
+    stroke-width 220ms ease,
+    opacity 220ms ease;
+}
+
+.cf-orb-node.is-dimmed {
+  opacity: 0.5;
+}
+
+.cf-orb-node.is-related {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-orb-node,
+  .cf-orb-circle,
+  .cf-roadmap-map .react-flow__edge-path {
+    transition: none;
+  }
+}
+
+/* Hover affects the orb only */
+
+.cf-orb-node:hover .cf-orb-circle {
+  transform: scale(1.06);
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 0 4px rgba(212, 138, 103, 0.12),
+    0 0 20px rgba(212, 138, 103, 0.22);
+}
+
+/* Selection illuminates the connected path */
+
+.cf-roadmap-map
+.react-flow__edge.cf-edge-focused
+.react-flow__edge-path {
+  stroke-dasharray: 6 8;
+
+  animation: cf-path-flow 2.4s linear infinite;
+
+  filter: drop-shadow(
+    0 0 3px rgba(212, 138, 103, 0.4)
+  );
+}
+
+/* Evidenced-to-evidenced connections stay green */
+
+.cf-roadmap-map
+.react-flow__edge.cf-edge-achieved
+.react-flow__edge-path {
+  filter: drop-shadow(
+    0 0 4px rgba(87, 200, 148, 0.5)
+  );
+}
+
+@keyframes cf-path-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-roadmap-map
+  .react-flow__edge.cf-edge-focused
+  .react-flow__edge-path {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}

@@ -1,8 +1,6 @@
-
 import { Handle, Position } from '@xyflow/react';
 import type { Node, NodeProps } from '@xyflow/react';
 import type { IconType } from 'react-icons';
-
 import { SiPython } from 'react-icons/si';
 import {
   FiBarChart2,
@@ -10,6 +8,11 @@ import {
   FiCpu,
   FiDatabase,
   FiPieChart,
+  FiBookOpen,
+    FiLayers,
+    FiMessageSquare,
+    FiTrendingUp,
+    FiCheck,
 } from 'react-icons/fi';
 
 export type SkillMapNodeType = Node<
@@ -18,17 +21,24 @@ export type SkillMapNodeType = Node<
     label: string;
     glyph: string;
     status: string;
+    related?: boolean;
+    dimmed?: boolean;
   },
   'skill'
 >;
 
 const skillIcons: Record<string, IconType> = {
   python: SiPython,
-  statistics: FiPieChart,
-  data_cleaning: FiDatabase,
+  notebook_tooling: FiBookOpen,
+  sql: FiDatabase,
+  statistics_inference: FiPieChart,
+  data_science_libraries: FiLayers,
+  data_preparation: FiDatabase,
   exploratory_analysis: FiBarChart2,
-  machine_learning: FiCpu,
+  visualization_tools: FiTrendingUp,
+  ml_training: FiCpu,
   model_evaluation: FiCheckCircle,
+  data_communication: FiMessageSquare,
 };
 
 const statusLabels: Record<string, string> = {
@@ -53,10 +63,12 @@ export default function SkillMapNode({
   return (
     <div
       className={[
-        'cf-orb-node',
-        `cf-orb-node--${status}`,
-        selected ? 'is-selected' : '',
-      ].join(' ')}
+    'cf-orb-node',
+    `cf-orb-node--${status}`,
+    selected ? 'is-selected' : '',
+    data.related ? 'is-related' : '',
+    data.dimmed ? 'is-dimmed' : '',
+    ].join(' ')}
       title={`${data.title} — ${statusLabels[status]}`}
     >
         <Handle
@@ -66,18 +78,30 @@ export default function SkillMapNode({
         isConnectable={false}
         />
 
-      <div className="cf-orb-circle">
-        {Icon ? (
-          <Icon
-            className={id === 'python' ? 'cf-python-icon' : ''}
-            aria-hidden="true"
-          />
-        ) : (
-          <span className="cf-orb-glyph" aria-hidden="true">
-            {data.glyph}
-          </span>
-        )}
-      </div>
+
+    <div className="cf-orb-circle">
+    {Icon ? (
+        <Icon
+        className={id === 'python' ? 'cf-python-icon' : ''}
+        aria-hidden="true"
+        />
+    ) : (
+        <span className="cf-orb-glyph" aria-hidden="true">
+        {data.glyph}
+        </span>
+    )}
+
+    {status === 'evidenced' && (
+        <span
+        className="cf-orb-achieved"
+        title="Evidence recorded"
+        aria-label="Evidence recorded"
+        >
+        <FiCheck aria-hidden="true" />
+        </span>
+    )}
+    </div>
+
 
       <span className="cf-orb-label">
         {data.label}

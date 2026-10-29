@@ -1,23 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Background,
-  BackgroundVariant,
-  Controls,
-  MarkerType,
-  Position,
-  ReactFlow,
-} from '@xyflow/react';
+import { Background, BackgroundVariant, Controls, ReactFlow } from '@xyflow/react';
 import type { Edge, Node } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
-
 import '@xyflow/react/dist/style.css';
 import '../roadmap.css';
-
 import { useAuth } from '../context/AuthContext';
 import { onboardingApi } from '../lib/onboarding';
 import { getCareerRoadmap } from '../lib/roadmap';
 import { buildSkillTree } from '../lib/skilltreetemplates';
-
 import type { CareerRoadmap } from '../lib/roadmap';
 import type { SkillTreeItem } from '../lib/skilltreetemplates';
 import SkillMapNode from '../components/skillmapnode';
@@ -67,30 +57,17 @@ const skillVisuals: Record<
   string,
   { label: string; glyph: string }
 > = {
-  python: {
-    label: 'Python',
-    glyph: 'Py',
-  },
-  statistics: {
-    label: 'Statistics',
-    glyph: 'Σ',
-  },
-  data_cleaning: {
-    label: 'Data Prep',
-    glyph: '{ }',
-  },
-  exploratory_analysis: {
-    label: 'Data Analysis',
-    glyph: 'EDA',
-  },
-  machine_learning: {
-    label: 'Machine Learning',
-    glyph: 'ML',
-  },
-  model_evaluation: {
-    label: 'Model Evaluation',
-    glyph: 'EV',
-  },
+  python: { label: 'Python', glyph: 'Py' },
+  notebook_tooling: { label: 'Notebooks', glyph: 'NB' },
+  sql: { label: 'SQL', glyph: 'SQL' },
+  statistics_inference: { label: 'Statistics', glyph: 'Σ' },
+  data_science_libraries: { label: 'ML Libraries', glyph: 'LIB' },
+  data_preparation: { label: 'Data Preparation', glyph: 'DP' },
+  exploratory_analysis: { label: 'Data Analysis', glyph: 'EDA' },
+  visualization_tools: { label: 'Visualization', glyph: 'VIS' },
+  ml_training: { label: 'Machine Learning', glyph: 'ML' },
+  model_evaluation: { label: 'Model Evaluation', glyph: 'EV' },
+  data_communication: { label: 'Communication', glyph: 'COM' },
 };
 
 function skillVisual(item: SkillTreeItem) {
@@ -116,28 +93,57 @@ function skillVisual(item: SkillTreeItem) {
 }
 
 
-
-function layoutSkillGraph(
+function getPrerequisitePath(
   items: SkillTreeItem[],
-  selectedId: string | null
+  focusId: string | null
+): Set<string> {
+  const path = new Set<string>();
+
+  if (!focusId) return path;
+
+  const byId = new Map(
+    items.map((item) => [item.id, item])
+  );
+
+  function visit(id: string) {
+    if (path.has(id)) return;
+
+    path.add(id);
+
+    for (const prerequisite of byId.get(id)?.requires ?? []) {
+      visit(prerequisite);
+    }
+  }
+
+  visit(focusId);
+  return path;
+}
+
+
+
+// Lay out the dependency graph only when the roadmap changes.
+// Node selection is applied separately; pointer movement never reruns Dagre.
+function layoutSkillGraph(
+  items: SkillTreeItem[]
 ): { nodes: Node[]; edges: Edge[] } {
   const layout = new dagre.graphlib.Graph();
 
   layout.setDefaultEdgeLabel(() => ({}));
-
-    layout.setGraph({
+  layout.setGraph({
     rankdir: 'LR',
     nodesep: 80,
     ranksep: 110,
     marginx: 60,
     marginy: 60,
-    });
+  });
 
   const ids = new Set(items.map((item) => item.id));
+  const statuses = new Map(
+    items.map((item) => [item.id, item.step?.status ?? 'unlinked'])
+  );
 
   const nodes: Node[] = items.map((item) => {
     const visual = skillVisual(item);
-
     layout.setNode(item.id, {
       width: NODE_WIDTH,
       height: NODE_HEIGHT,
@@ -148,12 +154,13 @@ function layoutSkillGraph(
       type: 'skill',
       position: { x: 0, y: 0 },
       draggable: false,
-      selected: selectedId === item.id,
       data: {
         title: item.title,
         label: visual.label,
         glyph: visual.glyph,
-        status: item.step?.status ?? 'unlinked',
+        status: statuses.get(item.id) ?? 'unlinked',
+        related: false,
+        dimmed: false,
       },
     };
   });
@@ -165,22 +172,21 @@ function layoutSkillGraph(
       if (!ids.has(prerequisite)) continue;
 
       layout.setEdge(prerequisite, item.id);
-
-      const highlighted =
-        selectedId === item.id ||
-        selectedId === prerequisite;
+      const completed =
+        statuses.get(prerequisite) === 'evidenced' &&
+        statuses.get(item.id) === 'evidenced';
 
       edges.push({
         id: `${prerequisite}:${item.id}`,
         source: prerequisite,
         target: item.id,
         type: 'smoothstep',
+        animated: false,
+        className: completed ? 'cf-edge-achieved' : '',
         style: {
-          stroke: highlighted
-            ? 'var(--accent)'
-            : 'var(--muted)',
-          strokeWidth: highlighted ? 2 : 1.4,
-          opacity: highlighted ? 0.9 : 0.4,
+          stroke: completed ? '#57c894' : 'var(--muted)',
+          strokeWidth: completed ? 2.2 : 1.3,
+          opacity: completed ? 0.95 : 0.36,
         },
       });
     }
@@ -191,7 +197,6 @@ function layoutSkillGraph(
   return {
     nodes: nodes.map((node) => {
       const position = layout.node(node.id);
-
       return {
         ...node,
         position: {
@@ -208,13 +213,8 @@ function layoutSkillGraph(
 export default function RoadmapPage() {
   const { user } = useAuth();
   const userId = user?.id;
-
-  const [roadmap, setRoadmap] =
-    useState<CareerRoadmap | null>(null);
-
-  const [selectedId, setSelectedId] =
-    useState<string | null>(null);
-
+  const [roadmap, setRoadmap] = useState<CareerRoadmap | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [needsCareer, setNeedsCareer] = useState(false);
@@ -276,15 +276,86 @@ export default function RoadmapPage() {
     [roadmap]
   );
 
-  const graph = useMemo(() => {
-    const visibleItems = tree
+  // Calculate graph positions only when roadmap data changes.
+  const baseGraph = useMemo(() => {
+    const items = tree
       ? tree.hasTemplate
         ? tree.connected
         : tree.unmapped
       : [];
 
-    return layoutSkillGraph(visibleItems, selectedId);
-  }, [tree, selectedId]);
+    return layoutSkillGraph(items);
+  }, [tree]);
+  // Update visual highlighting without recalculating layout.
+
+  const graph = useMemo(() => {
+    const items = tree
+      ? tree.hasTemplate
+        ? tree.connected
+        : tree.unmapped
+      : [];
+
+    const hasSelection =
+      selectedId !== null && items.some((item) => item.id === selectedId);
+    const upstream = getPrerequisitePath(items, selectedId);
+    const nextSkills = new Set(
+      items
+        .filter((item) => selectedId !== null && item.requires.includes(selectedId))
+        .map((item) => item.id)
+    );
+
+    const statusById = new Map(
+      items.map((item) => [item.id, item.step?.status ?? 'unlinked'])
+    );
+
+    const nodes = baseGraph.nodes.map((node) => {
+      const related = upstream.has(node.id) || nextSkills.has(node.id);
+
+      return {
+        ...node,
+        selected: node.id === selectedId,
+        data: {
+          ...node.data,
+          related: hasSelection && related,
+          dimmed: hasSelection && !related,
+        },
+      };
+    });
+
+    const edges = baseGraph.edges.map((edge) => {
+      const completed =
+        statusById.get(edge.source) === 'evidenced' &&
+        statusById.get(edge.target) === 'evidenced';
+
+      const highlighted =
+        hasSelection &&
+        ((upstream.has(edge.source) && upstream.has(edge.target)) ||
+          edge.source === selectedId);
+
+      return {
+        ...edge,
+        animated: false,
+        className: [
+          completed ? 'cf-edge-achieved' : '',
+          highlighted ? 'cf-edge-focused' : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+        style: {
+          ...edge.style,
+          stroke: completed
+            ? '#57c894'
+            : highlighted
+              ? 'var(--accent)'
+              : 'var(--muted)',
+          strokeWidth: highlighted ? 2.5 : completed ? 2.2 : 1.3,
+          opacity: highlighted ? 1 : completed ? 0.95 : 0.36,
+        },
+      };
+    });
+
+    return { nodes, edges };
+  }, [tree, baseGraph, selectedId]);
 
   const selectedItem = [
     ...(tree?.connected ?? []),
