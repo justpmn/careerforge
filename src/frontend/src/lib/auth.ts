@@ -14,7 +14,7 @@ export type Registration = Credentials & { name: string };
 
 const API_ROOT = '/api/auth';
 
-function csrfHeader(): Record<string, string> {
+export function csrfHeader(): Record<string, string> {
   const item = document.cookie.split('; ').find((part) => part.startsWith('csrf_token='));
   if (!item) return {};
   return { 'X-CSRF-Token': decodeURIComponent(item.slice('csrf_token='.length)) };
@@ -67,15 +67,45 @@ export const authApi = {
   }),
   logout: () => post('/logout'),
   completeOnboarding: () => post('/onboarding/complete'),
+
+
   async me(): Promise<User | null> {
-    const response = await request('/me');
-    if (response.status === 401) return null;
-    if (!response.ok) throw new Error(await messageFrom(response));
-    const user: User = await response.json();
-    if (!user || typeof user.id !== 'string' || typeof user.onboarding_completed !== 'boolean') {
-      throw new Error('Invalid user response from the API. Check the /api/auth/me contract.');
+    const controller = new AbortController();
+
+    // Give the authentication request 10 seconds.
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 10000);
+
+    try {
+      const response = await request('/me', {
+        signal: controller.signal,
+      });
+
+      if (response.status === 401) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(await messageFrom(response));
+      }
+
+      const user: User = await response.json();
+
+      if (
+        !user ||
+        typeof user.id !== 'string' ||
+        typeof user.onboarding_completed !== 'boolean'
+      ) {
+        throw new Error(
+          'Invalid user response from the API.'
+        );
+      }
+
+      return user;
+    } finally {
+      clearTimeout(timeout);
     }
-    return user;
   },
 };
 

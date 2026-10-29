@@ -232,7 +232,11 @@ def complete_onboarding(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found.",
         )
-
+    if user.target_career_id is None:
+        raise HTTPException(
+        status_code=400,
+        detail="Select a target career before completing setup.",
+        )
     user.onboarding_completed = True
     db.commit()
 
