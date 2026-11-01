@@ -2,17 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, Path
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
 from src.backend.app.api.auth import get_current_user_id
 from src.backend.app.database.models.career import Career
 from src.backend.app.database.models.user_learning_progress import UserLearningProgress
 from src.backend.app.database.session import get_db
 from src.backend.app.services.career_competency_profiles import CAREER_COMPETENCY_PROFILES
+from src.backend.app.services.learning_resource_service import (get_resources_for_skills, get_resources_for_competencies)
 
 router = APIRouter(prefix="/roadmaps", tags=["Learning Progress"])
 
-# Supplemental tree roots that do not exist in the competency profile yet.
-# Keep this small until career templates are served by the backend.
+
 EXTRA_SKILLS = {"data_scientist": {"python"}}
 
 
@@ -89,3 +88,59 @@ def update_learning_progress(
 
     db.commit()
     return LearningSkillResponse(skill_key=skill_key, learned=record.learned)
+
+
+
+# Maps visual-only foundation nodes to canonical
+# skill names stored in PostgreSQL.
+FOUNDATION_SKILL_NAMES = {
+    "data_scientist": {
+        "python": "Python",
+    },
+}
+
+
+@router.get("/skill-resources/{career_key}/{skill_key}")
+def read_skill_resources(
+    career_key: str,
+    skill_key: str,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    # Check that the requested career and skill
+    # belong to a recognized roadmap.
+    _, allowed_keys = get_career_and_keys(
+        db,
+        career_key,
+    )
+
+    if skill_key not in allowed_keys:
+        raise HTTPException(
+            status_code=404,
+            detail="Skill not found in career roadmap.",
+        )
+
+    # Foundation nodes correspond to canonical skills.
+    canonical_name = FOUNDATION_SKILL_NAMES.get(
+        career_key,
+        {},
+    ).get(skill_key)
+
+    if canonical_name:
+        resources = get_resources_for_skills(
+            db,
+            [canonical_name],
+        )
+    else:
+        # Regular nodes correspond to competencies.
+        resources = get_resources_for_competencies(
+            db,
+            [skill_key],
+            career_key,
+        ).get(skill_key, [])
+
+    return {
+        "career_key": career_key,
+        "skill_key": skill_key,
+        "resources": resources,
+    }

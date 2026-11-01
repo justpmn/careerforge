@@ -1,0 +1,220 @@
+
+{
+  "version": 1,
+  "resources": [
+    {
+      "title": "Statistics and Probability",
+      "provider": "Khan Academy",
+      "resource_type": "course",
+      "url": "https://www.khanacademy.org/math/statistics-probability",
+      "description": "Learn descriptive statistics, probability, sampling, hypothesis testing and inference."
+    },
+    {
+      "title": "How to Calculate Summary Statistics",
+      "provider": "pandas",
+      "resource_type": "tutorial",
+      "url": "https://pandas.pydata.org/docs/getting_started/intro_tutorials/06_calculate_statistics.html",
+      "description": "Explore grouped summaries and descriptive statistics using pandas."
+    },
+    {
+      "title": "Supervised Learning",
+      "provider": "scikit-learn",
+      "resource_type": "documentation",
+      "url": "https://scikit-learn.org/stable/supervised_learning.html",
+      "description": "Explore classification and regression estimators and model training approaches."
+    },
+    {
+      "title": "Model Evaluation",
+      "provider": "scikit-learn",
+      "resource_type": "documentation",
+      "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+      "description": "Learn validation strategies and evaluation metrics for machine learning models."
+    },
+    {
+      "title": "Matplotlib Tutorials",
+      "provider": "Matplotlib",
+      "resource_type": "tutorial",
+      "url": "https://matplotlib.org/stable/tutorials/index.html",
+      "description": "Create and customize plots using the Matplotlib library."
+    },
+    {
+      "title": "From Data to Viz",
+      "provider": "From Data to Viz",
+      "resource_type": "tutorial",
+      "url": "https://www.data-to-viz.com/",
+      "description": "Choose appropriate visualizations and avoid misleading chart design."
+    },
+    {
+      "title": "Authentication Cheat Sheet",
+      "provider": "OWASP",
+      "resource_type": "documentation",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "description": "Learn common authentication requirements and defensive implementation practices."
+    }
+  ],
+  "mappings": [
+    {
+      "career_key": "data_scientist",
+      "competency_key": "data_science_programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://stat.ethz.ch/CRAN/doc/manuals/r-release/R-intro.html"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "statistics_inference",
+      "urls": [
+        "https://www.khanacademy.org/math/statistics-probability"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "exploratory_analysis",
+      "urls": [
+        "https://pandas.pydata.org/docs/getting_started/intro_tutorials/06_calculate_statistics.html"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "data_preparation",
+      "urls": [
+        "https://pandas.pydata.org/docs/getting_started/"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "ml_training",
+      "urls": [
+        "https://scikit-learn.org/stable/supervised_learning.html",
+        "https://scikit-learn.org/stable/getting_started"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "model_evaluation",
+      "urls": [
+        "https://scikit-learn.org/stable/modules/model_evaluation.html"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "data_science_libraries",
+      "urls": [
+        "https://numpy.org/doc/stable/user/absolute_beginners",
+        "https://scikit-learn.org/stable/getting_started"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "sql",
+      "urls": [
+        "https://sqlbolt.com/"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "visualization_tools",
+      "urls": [
+        "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started",
+        "https://matplotlib.org/stable/tutorials/index.html"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "data_communication",
+      "urls": [
+        "https://www.data-to-viz.com/"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "notebook_tooling",
+      "urls": [
+        "https://jupyter.org/try"
+      ]
+    },
+    {
+      "career_key": "data_scientist",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "backend_runtime",
+      "urls": [
+        "https://nodejs.org/learn/getting-started/introduction-to-nodejs",
+        "https://fastapi.tiangolo.com/tutorial/"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "database",
+      "urls": [
+        "https://dev.mysql.com/doc/mysql-getting-started/en/",
+        "https://www.postgresql.org/docs/current/tutorial.html"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "api",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Glossary/REST",
+        "https://fastapi.tiangolo.com/tutorial/"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "deployment",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "testing",
+      "urls": [
+        "https://docs.pytest.org/en/stable/getting-started.html",
+        "https://vitest.dev/guide/"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "authentication_security",
+      "urls": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "debugging",
+      "urls": [
+        "https://code.visualstudio.com/docs/debugtest/debugging"
+      ]
+    },
+    {
+      "career_key": "backend_developer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    }
+  ]
+}

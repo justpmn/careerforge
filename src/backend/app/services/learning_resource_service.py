@@ -1,13 +1,19 @@
-
+import json
+from functools import lru_cache
+from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from src.backend.app.database.models.skill import Skill
-from src.backend.app.database.models.learning_resource import ( LearningResource)
+from src.backend.app.database.models.learning_resource import (LearningResource)
 from src.backend.app.database.models.learning_resource_skill import (LearningResourceSkill)
 
 
+CATALOG_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "resource_catalog"
+    / "competency_resources.json"
+)
 
-# Resources suitable for multiple career paths.
 COMMON_COMPETENCY_RESOURCE_URLS = {
     "ci_cd": [
         "https://docs.github.com/en/actions/get-started",
@@ -15,28 +21,20 @@ COMMON_COMPETENCY_RESOURCE_URLS = {
 }
 
 
-# Resources selected for specific career-competency pairs.
 CAREER_COMPETENCY_RESOURCE_URLS = {
-    ("backend_developer", "testing"): [
-        "https://docs.pytest.org/en/stable/getting-started.html",
-    ],
-    
     ("backend_developer", "testing"): [
         "https://docs.pytest.org/en/stable/getting-started.html",
         "https://vitest.dev/guide/",
     ],
-    
     ("backend_developer", "debugging"): [
         "https://code.visualstudio.com/docs/debugtest/debugging",
     ],
-
     ("software_engineer", "debugging"): [
         "https://code.visualstudio.com/docs/debugtest/debugging",
     ],
     ("qa_test_engineer", "debugging"): [
         "https://code.visualstudio.com/docs/debugtest/debugging",
     ],
-    
     ("frontend_developer", "testing"): [
         "https://vitest.dev/guide/",
     ],
@@ -46,7 +44,6 @@ CAREER_COMPETENCY_RESOURCE_URLS = {
     ("qa_test_engineer", "testing"): [
         "https://playwright.dev/docs/intro",
     ],
-
     ("qa_test_engineer", "api_testing"): [
         (
             "https://learning.postman.com/docs/"
@@ -59,22 +56,59 @@ CAREER_COMPETENCY_RESOURCE_URLS = {
             "get-started/write-your-first-test/"
         ),
     ],
-
 }
+
+
+@lru_cache(maxsize=1)
+def load_competency_resource_mappings(
+) -> dict[tuple[str, str], list[str]]:
+    """
+    Load career and competency resource mappings
+    from the JSON catalog.
+    """
+
+    with CATALOG_PATH.open(
+        "r",
+        encoding="utf-8",
+    ) as file:
+        catalog = json.load(file)
+
+    if catalog.get("version") != 1:
+        raise ValueError(
+            "Unsupported competency resource catalog version."
+        )
+
+    mappings = {}
+
+    for item in catalog["mappings"]:
+        key = (
+            item["career_key"],
+            item["competency_key"],
+        )
+
+        if key in mappings:
+            raise ValueError(
+                f"Duplicate competency resource mapping: {key}"
+            )
+
+        mappings[key] = item["urls"]
+
+    return mappings
 
 
 def get_resources_for_skills(
     db: Session,
     skill_names: list[str],
 ) -> list[dict]:
+    """
+    Retrieve resources linked to canonical skills.
+    """
 
-    # Remove duplicate skill names.
     skill_names = sorted(set(skill_names))
 
     if not skill_names:
         return []
 
-    # Retrieve resources associated with canonical skills.
     rows = db.execute(
         select(
             LearningResource,
@@ -96,12 +130,9 @@ def get_resources_for_skills(
         )
     ).all()
 
-    # Group results so a resource linked to several
-    # skills appears only once.
     resources = {}
 
     for resource, skill_name in rows:
-
         if resource.id not in resources:
             resources[resource.id] = {
                 "id": resource.id,
@@ -120,26 +151,39 @@ def get_resources_for_skills(
     return list(resources.values())
 
 
-
-
 def get_resources_for_competencies(
     db: Session,
     competency_keys: list[str],
     career_key: str,
 ) -> dict[str, list[dict]]:
+    """
+    Resolve competency resources from the JSON
+    catalog and retrieve their details from PostgreSQL.
+
+    Existing Python mappings remain as fallbacks.
+    """
 
     competency_keys = sorted(set(competency_keys))
 
     if not competency_keys:
         return {}
 
-    # Resolve resources for this specific career.
+    catalog_mappings = (
+        load_competency_resource_mappings()
+    )
+
     resource_urls = {}
 
     for key in competency_keys:
-        resource_urls[key] = CAREER_COMPETENCY_RESOURCE_URLS.get(
+        resource_urls[key] = catalog_mappings.get(
             (career_key, key),
-            COMMON_COMPETENCY_RESOURCE_URLS.get(key, []),
+            CAREER_COMPETENCY_RESOURCE_URLS.get(
+                (career_key, key),
+                COMMON_COMPETENCY_RESOURCE_URLS.get(
+                    key,
+                    [],
+                ),
+            ),
         )
 
     requested_urls = {
@@ -156,7 +200,6 @@ def get_resources_for_competencies(
     if not requested_urls:
         return results
 
-    # Fetch the required resources in one query.
     resources = db.scalars(
         select(LearningResource)
         .where(
@@ -169,11 +212,13 @@ def get_resources_for_competencies(
         for resource in resources
     }
 
-    missing_urls = requested_urls - resources_by_url.keys()
+    missing_urls = (
+        requested_urls - resources_by_url.keys()
+    )
 
     if missing_urls:
         raise ValueError(
-            f"Competency resources not found: "
+            "Competency resources not found: "
             f"{sorted(missing_urls)}"
         )
 

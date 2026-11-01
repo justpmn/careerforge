@@ -15,7 +15,6 @@ import {
   getLearningProgress,
   updateLearningProgress,
 } from '../lib/learningprogress';
-import { resourcesForSkill } from '../lib/skillresourcecatalog';
 import '../roadmapprogress.css';
 
 const NODE_WIDTH = 126;
@@ -215,6 +214,15 @@ function layoutSkillGraph(
   };
 }
 
+type FoundationResource = {
+  id?: number;
+  title: string;
+  provider?: string | null;
+  url?: string | null;
+  description?: string | null;
+  explanation?: string | null;
+  reason?: string | null;
+};
 
 export default function RoadmapPage() {
   const { user } = useAuth();
@@ -228,6 +236,16 @@ export default function RoadmapPage() {
   const [learnedByKey, setLearnedByKey] = useState<Record<string, boolean>>({});
   const [savingLearned, setSavingLearned] = useState(false);
   const [learningError, setLearningError] = useState('');
+    
+  const [pythonResources, setPythonResources] =
+    useState<FoundationResource[]>([]);
+
+  const [pythonResourcesLoading, setPythonResourcesLoading] =
+    useState(false);
+
+  const [pythonResourcesError, setPythonResourcesError] =
+    useState('');
+
 
   useEffect(() => {
     if (!userId) {
@@ -286,6 +304,74 @@ export default function RoadmapPage() {
       active = false;
     };
   }, [userId]);
+
+  
+useEffect(() => {
+  if (
+    roadmap?.career_key !== 'data_scientist' ||
+    selectedId !== 'python'
+  ) {
+    return;
+  }
+
+  const controller = new AbortController();
+
+  setPythonResources([]);
+  setPythonResourcesLoading(true);
+  setPythonResourcesError('');
+
+  async function loadPythonResources() {
+    try {
+      const response = await fetch(
+        '/api/roadmaps/skill-resources/data_scientist/python',
+        {
+          credentials: 'include',
+          signal: controller.signal,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Could not retrieve Python resources (HTTP ${response.status}).`
+        );
+      }
+
+      const data: unknown = await response.json();
+
+      if (
+        !data ||
+        typeof data !== 'object' ||
+        !('resources' in data) ||
+        !Array.isArray(data.resources)
+      ) {
+        throw new Error('Unexpected resource response.');
+      }
+
+      if (!controller.signal.aborted) {
+        setPythonResources(
+          data.resources as FoundationResource[]
+        );
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setPythonResourcesError(
+          error instanceof Error
+            ? error.message
+            : 'Unable to load Python resources.'
+        );
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setPythonResourcesLoading(false);
+      }
+    }
+  }
+
+  void loadPythonResources();
+
+  return () => controller.abort();
+}, [roadmap?.career_key, selectedId]);
+
 
   const tree = useMemo(
     () => (roadmap ? buildSkillTree(roadmap, recordedSkills) : null),
@@ -388,12 +474,13 @@ export default function RoadmapPage() {
   const selectedStatus = step?.status ?? selectedItem?.status ?? 'unlinked';
   const selectedSkillKey = step?.competency_key ?? selectedItem?.id;
   const isLearned = Boolean(selectedSkillKey && learnedByKey[selectedSkillKey]);
-  const resourceInfo = resourcesForSkill(
-    roadmap?.career_key ?? '',
-    selectedSkillKey ?? '',
-    step?.suggested_resources ?? []
-  );
-  const resources = resourceInfo.resources;
+  
+const resources =
+  selectedItem?.id === 'python'
+    ? pythonResources
+    : step?.suggested_resources ?? [];
+
+
 
   async function toggleLearned() {
     if (!roadmap || !selectedSkillKey || savingLearned) return;
@@ -590,13 +677,12 @@ export default function RoadmapPage() {
 
             <div className="cf-skill-inspector-section">
               <h3>Learning resources</h3>
-              {resourceInfo.starter && resources.length > 0 && (
-                <p className="cf-learning-helper">
-                  Starter resource · not yet mapped in the CareerForge database.
-                </p>
-              )}
 
-              {resources.length > 0 ? (
+              {selectedItem?.id === 'python' && pythonResourcesLoading ? (
+                <p>Loading Python resources...</p>
+              ) : selectedItem?.id === 'python' && pythonResourcesError ? (
+                <p role="alert">{pythonResourcesError}</p>
+              ) : resources.length > 0 ? (
                 <div className="cf-skill-resources">
                   {resources.map((resource, index) => {
                     const url = safeLink(resource.url);
