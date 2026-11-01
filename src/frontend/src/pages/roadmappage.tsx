@@ -62,6 +62,7 @@ const skillVisuals: Record<
   string,
   { label: string; glyph: string }
 > = {
+  // Data Scientist
   python: { label: 'Python', glyph: 'Py' },
   notebook_tooling: { label: 'Notebooks', glyph: 'NB' },
   sql: { label: 'SQL', glyph: 'SQL' },
@@ -73,7 +74,21 @@ const skillVisuals: Record<
   ml_training: { label: 'Machine Learning', glyph: 'ML' },
   model_evaluation: { label: 'Model Evaluation', glyph: 'EV' },
   data_communication: { label: 'Communication', glyph: 'COM' },
+  
+  // Backend Developer
+  programming: { label: 'Programming', glyph: 'PF' },
+  version_control: { label: 'Git', glyph: 'GIT' },
+  backend_runtime: { label: 'Backend Frameworks', glyph: 'BE' },
+  database: { label: 'Databases', glyph: 'DB' },
+  api: { label: 'API Development', glyph: 'API' },
+  debugging: { label: 'Debugging', glyph: 'DBG' },
+  authentication_security: { label: 'Authentication', glyph: 'SEC' },
+  testing: { label: 'Testing', glyph: 'TST' },
+  deployment: { label: 'Deployment', glyph: 'DEP' },
+  ci_cd: { label: 'CI/CD', glyph: 'CI' },
+
 };
+
 
 function skillVisual(item: SkillTreeItem) {
   const predefined = skillVisuals[item.id];

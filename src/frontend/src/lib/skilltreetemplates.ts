@@ -98,8 +98,84 @@ const templates: Record<string, CareerTemplate> = {
           'model_evaluation',
         ],
       },
+      
     ],
   },
+  
+  backend_developer: {
+    version: 1,
+    nodes: [
+      {
+        id: 'programming',
+        title: 'Programming Fundamentals',
+        requires: [],
+        skillAliases: [
+          'Python',
+          'JavaScript',
+          'Java',
+          'C#',
+          'Go',
+        ],
+      },
+      {
+        id: 'version_control',
+        title: 'Version Control with Git',
+        requires: [],
+        skillAliases: ['Git'],
+      },
+      {
+        id: 'backend_runtime',
+        title: 'Backend Languages and Frameworks',
+        requires: ['programming'],
+      },
+      {
+        id: 'database',
+        title: 'Databases and SQL',
+        requires: ['programming'],
+      },
+      {
+        id: 'api',
+        title: 'API Design and Development',
+        requires: [
+          'backend_runtime',
+          'database',
+        ],
+      },
+      {
+        id: 'debugging',
+        title: 'Debugging and Troubleshooting',
+        requires: ['backend_runtime'],
+      },
+      {
+        id: 'authentication_security',
+        title: 'Authentication and Security',
+        requires: ['api'],
+      },
+      {
+        id: 'testing',
+        title: 'Backend Testing',
+        requires: ['api'],
+      },
+      {
+        id: 'deployment',
+        title: 'Application Deployment',
+        requires: [
+          'api',
+          'version_control',
+        ],
+      },
+      {
+        id: 'ci_cd',
+        title: 'Continuous Integration and Deployment',
+        requires: [
+          'testing',
+          'deployment',
+          'version_control',
+        ],
+      },
+    ],
+  },
+
 };
 
 function validateTemplate(template: CareerTemplate): void {
