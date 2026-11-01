@@ -1,4 +1,3 @@
-
 {
   "version": 1,
   "resources": [
@@ -50,6 +49,139 @@
       "resource_type": "documentation",
       "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
       "description": "Learn common authentication requirements and defensive implementation practices."
+    },
+    {
+      "title": "Introduction to dbt",
+      "provider": "dbt Labs",
+      "resource_type": "documentation",
+      "url": "https://docs.getdbt.com/docs/introduction",
+      "description": "Learn modular SQL data modeling, transformations, testing, documentation and lineage."
+    },
+    {
+      "title": "Apache Airflow Tutorials",
+      "provider": "Apache Airflow",
+      "resource_type": "tutorial",
+      "url": "https://airflow.apache.org/docs/apache-airflow/stable/tutorial/",
+      "description": "Learn workflow orchestration, DAGs, dependencies and scheduled data pipelines."
+    },
+    {
+      "title": "Try Great Expectations Core",
+      "provider": "Great Expectations",
+      "resource_type": "tutorial",
+      "url": "https://docs.greatexpectations.io/docs/core/introduction/try_gx/",
+      "description": "Learn data validation, quality rules and automated checks for datasets."
+    },
+    {
+      "title": "Accessibility on the Web",
+      "provider": "MDN Web Docs",
+      "resource_type": "tutorial",
+      "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Accessibility",
+      "description": "Learn accessible HTML, interaction patterns and inclusive web design."
+    },
+    {
+      "title": "Amazon VPC Fundamentals",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+      "description": "Understand cloud networks, subnets, routing and connectivity."
+    },
+    {
+      "title": "AWS Identity and Access Management",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+      "description": "Understand identities, roles, permissions and authorization."
+    },
+    {
+      "title": "Getting Started with Amazon ECS",
+      "provider": "Amazon Web Services",
+      "resource_type": "tutorial",
+      "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html",
+      "description": "Learn how to deploy containerized applications in AWS."
+    },
+    {
+      "title": "Introduction to Amazon CloudWatch",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+      "description": "Monitor cloud resources, applications and operational health."
+    },
+    {
+      "title": "AWS Reliability Pillar",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html",
+      "description": "Explore resilient architecture, scaling and failure recovery."
+    },
+    {
+      "title": "Observability Primer",
+      "provider": "OpenTelemetry",
+      "resource_type": "documentation",
+      "url": "https://opentelemetry.io/docs/concepts/observability-primer/",
+      "description": "Understand logs, metrics, traces and system observability."
+    },
+    {
+      "title": "Managing Incidents",
+      "provider": "Google SRE",
+      "resource_type": "book",
+      "url": "https://sre.google/sre-book/managing-incidents/",
+      "description": "Learn structured operational incident response and coordination."
+    },
+    {
+      "title": "Service Level Objectives",
+      "provider": "Google SRE",
+      "resource_type": "book",
+      "url": "https://sre.google/sre-book/service-level-objectives/",
+      "description": "Learn service level indicators, objectives and error budgets."
+    },
+    {
+      "title": "Advanced Hunting in Microsoft Defender",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-overview",
+      "description": "Explore security events, threat hunting queries and investigations."
+    },
+    {
+      "title": "Getting Started with MITRE ATT&CK",
+      "provider": "MITRE",
+      "resource_type": "documentation",
+      "url": "https://attack.mitre.org/resources/",
+      "description": "Learn adversary tactics, techniques and threat investigation concepts."
+    },
+    {
+      "title": "NIST Incident Response Recommendations",
+      "provider": "NIST",
+      "resource_type": "documentation",
+      "url": "https://csrc.nist.gov/pubs/sp/800/61/r3/final",
+      "description": "Study incident preparation, detection, response and recovery."
+    },
+    {
+      "title": "OWASP Web Security Testing Guide",
+      "provider": "OWASP",
+      "resource_type": "documentation",
+      "url": "https://owasp.org/projects/web-security-testing-guide",
+      "description": "Explore structured security testing and vulnerability assessment."
+    },
+    {
+      "title": "CIS Benchmarks",
+      "provider": "Center for Internet Security",
+      "resource_type": "documentation",
+      "url": "https://www.cisecurity.org/cis-benchmarks",
+      "description": "Learn secure configuration and system hardening practices."
+    },
+    {
+      "title": "Azure Network Security Best Practices",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/azure/security/fundamentals/network-best-practices",
+      "description": "Learn network segmentation, access controls and security monitoring."
+    },
+    {
+      "title": "NIST Cybersecurity Framework 2.0",
+      "provider": "NIST",
+      "resource_type": "documentation",
+      "url": "https://www.nist.gov/cyberframework",
+      "description": "Understand cybersecurity risk management and security frameworks."
     }
   ],
   "mappings": [
@@ -214,6 +346,249 @@
       "competency_key": "ci_cd",
       "urls": [
         "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "data_programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://dev.java/learn/"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "sql_querying",
+      "urls": [
+        "https://sqlbolt.com/"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "data_storage",
+      "urls": [
+        "https://www.postgresql.org/docs/current/tutorial.html",
+        "https://docs.snowflake.com/en/user-guide-getting-started"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "data_modeling",
+      "urls": [
+        "https://docs.getdbt.com/docs/introduction"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "pipeline_design",
+      "urls": [
+        "https://airflow.apache.org/docs/apache-airflow/stable/tutorial/"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "data_quality",
+      "urls": [
+        "https://docs.greatexpectations.io/docs/core/introduction/try_gx/"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://docs.cloud.google.com/bigquery/docs/",
+        "https://aws.amazon.com/training/learn-about/cloud-practitioner/"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "data_engineer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "web_accessibility",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Accessibility"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "authentication_security",
+      "urls": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_infrastructure",
+      "urls": [
+        "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_networking",
+      "urls": [
+        "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_iam",
+      "urls": [
+        "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "infrastructure_as_code",
+      "urls": [
+        "https://developer.hashicorp.com/terraform/tutorials/aws-get-started"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_deployment",
+      "urls": [
+        "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/getting-started.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_monitoring",
+      "urls": [
+        "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_reliability",
+      "urls": [
+        "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "infrastructure_as_code",
+      "urls": [
+        "https://developer.hashicorp.com/terraform/tutorials/aws-get-started"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "deployment_automation",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "configuration_management",
+      "urls": [
+        "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "observability",
+      "urls": [
+        "https://opentelemetry.io/docs/concepts/observability-primer/"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "incident_management",
+      "urls": [
+        "https://sre.google/sre-book/managing-incidents/"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "sre_reliability",
+      "urls": [
+        "https://sre.google/sre-book/service-level-objectives/"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_monitoring",
+      "urls": [
+        "https://learn.microsoft.com/en-us/defender-xdr/advanced-hunting-overview"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "threat_detection",
+      "urls": [
+        "https://attack.mitre.org/resources/"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_incident_response",
+      "urls": [
+        "https://csrc.nist.gov/pubs/sp/800/61/r3/final"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "vulnerability_assessment",
+      "urls": [
+        "https://owasp.org/projects/web-security-testing-guide"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_controls",
+      "urls": [
+        "https://www.cisecurity.org/cis-benchmarks"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "identity_access_security",
+      "urls": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+        "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "network_security",
+      "urls": [
+        "https://learn.microsoft.com/en-us/azure/security/fundamentals/network-best-practices"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_risk",
+      "urls": [
+        "https://www.nist.gov/cyberframework"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_compliance",
+      "urls": [
+        "https://www.nist.gov/cyberframework",
+        "https://www.cisecurity.org/cis-benchmarks"
       ]
     }
   ]

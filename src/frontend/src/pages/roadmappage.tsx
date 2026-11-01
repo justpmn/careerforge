@@ -87,6 +87,17 @@ const skillVisuals: Record<
   deployment: { label: 'Deployment', glyph: 'DEP' },
   ci_cd: { label: 'CI/CD', glyph: 'CI' },
 
+  
+  // Data Engineer
+  data_programming: { label: 'Programming', glyph: 'PY' },
+  sql_querying: { label: 'SQL', glyph: 'SQL' },
+  data_storage: { label: 'Data Storage', glyph: 'DB' },
+  data_modeling: { label: 'Data Modeling', glyph: 'DM' },
+  pipeline_design: { label: 'Data Pipelines', glyph: 'ETL' },
+  data_quality: { label: 'Data Quality', glyph: 'DQ' },
+  cloud_platform: { label: 'Cloud', glyph: 'CLD' },
+  containers: { label: 'Containers', glyph: 'CTR' },
+
 };
 
 
@@ -99,17 +110,17 @@ function skillVisual(item: SkillTreeItem) {
 
   const words = title.match(/[A-Za-z0-9]+/g) ?? [];
 
-  return {
-    label:
-      title.length > 27
-        ? `${title.slice(0, 24).trimEnd()}…`
-        : title,
-    glyph:
-      words
-        .slice(0, 2)
-        .map((word) => word[0].toUpperCase())
-        .join('') || 'SK',
-  };
+
+return {
+  label: title,
+  glyph:
+    words
+      .slice(0, 2)
+      .map((word) => word[0].toUpperCase())
+      .join('') || 'SK',
+};
+
+  
 }
 
 

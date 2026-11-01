@@ -100,6 +100,7 @@ FOUNDATION_SKILL_NAMES = {
 }
 
 
+
 @router.get("/skill-resources/{career_key}/{skill_key}")
 def read_skill_resources(
     career_key: str,
@@ -107,8 +108,7 @@ def read_skill_resources(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    # Check that the requested career and skill
-    # belong to a recognized roadmap.
+    # Verify that this is a recognized career and skill.
     _, allowed_keys = get_career_and_keys(
         db,
         career_key,
@@ -120,24 +120,68 @@ def read_skill_resources(
             detail="Skill not found in career roadmap.",
         )
 
-    # Foundation nodes correspond to canonical skills.
-    canonical_name = FOUNDATION_SKILL_NAMES.get(
+    # Get the competency profile for this career.
+    profile = CAREER_COMPETENCY_PROFILES[career_key]
+
+    competency = next(
+        (
+            group
+            for group in profile
+            if group["key"] == skill_key
+        ),
+        None,
+    )
+
+    # Some nodes are visual foundations rather than
+    # competencies, such as Python in Data Scientist.
+    foundation_name = FOUNDATION_SKILL_NAMES.get(
         career_key,
         {},
     ).get(skill_key)
 
-    if canonical_name:
-        resources = get_resources_for_skills(
-            db,
-            [canonical_name],
+    if foundation_name:
+        skill_names = [foundation_name]
+    elif competency:
+        # 'any_of' contains canonical skill alternatives
+        # associated with this competency.
+        skill_names = list(
+            competency.get("any_of") or []
         )
     else:
-        # Regular nodes correspond to competencies.
-        resources = get_resources_for_competencies(
-            db,
-            [skill_key],
-            career_key,
-        ).get(skill_key, [])
+        skill_names = []
+
+    # Retrieve resources linked directly to skills.
+    skill_resources = get_resources_for_skills(
+        db,
+        skill_names,
+    )
+
+    # Retrieve resources explicitly curated for
+    # this career and competency.
+    competency_resources = []
+
+    if competency is not None:
+        competency_resources = (
+            get_resources_for_competencies(
+                db,
+                [skill_key],
+                career_key,
+            ).get(skill_key, [])
+        )
+
+    # Merge both sources without duplicate resources.
+    resources = []
+    seen_ids = set()
+
+    for resource in [
+        *competency_resources,
+        *skill_resources,
+    ]:
+        if resource["id"] in seen_ids:
+            continue
+
+        resources.append(resource)
+        seen_ids.add(resource["id"])
 
     return {
         "career_key": career_key,
