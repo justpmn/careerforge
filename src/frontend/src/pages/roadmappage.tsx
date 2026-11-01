@@ -11,11 +11,10 @@ import { buildSkillTree } from '../lib/skilltreetemplates';
 import type { CareerRoadmap, RecordedSkill } from '../lib/roadmap';
 import type { SkillTreeItem } from '../lib/skilltreetemplates';
 import SkillMapNode from '../components/skillmapnode';
-import {
-  getLearningProgress,
-  updateLearningProgress,
-} from '../lib/learningprogress';
+import CompetencyEvidencePanel from '../components/competencyevidencepanel';
+import {getLearningProgress,updateLearningProgress} from '../lib/learningprogress';
 import '../roadmapprogress.css';
+import CompetencyAssessmentPanel from '../components/competencyassessmentpanel';
 
 const NODE_WIDTH = 126;
 const NODE_HEIGHT = 112;
@@ -696,6 +695,32 @@ const resources =
                       : 'No matching skill record was found. You can assess or document your experience.'}
               </p>
             </div>
+            
+            {step?.competency_key && (
+              <CompetencyAssessmentPanel
+                key={`${roadmap.career_key}:${step.competency_key}`}
+                careerKey={roadmap.career_key}
+                competencyKey={step.competency_key}
+              />
+            )}
+
+              {step?.competency_key && userId != null && (
+                <CompetencyEvidencePanel
+                  key={`${roadmap.career_key}:${step.competency_key}`}
+                  userId={userId}
+                  careerKey={roadmap.career_key}
+                  competencyKey={step.competency_key}
+                  onSaved={async () => {
+                    const refreshedRoadmap = await getCareerRoadmap(
+                      userId,
+                      roadmap.career_key
+                    );
+
+                    setRoadmap(refreshedRoadmap);
+                  }}
+                />
+              )}
+
 
             {step?.priority_group && (
               <div className="cf-skill-inspector-section">
