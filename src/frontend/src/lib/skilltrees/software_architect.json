@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "programming",
+      "title": "Programming",
+      "requires": [],
+      "skillAliases": [
+        "C#",
+        "Go",
+        "Java",
+        "JavaScript",
+        "PHP",
+        "Python",
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "cloud_platform",
+      "title": "Cloud Platforms",
+      "requires": [],
+      "skillAliases": [
+        "Amazon Web Services (AWS)",
+        "Google Cloud",
+        "Microsoft Azure"
+      ]
+    },
+    {
+      "id": "containers",
+      "title": "Containers",
+      "requires": [],
+      "skillAliases": [
+        "Docker"
+      ]
+    },
+    {
+      "id": "software_design",
+      "title": "Software Design",
+      "requires": [
+        "programming"
+      ]
+    },
+    {
+      "id": "database_architecture",
+      "title": "Database Architecture",
+      "requires": [
+        "software_design"
+      ]
+    },
+    {
+      "id": "system_design",
+      "title": "System Design",
+      "requires": [
+        "software_design",
+        "database_architecture"
+      ]
+    },
+    {
+      "id": "security_architecture",
+      "title": "Security Architecture",
+      "requires": [
+        "system_design"
+      ]
+    },
+    {
+      "id": "scalability_reliability",
+      "title": "Scalability and Reliability",
+      "requires": [
+        "system_design",
+        "cloud_platform"
+      ]
+    },
+    {
+      "id": "technical_leadership",
+      "title": "Technical Leadership",
+      "requires": [
+        "system_design"
+      ]
+    }
+  ]
+}

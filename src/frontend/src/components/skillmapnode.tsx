@@ -114,6 +114,155 @@ const additionalSkillIcons: Record<string, IconType> = {
 };
 
 
+const jsonCareerSkillIcons: Record<string, IconType> = {
+  // AI / ML Engineer
+  ml_programming: FeatherIcons.FiCode,
+  model_serving: FeatherIcons.FiServer,
+  model_monitoring: FeatherIcons.FiActivity,
+  ml_libraries: FeatherIcons.FiCpu,
+  model_api_tooling: FeatherIcons.FiLink,
+  ml_workflows: FeatherIcons.FiGitMerge,
+
+  // Database Engineer
+  db_platform: FeatherIcons.FiDatabase,
+  database_architecture: FeatherIcons.FiDatabase,
+  query_optimization: FeatherIcons.FiZap,
+  database_administration: FeatherIcons.FiServer,
+  backup_recovery: FeatherIcons.FiArchive,
+  database_security: FeatherIcons.FiLock,
+  database_monitoring: FeatherIcons.FiActivity,
+  database_migrations: FeatherIcons.FiGitBranch,
+  db_automation: FeatherIcons.FiTerminal,
+  nosql_db: FeatherIcons.FiDatabase,
+
+  // Mobile Developer
+  mobile_app_development: FeatherIcons.FiSmartphone,
+  mobile_ui: FeatherIcons.FiLayout,
+  mobile_platform_integration: FeatherIcons.FiSettings,
+  mobile_testing: FeatherIcons.FiCheckCircle,
+  mobile_languages: FeatherIcons.FiCode,
+  mobile_tooling: FeatherIcons.FiTool,
+  mobile_storage: FeatherIcons.FiDatabase,
+  mobile_api: FeatherIcons.FiLink,
+  mobile_release: FeatherIcons.FiUploadCloud,
+
+  // QA and Software Engineering
+  test_strategy: FeatherIcons.FiClipboard,
+  defect_management: FeatherIcons.FiAlertCircle,
+  test_programming: FeatherIcons.FiCode,
+  debugging: FeatherIcons.FiTool,
+  api_testing: FeatherIcons.FiLink,
+  performance_testing: FeatherIcons.FiActivity,
+  programming: FeatherIcons.FiCode,
+  software_design: FeatherIcons.FiLayers,
+
+  // Data / Business Analyst
+  analysis_interpretation: FeatherIcons.FiBarChart2,
+  requirements_analysis: FeatherIcons.FiClipboard,
+  reporting_dashboards: FeatherIcons.FiPieChart,
+  business_metrics: FeatherIcons.FiTrendingUp,
+  data_communication: FeatherIcons.FiMessageSquare,
+  data_quality: FeatherIcons.FiCheckSquare,
+  spreadsheet_tools: FeatherIcons.FiGrid,
+  bi_tools: FeatherIcons.FiBarChart2,
+  analysis_programming: FeatherIcons.FiCode,
+  analytical_databases: FeatherIcons.FiDatabase,
+
+  // Embedded Developer
+  embedded_firmware: FeatherIcons.FiCpu,
+  embedded_microcontrollers: FeatherIcons.FiCpu,
+  embedded_interfaces: FeatherIcons.FiGitMerge,
+  embedded_real_time: FeatherIcons.FiClock,
+  embedded_debugging: FeatherIcons.FiTool,
+  embedded_testing: FeatherIcons.FiCheckCircle,
+  embedded_languages: FeatherIcons.FiCode,
+  embedded_build_tools: FeatherIcons.FiSettings,
+
+  // Game Developer
+  game_engine: FeatherIcons.FiBox,
+  gameplay_programming: FeatherIcons.FiCode,
+  game_design: FeatherIcons.FiPenTool,
+  game_physics: FeatherIcons.FiActivity,
+  game_testing: FeatherIcons.FiCheckCircle,
+  game_languages: FeatherIcons.FiCode,
+  game_rendering: FeatherIcons.FiMonitor,
+  game_optimization: FeatherIcons.FiZap,
+
+  // IT Project Manager
+  project_planning: FeatherIcons.FiCalendar,
+  scope_management: FeatherIcons.FiTarget,
+  project_scheduling: FeatherIcons.FiClock,
+  budget_management: FeatherIcons.FiDollarSign,
+  project_risk_management: FeatherIcons.FiAlertTriangle,
+  stakeholder_management: FeatherIcons.FiUsers,
+  project_delivery: FeatherIcons.FiCheckCircle,
+  project_communication: FeatherIcons.FiMessageSquare,
+  project_change_management: FeatherIcons.FiRefreshCw,
+  project_quality_management: FeatherIcons.FiCheckSquare,
+  delivery_methodologies: FeatherIcons.FiLayers,
+  project_management_tools: FeatherIcons.FiTool,
+  project_reporting_tools: FeatherIcons.FiFileText,
+
+  // IT Support
+  end_user_support: FeatherIcons.FiHeadphones,
+  hardware_support: FeatherIcons.FiHardDrive,
+  software_support: FeatherIcons.FiMonitor,
+  connectivity_support: FeatherIcons.FiWifi,
+  account_support: FeatherIcons.FiUserCheck,
+  ticket_management: FeatherIcons.FiList,
+  customer_communication: FeatherIcons.FiMessageCircle,
+  knowledge_documentation: FeatherIcons.FiBookOpen,
+  os_familiarity: FeatherIcons.FiTerminal,
+  support_ticketing_tooling: FeatherIcons.FiTag,
+  directory_tooling: FeatherIcons.FiFolder,
+
+  // Product Manager
+  product_strategy: FeatherIcons.FiCompass,
+  product_discovery: FeatherIcons.FiSearch,
+  product_roadmap: FeatherIcons.FiMap,
+  feature_prioritization: FeatherIcons.FiList,
+  product_metrics: FeatherIcons.FiTrendingUp,
+  product_launch: FeatherIcons.FiSend,
+  product_experimentation: FeatherIcons.FiActivity,
+  product_management_tools: FeatherIcons.FiTrello,
+  product_analytics_tools: FeatherIcons.FiBarChart2,
+
+  // Software Architect
+  system_design: FeatherIcons.FiGitBranch,
+  scalability_reliability: FeatherIcons.FiTrendingUp,
+  security_architecture: FeatherIcons.FiShield,
+  technical_leadership: FeatherIcons.FiUsers,
+
+  // Systems / Network Administrator
+  systems_administration: FeatherIcons.FiServer,
+  network_configuration: FeatherIcons.FiWifi,
+  network_troubleshooting: FeatherIcons.FiActivity,
+  directory_management: FeatherIcons.FiFolder,
+  system_monitoring: FeatherIcons.FiActivity,
+  system_backup_recovery: FeatherIcons.FiArchive,
+  patch_management: FeatherIcons.FiRefreshCw,
+  access_permissions: FeatherIcons.FiLock,
+  os_platforms: FeatherIcons.FiMonitor,
+  sys_scripting: FeatherIcons.FiTerminal,
+
+  // UI / UX Designer
+  user_research: FeatherIcons.FiUsers,
+  information_architecture: FeatherIcons.FiGitBranch,
+  wireframing: FeatherIcons.FiLayout,
+  prototyping: FeatherIcons.FiMousePointer,
+  interaction_design: FeatherIcons.FiMousePointer,
+  usability_testing: FeatherIcons.FiCheckCircle,
+  design_systems: FeatherIcons.FiLayers,
+  ux_accessibility: FeatherIcons.FiEye,
+  visual_design: FeatherIcons.FiPenTool,
+  design_tooling: FeatherIcons.FiPenTool,
+  graphics_tooling: FeatherIcons.FiImage,
+  frontend_fundamentals: FeatherIcons.FiCode,
+  design_handoff: FeatherIcons.FiShare2,
+};
+
+
+
 const statusLabels: Record<string, string> = {
   evidenced: 'Recorded evidence',
   evidence_found: 'Review evidence',
@@ -127,7 +276,10 @@ export default function SkillMapNode({
   data,
   selected,
 }: NodeProps<SkillMapNodeType>) {
-  const Icon = skillIcons[id] ?? additionalSkillIcons[id];
+  const Icon =
+  skillIcons[id] ??
+  additionalSkillIcons[id] ??
+  jsonCareerSkillIcons[id];
   const status = Object.hasOwn(statusLabels, data.status)
     ? data.status
     : 'unlinked';

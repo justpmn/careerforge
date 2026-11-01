@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "embedded_languages",
+      "title": "Embedded Programming",
+      "requires": [],
+      "skillAliases": [
+        "Assembly",
+        "C",
+        "C++",
+        "Rust"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "embedded_microcontrollers",
+      "title": "Microcontrollers",
+      "requires": [
+        "embedded_languages"
+      ]
+    },
+    {
+      "id": "embedded_build_tools",
+      "title": "Build Tools",
+      "requires": [
+        "embedded_languages"
+      ],
+      "skillAliases": [
+        "Make",
+        "Ninja"
+      ]
+    },
+    {
+      "id": "embedded_interfaces",
+      "title": "Hardware Interfaces",
+      "requires": [
+        "embedded_microcontrollers"
+      ]
+    },
+    {
+      "id": "embedded_firmware",
+      "title": "Firmware",
+      "requires": [
+        "embedded_microcontrollers",
+        "embedded_build_tools"
+      ]
+    },
+    {
+      "id": "embedded_real_time",
+      "title": "Real-Time Systems",
+      "requires": [
+        "embedded_firmware"
+      ]
+    },
+    {
+      "id": "embedded_debugging",
+      "title": "Hardware Debugging",
+      "requires": [
+        "embedded_firmware",
+        "embedded_interfaces"
+      ]
+    },
+    {
+      "id": "embedded_testing",
+      "title": "Embedded Testing",
+      "requires": [
+        "embedded_debugging",
+        "embedded_real_time"
+      ]
+    }
+  ]
+}

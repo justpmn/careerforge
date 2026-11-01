@@ -441,6 +441,405 @@
       "resource_type": "tutorial",
       "url": "https://refactoring.guru/design-patterns",
       "description": "Study software design patterns using resources from Refactoring Guru."
+    },
+    {
+      "title": "Microsoft Excel Help",
+      "provider": "Microsoft",
+      "resource_type": "documentation",
+      "url": "https://support.microsoft.com/en-us/excel",
+      "description": "Learning material for microsoft excel help provided by Microsoft."
+    },
+    {
+      "title": "Getting Started with Power BI",
+      "provider": "Microsoft Learn",
+      "resource_type": "tutorial",
+      "url": "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started",
+      "description": "Learning material for getting started with power bi provided by Microsoft Learn."
+    },
+    {
+      "title": "User Stories",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/project-management/user-stories",
+      "description": "Learning material for user stories provided by Atlassian."
+    },
+    {
+      "title": "Power BI Data Analyst Skills",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/certifications/resources/study-guides/PL-300",
+      "description": "Learning material for power bi data analyst skills provided by Microsoft Learn."
+    },
+    {
+      "title": "Arduino Programming and Electronics",
+      "provider": "Arduino",
+      "resource_type": "tutorial",
+      "url": "https://docs.arduino.cc/learn/",
+      "description": "Learning material for arduino programming and electronics provided by Arduino."
+    },
+    {
+      "title": "Microcontroller Debugging Fundamentals",
+      "provider": "Arduino",
+      "resource_type": "tutorial",
+      "url": "https://docs.arduino.cc/learn/microcontrollers/debugging/",
+      "description": "Learning material for microcontroller debugging fundamentals provided by Arduino."
+    },
+    {
+      "title": "PlatformIO Documentation",
+      "provider": "PlatformIO",
+      "resource_type": "documentation",
+      "url": "https://docs.platformio.org/en/latest/",
+      "description": "Learning material for platformio documentation provided by PlatformIO."
+    },
+    {
+      "title": "PlatformIO Unit Testing",
+      "provider": "PlatformIO",
+      "resource_type": "tutorial",
+      "url": "https://docs.platformio.org/en/latest/advanced/unit-testing/index.html",
+      "description": "Learning material for platformio unit testing provided by PlatformIO."
+    },
+    {
+      "title": "FreeRTOS Fundamentals",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/freertos/latest/userguide/what-is-freertos.html",
+      "description": "Learning material for freertos fundamentals provided by Amazon Web Services."
+    },
+    {
+      "title": "Learn C Programming",
+      "provider": "Learn-C.org",
+      "resource_type": "tutorial",
+      "url": "https://www.learn-c.org/",
+      "description": "Learning material for learn c programming provided by Learn-C.org."
+    },
+    {
+      "title": "Unity Learn",
+      "provider": "Unity Technologies",
+      "resource_type": "course",
+      "url": "https://learn.unity.com/",
+      "description": "Learning material for unity learn provided by Unity Technologies."
+    },
+    {
+      "title": "Your First 2D Game",
+      "provider": "Godot",
+      "resource_type": "tutorial",
+      "url": "https://docs.godotengine.org/en/stable/getting_started/first_2d_game/index.html",
+      "description": "Learning material for your first 2d game provided by Godot."
+    },
+    {
+      "title": "Godot Physics Introduction",
+      "provider": "Godot",
+      "resource_type": "documentation",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/physics/physics_introduction.html",
+      "description": "Learning material for godot physics introduction provided by Godot."
+    },
+    {
+      "title": "Godot Performance Optimization",
+      "provider": "Godot",
+      "resource_type": "documentation",
+      "url": "https://docs.godotengine.org/en/stable/tutorials/performance/",
+      "description": "Learning material for godot performance optimization provided by Godot."
+    },
+    {
+      "title": "Tour of C#",
+      "provider": "Microsoft Learn",
+      "resource_type": "tutorial",
+      "url": "https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/",
+      "description": "Learning material for tour of c# provided by Microsoft Learn."
+    },
+    {
+      "title": "Learn OpenGL",
+      "provider": "LearnOpenGL",
+      "resource_type": "tutorial",
+      "url": "https://learnopengl.com/Getting-started/OpenGL",
+      "description": "Learning material for learn opengl provided by LearnOpenGL."
+    },
+    {
+      "title": "Project Management Open Textbook",
+      "provider": "BCcampus",
+      "resource_type": "book",
+      "url": "https://opentextbc.ca/projectmanagement/",
+      "description": "Learning material for project management open textbook provided by BCcampus."
+    },
+    {
+      "title": "PMBOK Guide",
+      "provider": "Project Management Institute",
+      "resource_type": "documentation",
+      "url": "https://www.pmi.org/standards/pmbok",
+      "description": "Learning material for pmbok guide provided by Project Management Institute."
+    },
+    {
+      "title": "The Scrum Guide",
+      "provider": "Scrum Guides",
+      "resource_type": "documentation",
+      "url": "https://scrumguides.org/scrum-guide.html",
+      "description": "Learning material for the scrum guide provided by Scrum Guides."
+    },
+    {
+      "title": "Getting Started with Jira",
+      "provider": "Atlassian",
+      "resource_type": "tutorial",
+      "url": "https://www.atlassian.com/software/jira/guides/getting-started/basics",
+      "description": "Learning material for getting started with jira provided by Atlassian."
+    },
+    {
+      "title": "IT Change Management",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/itsm/change-management",
+      "description": "Learning material for it change management provided by Atlassian."
+    },
+    {
+      "title": "Knowledge Management",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/itsm/knowledge-management",
+      "description": "Learning material for knowledge management provided by Atlassian."
+    },
+    {
+      "title": "Windows Server Troubleshooting",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/troubleshoot/windows-server/welcome-windows-server",
+      "description": "Learning material for windows server troubleshooting provided by Microsoft Learn."
+    },
+    {
+      "title": "Monitor and Troubleshoot Windows Server",
+      "provider": "Microsoft Learn",
+      "resource_type": "course",
+      "url": "https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/",
+      "description": "Learning material for monitor and troubleshoot windows server provided by Microsoft Learn."
+    },
+    {
+      "title": "Google IT Support",
+      "provider": "Google / Coursera",
+      "resource_type": "course",
+      "url": "https://www.coursera.org/professional-certificates/google-it-support",
+      "description": "Learning material for google it support provided by Google / Coursera."
+    },
+    {
+      "title": "PC Repair Guides",
+      "provider": "iFixit",
+      "resource_type": "tutorial",
+      "url": "https://www.ifixit.com/Device/PC",
+      "description": "Learning material for pc repair guides provided by iFixit."
+    },
+    {
+      "title": "Active Directory Domain Services",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview",
+      "description": "Learning material for active directory domain services provided by Microsoft Learn."
+    },
+    {
+      "title": "Jira Service Management",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/software/jira/service-management",
+      "description": "Learning material for jira service management provided by Atlassian."
+    },
+    {
+      "title": "Computer Networking Fundamentals",
+      "provider": "Cloudflare",
+      "resource_type": "tutorial",
+      "url": "https://www.cloudflare.com/learning/network-layer/what-is-a-computer-network/",
+      "description": "Learning material for computer networking fundamentals provided by Cloudflare."
+    },
+    {
+      "title": "Ubuntu Server Documentation",
+      "provider": "Canonical",
+      "resource_type": "documentation",
+      "url": "https://ubuntu.com/server/docs",
+      "description": "Learning material for ubuntu server documentation provided by Canonical."
+    },
+    {
+      "title": "Windows Server Documentation",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/windows-server/",
+      "description": "Learning material for windows server documentation provided by Microsoft Learn."
+    },
+    {
+      "title": "Windows Updates and Servicing",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/windows/deployment/update/",
+      "description": "Learning material for windows updates and servicing provided by Microsoft Learn."
+    },
+    {
+      "title": "PowerShell Documentation",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/powershell/scripting/overview",
+      "description": "Learning material for powershell documentation provided by Microsoft Learn."
+    },
+    {
+      "title": "Windows Firewall Overview",
+      "provider": "Microsoft Learn",
+      "resource_type": "documentation",
+      "url": "https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/",
+      "description": "Learning material for windows firewall overview provided by Microsoft Learn."
+    },
+    {
+      "title": "Jira Product Discovery",
+      "provider": "Atlassian",
+      "resource_type": "tutorial",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/guides/getting-started/introduction",
+      "description": "Learning material for jira product discovery provided by Atlassian."
+    },
+    {
+      "title": "Product Discovery",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/product-management/discovery",
+      "description": "Learning material for product discovery provided by Atlassian."
+    },
+    {
+      "title": "Product Roadmap Guide",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/product-management/product-roadmaps",
+      "description": "Learning material for product roadmap guide provided by Atlassian."
+    },
+    {
+      "title": "Product Prioritization",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/software/jira/product-discovery/resources/handbook/prioritization",
+      "description": "Learning material for product prioritization provided by Atlassian."
+    },
+    {
+      "title": "Product Development Process",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/product-management/new-product-development-process",
+      "description": "Learning material for product development process provided by Atlassian."
+    },
+    {
+      "title": "Growth Product Management",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/product-management/growth-product-management",
+      "description": "Learning material for growth product management provided by Atlassian."
+    },
+    {
+      "title": "A/B Testing Fundamentals",
+      "provider": "Optimizely",
+      "resource_type": "documentation",
+      "url": "https://www.optimizely.com/optimization-glossary/ab-testing/",
+      "description": "Learning material for a/b testing fundamentals provided by Optimizely."
+    },
+    {
+      "title": "Google Analytics Setup",
+      "provider": "Google Analytics",
+      "resource_type": "tutorial",
+      "url": "https://support.google.com/analytics/answer/9304153",
+      "description": "Learning material for google analytics setup provided by Google Analytics."
+    },
+    {
+      "title": "C4 Model for Software Architecture",
+      "provider": "C4 Model",
+      "resource_type": "documentation",
+      "url": "https://c4model.com/",
+      "description": "Learning material for c4 model for software architecture provided by C4 Model."
+    },
+    {
+      "title": "AWS Well-Architected Framework",
+      "provider": "Amazon Web Services",
+      "resource_type": "documentation",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+      "description": "Learning material for aws well-architected framework provided by Amazon Web Services."
+    },
+    {
+      "title": "Application Security Verification Standard",
+      "provider": "OWASP",
+      "resource_type": "documentation",
+      "url": "https://owasp.org/www-project-application-security-verification-standard/",
+      "description": "Learning material for application security verification standard provided by OWASP."
+    },
+    {
+      "title": "Architecture Decision Records",
+      "provider": "ADR Community",
+      "resource_type": "documentation",
+      "url": "https://adr.github.io/",
+      "description": "Learning material for architecture decision records provided by ADR Community."
+    },
+    {
+      "title": "UX Research Methods",
+      "provider": "Nielsen Norman Group",
+      "resource_type": "documentation",
+      "url": "https://www.nngroup.com/articles/ux-research-cheat-sheet/",
+      "description": "Learning material for ux research methods provided by Nielsen Norman Group."
+    },
+    {
+      "title": "UX Deliverables and User Flows",
+      "provider": "Nielsen Norman Group",
+      "resource_type": "documentation",
+      "url": "https://www.nngroup.com/articles/ux-deliverables-glossary/",
+      "description": "Learning material for ux deliverables and user flows provided by Nielsen Norman Group."
+    },
+    {
+      "title": "Figma Help Center",
+      "provider": "Figma",
+      "resource_type": "documentation",
+      "url": "https://help.figma.com/hc/en-us",
+      "description": "Learning material for figma help center provided by Figma."
+    },
+    {
+      "title": "Guide to Prototyping in Figma",
+      "provider": "Figma",
+      "resource_type": "tutorial",
+      "url": "https://help.figma.com/hc/en-us/articles/360040314193-Guide-to-prototyping-in-Figma",
+      "description": "Learning material for guide to prototyping in figma provided by Figma."
+    },
+    {
+      "title": "Usability Testing 101",
+      "provider": "Nielsen Norman Group",
+      "resource_type": "tutorial",
+      "url": "https://www.nngroup.com/articles/usability-testing-101/",
+      "description": "Learning material for usability testing 101 provided by Nielsen Norman Group."
+    },
+    {
+      "title": "Material Design 3",
+      "provider": "Google",
+      "resource_type": "documentation",
+      "url": "https://m3.material.io/",
+      "description": "Learning material for material design 3 provided by Google."
+    },
+    {
+      "title": "Web Accessibility Tutorials",
+      "provider": "W3C",
+      "resource_type": "tutorial",
+      "url": "https://www.w3.org/WAI/tutorials/",
+      "description": "Learning material for web accessibility tutorials provided by W3C."
+    },
+    {
+      "title": "UX Design Disciplines",
+      "provider": "Nielsen Norman Group",
+      "resource_type": "documentation",
+      "url": "https://www.nngroup.com/articles/ux-disciplines-glossary/",
+      "description": "Learning material for ux design disciplines provided by Nielsen Norman Group."
+    },
+    {
+      "title": "Blender Manual",
+      "provider": "Blender Foundation",
+      "resource_type": "documentation",
+      "url": "https://docs.blender.org/manual/en/latest/",
+      "description": "Learning material for blender manual provided by Blender Foundation."
+    },
+    {
+      "title": "Learn Web Development",
+      "provider": "MDN Web Docs",
+      "resource_type": "tutorial",
+      "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started",
+      "description": "Learning material for learn web development provided by MDN Web Docs."
+    },
+    {
+      "title": "Guide to Dev Mode in Figma",
+      "provider": "Figma",
+      "resource_type": "documentation",
+      "url": "https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode-in-Figma",
+      "description": "Learning material for guide to dev mode in figma provided by Figma."
     }
   ],
   "mappings": [
@@ -1222,6 +1621,724 @@
       "competency_key": "containers",
       "urls": [
         "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "analysis_interpretation",
+      "urls": [
+        "https://pandas.pydata.org/docs/getting_started/intro_tutorials/06_calculate_statistics.html"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "requirements_analysis",
+      "urls": [
+        "https://www.atlassian.com/agile/project-management/user-stories"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "reporting_dashboards",
+      "urls": [
+        "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "business_metrics",
+      "urls": [
+        "https://learn.microsoft.com/en-us/certifications/resources/study-guides/PL-300"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "data_communication",
+      "urls": [
+        "https://www.data-to-viz.com/"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "data_quality",
+      "urls": [
+        "https://docs.greatexpectations.io/docs/core/introduction/try_gx/"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "sql",
+      "urls": [
+        "https://sqlbolt.com/"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "spreadsheet_tools",
+      "urls": [
+        "https://support.microsoft.com/en-us/excel"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "bi_tools",
+      "urls": [
+        "https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-getting-started"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "analysis_programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "data_business_analyst",
+      "competency_key": "analytical_databases",
+      "urls": [
+        "https://www.postgresql.org/docs/current/tutorial.html"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_firmware",
+      "urls": [
+        "https://docs.arduino.cc/learn/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_microcontrollers",
+      "urls": [
+        "https://docs.arduino.cc/learn/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_interfaces",
+      "urls": [
+        "https://docs.arduino.cc/learn/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_real_time",
+      "urls": [
+        "https://docs.aws.amazon.com/freertos/latest/userguide/what-is-freertos.html"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_debugging",
+      "urls": [
+        "https://docs.arduino.cc/learn/microcontrollers/debugging/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_testing",
+      "urls": [
+        "https://docs.platformio.org/en/latest/advanced/unit-testing/index.html"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_languages",
+      "urls": [
+        "https://www.learn-c.org/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "embedded_build_tools",
+      "urls": [
+        "https://docs.platformio.org/en/latest/"
+      ]
+    },
+    {
+      "career_key": "embedded_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_engine",
+      "urls": [
+        "https://learn.unity.com/"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "gameplay_programming",
+      "urls": [
+        "https://docs.godotengine.org/en/stable/getting_started/first_2d_game/index.html"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_design",
+      "urls": [
+        "https://learn.unity.com/"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_physics",
+      "urls": [
+        "https://docs.godotengine.org/en/stable/tutorials/physics/physics_introduction.html"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_testing",
+      "urls": [
+        "https://learn.unity.com/"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_languages",
+      "urls": [
+        "https://learn.microsoft.com/en-us/dotnet/csharp/tour-of-csharp/"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_rendering",
+      "urls": [
+        "https://learnopengl.com/Getting-started/OpenGL"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "game_optimization",
+      "urls": [
+        "https://docs.godotengine.org/en/stable/tutorials/performance/"
+      ]
+    },
+    {
+      "career_key": "game_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_planning",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/",
+        "https://www.pmi.org/standards/pmbok"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "scope_management",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_scheduling",
+      "urls": [
+        "https://www.atlassian.com/software/jira/guides/getting-started/basics",
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "budget_management",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_risk_management",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "stakeholder_management",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_delivery",
+      "urls": [
+        "https://scrumguides.org/scrum-guide.html",
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_communication",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/",
+        "https://www.atlassian.com/itsm/knowledge-management"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_change_management",
+      "urls": [
+        "https://www.atlassian.com/itsm/change-management"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_quality_management",
+      "urls": [
+        "https://opentextbc.ca/projectmanagement/"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "delivery_methodologies",
+      "urls": [
+        "https://scrumguides.org/scrum-guide.html"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_management_tools",
+      "urls": [
+        "https://www.atlassian.com/software/jira/guides/getting-started/basics"
+      ]
+    },
+    {
+      "career_key": "it_project_manager",
+      "competency_key": "project_reporting_tools",
+      "urls": [
+        "https://www.atlassian.com/software/jira/guides/getting-started/basics",
+        "https://www.atlassian.com/itsm/knowledge-management"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "debugging",
+      "urls": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/welcome-windows-server"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "end_user_support",
+      "urls": [
+        "https://www.coursera.org/professional-certificates/google-it-support"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "hardware_support",
+      "urls": [
+        "https://www.ifixit.com/Device/PC"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "software_support",
+      "urls": [
+        "https://learn.microsoft.com/en-us/troubleshoot/windows-server/welcome-windows-server"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "connectivity_support",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/",
+        "https://www.cloudflare.com/learning/network-layer/what-is-a-computer-network/"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "account_support",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "ticket_management",
+      "urls": [
+        "https://www.atlassian.com/software/jira/service-management"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "customer_communication",
+      "urls": [
+        "https://www.coursera.org/professional-certificates/google-it-support"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "knowledge_documentation",
+      "urls": [
+        "https://www.atlassian.com/itsm/knowledge-management"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "os_familiarity",
+      "urls": [
+        "https://ubuntu.com/server/docs",
+        "https://learn.microsoft.com/en-us/windows-server/"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "support_ticketing_tooling",
+      "urls": [
+        "https://www.atlassian.com/software/jira/service-management"
+      ]
+    },
+    {
+      "career_key": "it_support",
+      "competency_key": "directory_tooling",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_strategy",
+      "urls": [
+        "https://www.atlassian.com/software/jira/product-discovery/guides/getting-started/introduction",
+        "https://www.atlassian.com/agile/product-management/product-roadmaps"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_discovery",
+      "urls": [
+        "https://www.atlassian.com/agile/product-management/discovery"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_roadmap",
+      "urls": [
+        "https://www.atlassian.com/agile/product-management/product-roadmaps"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "feature_prioritization",
+      "urls": [
+        "https://www.atlassian.com/software/jira/product-discovery/resources/handbook/prioritization"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "requirements_analysis",
+      "urls": [
+        "https://www.atlassian.com/agile/project-management/user-stories"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "stakeholder_management",
+      "urls": [
+        "https://www.atlassian.com/software/jira/product-discovery/guides/getting-started/introduction"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_metrics",
+      "urls": [
+        "https://www.atlassian.com/agile/product-management/growth-product-management"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_launch",
+      "urls": [
+        "https://www.atlassian.com/agile/product-management/new-product-development-process"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_experimentation",
+      "urls": [
+        "https://www.optimizely.com/optimization-glossary/ab-testing/"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_management_tools",
+      "urls": [
+        "https://www.atlassian.com/software/jira/product-discovery/guides/getting-started/introduction"
+      ]
+    },
+    {
+      "career_key": "product_manager",
+      "competency_key": "product_analytics_tools",
+      "urls": [
+        "https://support.google.com/analytics/answer/9304153"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "software_design",
+      "urls": [
+        "https://refactoring.guru/design-patterns"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "system_design",
+      "urls": [
+        "https://c4model.com/"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "scalability_reliability",
+      "urls": [
+        "https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "database_architecture",
+      "urls": [
+        "https://www.postgresql.org/docs/current/ddl.html"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "security_architecture",
+      "urls": [
+        "https://owasp.org/www-project-application-security-verification-standard/"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "software_architect",
+      "competency_key": "technical_leadership",
+      "urls": [
+        "https://adr.github.io/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "systems_administration",
+      "urls": [
+        "https://ubuntu.com/server/docs",
+        "https://learn.microsoft.com/en-us/windows-server/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "network_configuration",
+      "urls": [
+        "https://www.cloudflare.com/learning/network-layer/what-is-a-computer-network/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "network_troubleshooting",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "directory_management",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "system_monitoring",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/monitor-troubleshoot-windows-server-environments/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "system_backup_recovery",
+      "urls": [
+        "https://ubuntu.com/server/docs"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "patch_management",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "access_permissions",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "os_platforms",
+      "urls": [
+        "https://ubuntu.com/server/docs",
+        "https://learn.microsoft.com/en-us/windows-server/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "sys_scripting",
+      "urls": [
+        "https://learn.microsoft.com/en-us/powershell/scripting/overview"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "directory_tooling",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "firewall_tooling",
+      "urls": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/"
+      ]
+    },
+    {
+      "career_key": "systems_network_admin",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://aws.amazon.com/training/learn-about/cloud-practitioner/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "user_research",
+      "urls": [
+        "https://www.nngroup.com/articles/ux-research-cheat-sheet/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "information_architecture",
+      "urls": [
+        "https://www.nngroup.com/articles/ux-deliverables-glossary/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "wireframing",
+      "urls": [
+        "https://www.nngroup.com/articles/ux-deliverables-glossary/",
+        "https://help.figma.com/hc/en-us"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "prototyping",
+      "urls": [
+        "https://help.figma.com/hc/en-us/articles/360040314193-Guide-to-prototyping-in-Figma"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "interaction_design",
+      "urls": [
+        "https://help.figma.com/hc/en-us/articles/360040314193-Guide-to-prototyping-in-Figma"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "usability_testing",
+      "urls": [
+        "https://www.nngroup.com/articles/usability-testing-101/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "design_systems",
+      "urls": [
+        "https://m3.material.io/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "ux_accessibility",
+      "urls": [
+        "https://www.w3.org/WAI/tutorials/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "visual_design",
+      "urls": [
+        "https://www.nngroup.com/articles/ux-disciplines-glossary/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "design_tooling",
+      "urls": [
+        "https://help.figma.com/hc/en-us"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "graphics_tooling",
+      "urls": [
+        "https://docs.blender.org/manual/en/latest/"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "frontend_fundamentals",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started"
+      ]
+    },
+    {
+      "career_key": "ui_ux_designer",
+      "competency_key": "design_handoff",
+      "urls": [
+        "https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode-in-Figma"
       ]
     }
   ]
