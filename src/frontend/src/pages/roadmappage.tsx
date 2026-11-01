@@ -237,14 +237,14 @@ export default function RoadmapPage() {
   const [savingLearned, setSavingLearned] = useState(false);
   const [learningError, setLearningError] = useState('');
     
-  const [pythonResources, setPythonResources] =
-    useState<FoundationResource[]>([]);
+  const [selectedResources, setSelectedResources] =
+  useState<FoundationResource[]>([]);
 
-  const [pythonResourcesLoading, setPythonResourcesLoading] =
-    useState(false);
+const [selectedResourcesLoading, setSelectedResourcesLoading] =
+  useState(false);
 
-  const [pythonResourcesError, setPythonResourcesError] =
-    useState('');
+const [selectedResourcesError, setSelectedResourcesError] =
+  useState('');
 
 
   useEffect(() => {
@@ -305,72 +305,6 @@ export default function RoadmapPage() {
     };
   }, [userId]);
 
-  
-useEffect(() => {
-  if (
-    roadmap?.career_key !== 'data_scientist' ||
-    selectedId !== 'python'
-  ) {
-    return;
-  }
-
-  const controller = new AbortController();
-
-  setPythonResources([]);
-  setPythonResourcesLoading(true);
-  setPythonResourcesError('');
-
-  async function loadPythonResources() {
-    try {
-      const response = await fetch(
-        '/api/roadmaps/skill-resources/data_scientist/python',
-        {
-          credentials: 'include',
-          signal: controller.signal,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Could not retrieve Python resources (HTTP ${response.status}).`
-        );
-      }
-
-      const data: unknown = await response.json();
-
-      if (
-        !data ||
-        typeof data !== 'object' ||
-        !('resources' in data) ||
-        !Array.isArray(data.resources)
-      ) {
-        throw new Error('Unexpected resource response.');
-      }
-
-      if (!controller.signal.aborted) {
-        setPythonResources(
-          data.resources as FoundationResource[]
-        );
-      }
-    } catch (error) {
-      if (!controller.signal.aborted) {
-        setPythonResourcesError(
-          error instanceof Error
-            ? error.message
-            : 'Unable to load Python resources.'
-        );
-      }
-    } finally {
-      if (!controller.signal.aborted) {
-        setPythonResourcesLoading(false);
-      }
-    }
-  }
-
-  void loadPythonResources();
-
-  return () => controller.abort();
-}, [roadmap?.career_key, selectedId]);
 
 
   const tree = useMemo(
@@ -473,14 +407,84 @@ useEffect(() => {
   const step = selectedItem?.step;
   const selectedStatus = step?.status ?? selectedItem?.status ?? 'unlinked';
   const selectedSkillKey = step?.competency_key ?? selectedItem?.id;
+  
+useEffect(() => {
+  const careerKey = roadmap?.career_key;
+  const skillKey = selectedSkillKey;
+
+  setSelectedResources([]);
+  setSelectedResourcesError('');
+
+  if (!careerKey || !skillKey) {
+    setSelectedResourcesLoading(false);
+    return;
+  }
+
+  const controller = new AbortController();
+  setSelectedResourcesLoading(true);
+
+  async function fetchSkillResources() {
+    try {
+      const url =
+        `/api/roadmaps/skill-resources/` +
+        `${encodeURIComponent(careerKey!)}/` +
+        `${encodeURIComponent(skillKey!)}`;
+
+      const response = await fetch(url, {
+        credentials: 'include',
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Unable to load resources (HTTP ${response.status}).`
+        );
+      }
+
+      const data: unknown = await response.json();
+
+      if (
+        !data ||
+        typeof data !== 'object' ||
+        !('resources' in data) ||
+        !Array.isArray(data.resources)
+      ) {
+        throw new Error('Invalid learning resource response.');
+      }
+
+      if (!controller.signal.aborted) {
+        setSelectedResources(
+          data.resources as FoundationResource[]
+        );
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setSelectedResourcesError(
+          error instanceof Error
+            ? error.message
+            : 'Unable to retrieve learning resources.'
+        );
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setSelectedResourcesLoading(false);
+      }
+    }
+  }
+
+  void fetchSkillResources();
+
+  return () => controller.abort();
+}, [roadmap?.career_key, selectedSkillKey]);
+
   const isLearned = Boolean(selectedSkillKey && learnedByKey[selectedSkillKey]);
   
 const resources =
-  selectedItem?.id === 'python'
-    ? pythonResources
-    : step?.suggested_resources ?? [];
-
-
+  selectedResourcesLoading
+    ? []
+    : selectedResources.length > 0
+      ? selectedResources
+      : step?.suggested_resources ?? [];
 
   async function toggleLearned() {
     if (!roadmap || !selectedSkillKey || savingLearned) return;
@@ -678,10 +682,10 @@ const resources =
             <div className="cf-skill-inspector-section">
               <h3>Learning resources</h3>
 
-              {selectedItem?.id === 'python' && pythonResourcesLoading ? (
-                <p>Loading Python resources...</p>
-              ) : selectedItem?.id === 'python' && pythonResourcesError ? (
-                <p role="alert">{pythonResourcesError}</p>
+              {selectedResourcesLoading ? (
+                <p>Loading learning resources...</p>
+              ) : selectedResourcesError ? (
+                <p role="alert">{selectedResourcesError}</p>
               ) : resources.length > 0 ? (
                 <div className="cf-skill-resources">
                   {resources.map((resource, index) => {
