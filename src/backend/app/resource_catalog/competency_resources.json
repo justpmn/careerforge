@@ -182,6 +182,265 @@
       "resource_type": "documentation",
       "url": "https://www.nist.gov/cyberframework",
       "description": "Understand cybersecurity risk management and security frameworks."
+    },
+    {
+      "title": "The Python Tutorial",
+      "provider": "Python",
+      "resource_type": "tutorial",
+      "url": "https://docs.python.org/3/tutorial/",
+      "description": "Study the python tutorial using resources from Python."
+    },
+    {
+      "title": "Pro Git",
+      "provider": "Git",
+      "resource_type": "book",
+      "url": "https://git-scm.com/book/en/v2",
+      "description": "Study pro git using resources from Git."
+    },
+    {
+      "title": "Docker Getting Started",
+      "provider": "Docker",
+      "resource_type": "tutorial",
+      "url": "https://docs.docker.com/get-started/introduction/index.html",
+      "description": "Study docker getting started using resources from Docker."
+    },
+    {
+      "title": "GitHub Actions Getting Started",
+      "provider": "GitHub",
+      "resource_type": "tutorial",
+      "url": "https://docs.github.com/en/actions/get-started",
+      "description": "Study github actions getting started using resources from GitHub."
+    },
+    {
+      "title": "AWS Cloud Practitioner Training",
+      "provider": "AWS",
+      "resource_type": "course",
+      "url": "https://aws.amazon.com/training/learn-about/cloud-practitioner/",
+      "description": "Study aws cloud practitioner training using resources from AWS."
+    },
+    {
+      "title": "FastAPI Tutorial",
+      "provider": "FastAPI",
+      "resource_type": "tutorial",
+      "url": "https://fastapi.tiangolo.com/tutorial/",
+      "description": "Study fastapi tutorial using resources from FastAPI."
+    },
+    {
+      "title": "REST APIs",
+      "provider": "MDN Web Docs",
+      "resource_type": "documentation",
+      "url": "https://developer.mozilla.org/en-US/docs/Glossary/REST",
+      "description": "Study rest apis using resources from MDN Web Docs."
+    },
+    {
+      "title": "Getting Started with pytest",
+      "provider": "pytest",
+      "resource_type": "tutorial",
+      "url": "https://docs.pytest.org/en/stable/getting-started.html",
+      "description": "Study getting started with pytest using resources from pytest."
+    },
+    {
+      "title": "Debugging in VS Code",
+      "provider": "Visual Studio Code",
+      "resource_type": "documentation",
+      "url": "https://code.visualstudio.com/docs/debugtest/debugging",
+      "description": "Study debugging in vs code using resources from Visual Studio Code."
+    },
+    {
+      "title": "PyTorch Tutorials",
+      "provider": "PyTorch",
+      "resource_type": "tutorial",
+      "url": "https://docs.pytorch.org/tutorials/",
+      "description": "Study pytorch tutorials using resources from PyTorch."
+    },
+    {
+      "title": "MLflow Experiment Tracking",
+      "provider": "MLflow",
+      "resource_type": "documentation",
+      "url": "https://mlflow.org/docs/latest/tracking/",
+      "description": "Study mlflow experiment tracking using resources from MLflow."
+    },
+    {
+      "title": "MLflow Model Serving",
+      "provider": "MLflow",
+      "resource_type": "documentation",
+      "url": "https://mlflow.org/docs/latest/ml/deployment",
+      "description": "Study mlflow model serving using resources from MLflow."
+    },
+    {
+      "title": "Evidently ML Monitoring",
+      "provider": "Evidently",
+      "resource_type": "documentation",
+      "url": "https://docs.evidentlyai.com/introduction",
+      "description": "Study evidently ml monitoring using resources from Evidently."
+    },
+    {
+      "title": "SQLBolt Interactive SQL Lessons",
+      "provider": "SQLBolt",
+      "resource_type": "tutorial",
+      "url": "https://sqlbolt.com/",
+      "description": "Study sqlbolt interactive sql lessons using resources from SQLBolt."
+    },
+    {
+      "title": "PostgreSQL Tutorial",
+      "provider": "PostgreSQL",
+      "resource_type": "tutorial",
+      "url": "https://www.postgresql.org/docs/current/tutorial.html",
+      "description": "Study postgresql tutorial using resources from PostgreSQL."
+    },
+    {
+      "title": "PostgreSQL Data Definition",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/ddl.html",
+      "description": "Study postgresql data definition using resources from PostgreSQL."
+    },
+    {
+      "title": "Understanding PostgreSQL EXPLAIN",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/using-explain.html",
+      "description": "Study understanding postgresql explain using resources from PostgreSQL."
+    },
+    {
+      "title": "PostgreSQL Server Administration",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/admin.html",
+      "description": "Study postgresql server administration using resources from PostgreSQL."
+    },
+    {
+      "title": "PostgreSQL Backup and Recovery",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/backup.html",
+      "description": "Study postgresql backup and recovery using resources from PostgreSQL."
+    },
+    {
+      "title": "PostgreSQL Database Roles",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/user-manag.html",
+      "description": "Study postgresql database roles using resources from PostgreSQL."
+    },
+    {
+      "title": "Monitoring PostgreSQL Activity",
+      "provider": "PostgreSQL",
+      "resource_type": "documentation",
+      "url": "https://www.postgresql.org/docs/current/monitoring.html",
+      "description": "Study monitoring postgresql activity using resources from PostgreSQL."
+    },
+    {
+      "title": "Alembic Database Migration Tutorial",
+      "provider": "SQLAlchemy",
+      "resource_type": "tutorial",
+      "url": "https://alembic.sqlalchemy.org/en/latest/tutorial.html",
+      "description": "Study alembic database migration tutorial using resources from SQLAlchemy."
+    },
+    {
+      "title": "MongoDB Tutorials",
+      "provider": "MongoDB",
+      "resource_type": "tutorial",
+      "url": "https://www.mongodb.com/docs/manual/tutorial/",
+      "description": "Study mongodb tutorials using resources from MongoDB."
+    },
+    {
+      "title": "Android Development Training",
+      "provider": "Android Developers",
+      "resource_type": "course",
+      "url": "https://developer.android.com/courses",
+      "description": "Study android development training using resources from Android Developers."
+    },
+    {
+      "title": "Get Started with Kotlin",
+      "provider": "Kotlin",
+      "resource_type": "tutorial",
+      "url": "https://kotlinlang.org/docs/getting-started.html",
+      "description": "Study get started with kotlin using resources from Kotlin."
+    },
+    {
+      "title": "Meet Android Studio",
+      "provider": "Android Developers",
+      "resource_type": "documentation",
+      "url": "https://developer.android.com/studio/intro",
+      "description": "Study meet android studio using resources from Android Developers."
+    },
+    {
+      "title": "Jetpack Compose Tutorial",
+      "provider": "Android Developers",
+      "resource_type": "tutorial",
+      "url": "https://developer.android.com/develop/ui/compose/tutorial",
+      "description": "Study jetpack compose tutorial using resources from Android Developers."
+    },
+    {
+      "title": "Android API Reference",
+      "provider": "Android Developers",
+      "resource_type": "documentation",
+      "url": "https://developer.android.com/reference",
+      "description": "Study android api reference using resources from Android Developers."
+    },
+    {
+      "title": "Android Network Connectivity",
+      "provider": "Android Developers",
+      "resource_type": "documentation",
+      "url": "https://developer.android.com/develop/connectivity/network-ops/connecting",
+      "description": "Study android network connectivity using resources from Android Developers."
+    },
+    {
+      "title": "Android Room Database",
+      "provider": "Android Developers",
+      "resource_type": "documentation",
+      "url": "https://developer.android.com/training/data-storage/room",
+      "description": "Study android room database using resources from Android Developers."
+    },
+    {
+      "title": "Test Android Applications",
+      "provider": "Android Developers",
+      "resource_type": "tutorial",
+      "url": "https://developer.android.com/training/testing",
+      "description": "Study test android applications using resources from Android Developers."
+    },
+    {
+      "title": "Publish Your Android App",
+      "provider": "Android Developers",
+      "resource_type": "documentation",
+      "url": "https://developer.android.com/studio/publish",
+      "description": "Study publish your android app using resources from Android Developers."
+    },
+    {
+      "title": "Software Testing Foundation Syllabus",
+      "provider": "ISTQB",
+      "resource_type": "course",
+      "url": "https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/",
+      "description": "Study software testing foundation syllabus using resources from ISTQB."
+    },
+    {
+      "title": "Bug Tracking Guide",
+      "provider": "Atlassian",
+      "resource_type": "documentation",
+      "url": "https://www.atlassian.com/agile/software-development/bug-tracking",
+      "description": "Study bug tracking guide using resources from Atlassian."
+    },
+    {
+      "title": "Getting Started with Postman",
+      "provider": "Postman",
+      "resource_type": "tutorial",
+      "url": "https://learning.postman.com/docs/getting-started/overview/",
+      "description": "Study getting started with postman using resources from Postman."
+    },
+    {
+      "title": "Get Started with k6",
+      "provider": "Grafana",
+      "resource_type": "tutorial",
+      "url": "https://grafana.com/docs/k6/latest/get-started/",
+      "description": "Study get started with k6 using resources from Grafana."
+    },
+    {
+      "title": "Software Design Patterns",
+      "provider": "Refactoring Guru",
+      "resource_type": "tutorial",
+      "url": "https://refactoring.guru/design-patterns",
+      "description": "Study software design patterns using resources from Refactoring Guru."
     }
   ],
   "mappings": [
@@ -589,6 +848,380 @@
       "urls": [
         "https://www.nist.gov/cyberframework",
         "https://www.cisecurity.org/cis-benchmarks"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "ml_programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "ml_training",
+      "urls": [
+        "https://scikit-learn.org/stable/supervised_learning.html",
+        "https://docs.pytorch.org/tutorials/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "model_evaluation",
+      "urls": [
+        "https://scikit-learn.org/stable/modules/model_evaluation.html"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "pipeline_design",
+      "urls": [
+        "https://airflow.apache.org/docs/apache-airflow/stable/tutorial/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "model_serving",
+      "urls": [
+        "https://mlflow.org/docs/latest/ml/deployment",
+        "https://fastapi.tiangolo.com/tutorial/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "model_monitoring",
+      "urls": [
+        "https://docs.evidentlyai.com/introduction"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "ml_libraries",
+      "urls": [
+        "https://docs.pytorch.org/tutorials/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "model_api_tooling",
+      "urls": [
+        "https://fastapi.tiangolo.com/tutorial/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "ml_workflows",
+      "urls": [
+        "https://mlflow.org/docs/latest/tracking/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://aws.amazon.com/training/learn-about/cloud-practitioner/"
+      ]
+    },
+    {
+      "career_key": "ai_ml_engineer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "sql",
+      "urls": [
+        "https://sqlbolt.com/"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "db_platform",
+      "urls": [
+        "https://www.postgresql.org/docs/current/tutorial.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "database_architecture",
+      "urls": [
+        "https://www.postgresql.org/docs/current/ddl.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "query_optimization",
+      "urls": [
+        "https://www.postgresql.org/docs/current/using-explain.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "database_administration",
+      "urls": [
+        "https://www.postgresql.org/docs/current/admin.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "backup_recovery",
+      "urls": [
+        "https://www.postgresql.org/docs/current/backup.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "database_security",
+      "urls": [
+        "https://www.postgresql.org/docs/current/user-manag.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "database_monitoring",
+      "urls": [
+        "https://www.postgresql.org/docs/current/monitoring.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "database_migrations",
+      "urls": [
+        "https://alembic.sqlalchemy.org/en/latest/tutorial.html"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "db_automation",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "nosql_db",
+      "urls": [
+        "https://www.mongodb.com/docs/manual/tutorial/"
+      ]
+    },
+    {
+      "career_key": "database_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_app_development",
+      "urls": [
+        "https://developer.android.com/courses"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_ui",
+      "urls": [
+        "https://developer.android.com/develop/ui/compose/tutorial"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_platform_integration",
+      "urls": [
+        "https://developer.android.com/reference"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_testing",
+      "urls": [
+        "https://developer.android.com/training/testing"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_languages",
+      "urls": [
+        "https://kotlinlang.org/docs/getting-started.html"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_tooling",
+      "urls": [
+        "https://developer.android.com/studio/intro"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_storage",
+      "urls": [
+        "https://developer.android.com/training/data-storage/room"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_api",
+      "urls": [
+        "https://developer.android.com/develop/connectivity/network-ops/connecting"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "mobile_release",
+      "urls": [
+        "https://developer.android.com/studio/publish"
+      ]
+    },
+    {
+      "career_key": "mobile_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "testing",
+      "urls": [
+        "https://docs.pytest.org/en/stable/getting-started.html"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "test_strategy",
+      "urls": [
+        "https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "defect_management",
+      "urls": [
+        "https://www.atlassian.com/agile/software-development/bug-tracking"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "test_programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "debugging",
+      "urls": [
+        "https://code.visualstudio.com/docs/debugtest/debugging"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "api_testing",
+      "urls": [
+        "https://learning.postman.com/docs/getting-started/overview/"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "performance_testing",
+      "urls": [
+        "https://grafana.com/docs/k6/latest/get-started/"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "qa_test_engineer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "programming",
+      "urls": [
+        "https://docs.python.org/3/tutorial/"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "software_design",
+      "urls": [
+        "https://refactoring.guru/design-patterns"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "database",
+      "urls": [
+        "https://www.postgresql.org/docs/current/tutorial.html"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "api",
+      "urls": [
+        "https://fastapi.tiangolo.com/tutorial/",
+        "https://developer.mozilla.org/en-US/docs/Glossary/REST"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "debugging",
+      "urls": [
+        "https://code.visualstudio.com/docs/debugtest/debugging"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "testing",
+      "urls": [
+        "https://docs.pytest.org/en/stable/getting-started.html"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "software_engineer",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
       ]
     }
   ]

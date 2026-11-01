@@ -1,5 +1,5 @@
 import type {CareerRoadmap, RoadmapStep, RecordedSkill} from './roadmap';
-
+import { jsonSkillTreeTemplates } from './skilltrees';
 
 
 type CareerTemplate = {
@@ -793,7 +793,9 @@ export function buildSkillTree(
   unmapped: SkillTreeItem[];
   hasTemplate: boolean;
 } {
-  const template = templates[roadmap.career_key];
+  const template =
+  jsonSkillTreeTemplates[roadmap.career_key] ??
+  templates[roadmap.career_key];
 
   // Index recorded skills for efficient matching.
   const recordedByName = new Map(

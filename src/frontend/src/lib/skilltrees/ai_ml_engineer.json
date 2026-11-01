@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "ml_programming",
+      "title": "ML Programming",
+      "requires": [],
+      "skillAliases": [
+        "Java",
+        "Python",
+        "R"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "cloud_platform",
+      "title": "Cloud",
+      "requires": [],
+      "skillAliases": [
+        "Amazon Web Services (AWS)",
+        "Google Cloud",
+        "Microsoft Azure"
+      ]
+    },
+    {
+      "id": "containers",
+      "title": "Containers",
+      "requires": [],
+      "skillAliases": [
+        "Docker"
+      ]
+    },
+    {
+      "id": "ml_libraries",
+      "title": "ML Frameworks",
+      "requires": [
+        "ml_programming"
+      ],
+      "skillAliases": [
+        "PyTorch",
+        "Scikit-learn",
+        "TensorFlow"
+      ]
+    },
+    {
+      "id": "ml_training",
+      "title": "Model Training",
+      "requires": [
+        "ml_programming",
+        "ml_libraries"
+      ]
+    },
+    {
+      "id": "pipeline_design",
+      "title": "ML Pipelines",
+      "requires": [
+        "ml_programming"
+      ]
+    },
+    {
+      "id": "model_evaluation",
+      "title": "Model Evaluation",
+      "requires": [
+        "ml_training"
+      ]
+    },
+    {
+      "id": "model_api_tooling",
+      "title": "API Frameworks",
+      "requires": [
+        "ml_programming"
+      ],
+      "skillAliases": [
+        "FastAPI",
+        "Flask",
+        "RESTful API"
+      ]
+    },
+    {
+      "id": "ml_workflows",
+      "title": "MLOps",
+      "requires": [
+        "ml_training",
+        "version_control"
+      ]
+    },
+    {
+      "id": "model_serving",
+      "title": "Model Serving",
+      "requires": [
+        "ml_training",
+        "model_api_tooling"
+      ]
+    },
+    {
+      "id": "ci_cd",
+      "title": "CI/CD",
+      "requires": [
+        "version_control",
+        "containers"
+      ]
+    },
+    {
+      "id": "model_monitoring",
+      "title": "Model Monitoring",
+      "requires": [
+        "model_serving",
+        "model_evaluation"
+      ]
+    }
+  ]
+}
