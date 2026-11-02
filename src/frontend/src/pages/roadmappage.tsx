@@ -24,6 +24,8 @@ const statusLabels: Record<string, string> = {
   evidence_found: 'Review evidence',
   not_assessed: 'Not assessed',
   not_evidenced: 'Not evidenced',
+  self_reported: 'Manually recorded skill',
+  confirm_self_reported_skill: 'Confirm your self-reported experience',
 };
 
 const actionLabels: Record<string, string> = {
@@ -332,10 +334,16 @@ const [selectedResourcesError, setSelectedResourcesError] =
 
 
 
-  const tree = useMemo(
-    () => (roadmap ? buildSkillTree(roadmap, recordedSkills) : null),
-    [roadmap, recordedSkills]
-  );
+  const tree = useMemo(() => {
+    if (!roadmap) return null;
+
+    const nonManualSkills = recordedSkills.filter(
+      (skill) =>
+        (skill as { source?: string }).source !== 'manual'
+    );
+
+    return buildSkillTree(roadmap, nonManualSkills);
+  }, [roadmap, recordedSkills]);
 
   // Calculate graph positions only when roadmap data changes.
   const baseGraph = useMemo(() => {
