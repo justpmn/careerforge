@@ -11,3 +11,4 @@ white  Simple Resume.pdf
 node_modules/
 dist/
 *.tsbuildinfo
+/logs/
