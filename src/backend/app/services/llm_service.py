@@ -1,6 +1,7 @@
 import json
 import os
 import httpx
+from src.backend.app.services.llm_monitoring import (monitor_mentor_inference)
 
 OLLAMA_BASE_URL = os.getenv(
     "OLLAMA_BASE_URL",
@@ -189,7 +190,7 @@ def build_mentor_messages(
 
 
 
-
+@monitor_mentor_inference
 async def generate_mentor_response(
     message: str,
     context: dict | None = None,

@@ -694,3 +694,38 @@
     flex-direction: column;
   }
 }
+
+/* Async service health indicators */
+
+.cf-admin-health-checking {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cf-admin-health-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: cf-admin-health-spin 0.75s linear infinite;
+}
+
+@keyframes cf-admin-health-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-admin-health-spinner {
+    animation: none;
+  }
+}

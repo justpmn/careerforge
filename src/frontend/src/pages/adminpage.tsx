@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -8,8 +9,10 @@ import {
   FiShield,
   FiUsers,
 } from 'react-icons/fi';
+
 import { onboardingApi } from '../lib/onboarding';
 import type { Career } from '../lib/onboarding';
+
 import {
   AdminApiError,
   getAdminIdentity,
@@ -29,6 +32,7 @@ import type {
   AdminCareerDetails,
   AdminSystemHealth,
 } from '../lib/admin';
+
 import '../admin.css';
 
 type Tab = 'overview' | 'users' | 'careers' | 'logs';
@@ -41,6 +45,14 @@ const navigation = [
   { id: 'logs', label: 'System Logs', Icon: FiActivity },
 ] as const;
 
+const HEALTH_SERVICES = [
+  { key: 'database', label: 'Database' },
+  { key: 'resource_catalog', label: 'Resource Catalog' },
+  { key: 'logging', label: 'Logging' },
+  { key: 'recommendation_model', label: 'Recommendation Model' },
+  { key: 'ai_mentor', label: 'AI Mentor' },
+] as const;
+
 const formatNumber = (value: number) =>
   new Intl.NumberFormat().format(value);
 
@@ -48,6 +60,7 @@ function formatDate(value?: string) {
   if (!value) return '—';
 
   const date = new Date(value);
+
   return Number.isNaN(date.getTime())
     ? '—'
     : date.toLocaleString();
@@ -62,11 +75,13 @@ function Metric({
   value,
 }: {
   label: string;
-  value: number;
+  value?: number;
 }) {
   return (
     <div className="cf-admin-metric">
-      <strong>{formatNumber(value)}</strong>
+      <strong>
+        {value == null ? '—' : formatNumber(value)}
+      </strong>
       <span>{label}</span>
     </div>
   );
@@ -81,18 +96,20 @@ function LogRow({ event }: { event: AdminLogEvent }) {
         >
           {event.severity}
         </span>
+
         <time>{formatDate(event.timestamp)}</time>
       </div>
 
       <strong>{readable(event.action)}</strong>
 
       <div className="cf-admin-log-details">
-        {event.duration_ms != null && (
-            <span>
-                Duration: {event.duration_ms.toFixed(2)} ms
-            </span>
-            )}
         <span>{event.category}</span>
+
+        {event.duration_ms != null && (
+          <span>
+            Duration: {event.duration_ms.toFixed(2)} ms
+          </span>
+        )}
 
         {event.status_code != null && (
           <span>HTTP {event.status_code}</span>
@@ -117,35 +134,53 @@ function LogRow({ event }: { event: AdminLogEvent }) {
 export default function AdminPage() {
   const [access, setAccess] = useState<Access>('checking');
   const [admin, setAdmin] = useState<AdminIdentity | null>(null);
+  const [accessError, setAccessError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+
+  const [overview, setOverview] =
+    useState<AdminOverview | null>(null);
+
+  const [users, setUsers] =
+    useState<AdminUsersPage | null>(null);
+
+  const [careers, setCareers] = useState<Career[]>([]);
+
+  const [logs, setLogs] =
+    useState<AdminLogsPage | null>(null);
+
   const [systemHealth, setSystemHealth] =
     useState<AdminSystemHealth | null>(null);
-  const [healthError, setHealthError] = useState('');
 
-  const [overview, setOverview] = useState<AdminOverview | null>(null);
-  const [users, setUsers] = useState<AdminUsersPage | null>(null);
-  const [careers, setCareers] = useState<Career[]>([]);
-  const [logs, setLogs] = useState<AdminLogsPage | null>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthError, setHealthError] = useState('');
 
   const [usersPage, setUsersPage] = useState(1);
   const [logsPage, setLogsPage] = useState(1);
 
   const [severity, setSeverity] = useState('');
   const [category, setCategory] = useState('');
+
   const [careerSearch, setCareerSearch] = useState('');
   const [userSearch, setUserSearch] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [accessError, setAccessError] = useState('');
   const [refreshCount, setRefreshCount] = useState(0);
-  const [selectedCareerKey, setSelectedCareerKey] = useState('');
+
+  const [selectedCareerKey, setSelectedCareerKey] =
+    useState('');
+
   const [careerDetails, setCareerDetails] =
     useState<AdminCareerDetails | null>(null);
-  const [careerDetailLoading, setCareerDetailLoading] = useState(false);
-  const [careerDetailError, setCareerDetailError] = useState('');
 
-  // Verify server-side administrative access.
+  const [careerDetailLoading, setCareerDetailLoading] =
+    useState(false);
+
+  const [careerDetailError, setCareerDetailError] =
+    useState('');
+
+  // 1. Verify administrator authorization.
+
   useEffect(() => {
     let active = true;
 
@@ -166,6 +201,7 @@ export default function AdminPage() {
           setAccess('denied');
         } else {
           setAccess('error');
+
           setAccessError(
             cause instanceof Error
               ? cause.message
@@ -179,64 +215,48 @@ export default function AdminPage() {
     };
   }, []);
 
-  // Load the active tab from the backend.
+  // 2. Load active tab data independently.
+
   useEffect(() => {
     if (access !== 'authorized') return;
 
     let active = true;
+
     setLoading(true);
     setError('');
 
     async function loadTab() {
       try {
+        if (activeTab === 'overview') {
+          const data = await getAdminOverview();
 
-            if (activeTab === 'overview') {
-            setHealthError('');
-
-            const [overviewResult, healthResult] =
-                await Promise.allSettled([
-                getAdminOverview(),
-                getAdminSystemHealth(),
-                ]);
-
-            if (!active) return;
-
-            if (overviewResult.status === 'fulfilled') {
-                setOverview(overviewResult.value);
-            } else {
-                throw overviewResult.reason;
-            }
-
-            if (healthResult.status === 'fulfilled') {
-                setSystemHealth(healthResult.value);
-            } else {
-                setSystemHealth(null);
-                setHealthError(
-                'Could not retrieve the system health report.'
-                );
-            }
-            }
-
-
-        if (activeTab === 'users') {
+          if (active) {
+            setOverview(data);
+          }
+        } else if (activeTab === 'users') {
           const data = await getAdminUsers(usersPage);
-          if (active) setUsers(data);
-        }
 
-        if (activeTab === 'careers') {
+          if (active) {
+            setUsers(data);
+          }
+        } else if (activeTab === 'careers') {
           const data = await onboardingApi.careers();
-          if (active) setCareers(data);
-        }
 
-        if (activeTab === 'logs') {
+          if (active) {
+            setCareers(data);
+          }
+        } else if (activeTab === 'logs') {
           const data = await getAdminLogs(
             logsPage,
             severity,
             category
           );
-          if (active) setLogs(data);
+
+          if (active) {
+            setLogs(data);
+          }
         }
-      } catch (cause) {
+      } catch (cause: unknown) {
         if (!active) return;
 
         if (
@@ -253,14 +273,13 @@ export default function AdminPage() {
             : 'Could not load administration data.'
         );
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
 
     void loadTab();
-
-    
-    
 
     return () => {
       active = false;
@@ -275,13 +294,59 @@ export default function AdminPage() {
     refreshCount,
   ]);
 
+  // 3. Load system health separately from overview.
+  //    This does not block rendering.
+
   useEffect(() => {
     if (
-        access !== 'authorized' ||
-        activeTab !== 'careers' ||
-        !selectedCareerKey
+      access !== 'authorized' ||
+      activeTab !== 'overview'
     ) {
-        return;
+      return;
+    }
+
+    let active = true;
+
+    setHealthLoading(true);
+    setHealthError('');
+
+    void getAdminSystemHealth()
+      .then((result) => {
+        if (active) {
+          setSystemHealth(result);
+        }
+      })
+      .catch((cause: unknown) => {
+        if (!active) return;
+
+        setSystemHealth(null);
+
+        setHealthError(
+          cause instanceof Error
+            ? cause.message
+            : 'Could not retrieve system health.'
+        );
+      })
+      .finally(() => {
+        if (active) {
+          setHealthLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [access, activeTab, refreshCount]);
+
+  // 4. Load selected career resources.
+
+  useEffect(() => {
+    if (
+      access !== 'authorized' ||
+      activeTab !== 'careers' ||
+      !selectedCareerKey
+    ) {
+      return;
     }
 
     let active = true;
@@ -291,27 +356,37 @@ export default function AdminPage() {
     setCareerDetailLoading(true);
 
     void getAdminCareerResources(selectedCareerKey)
-        .then((result) => {
-        if (active) setCareerDetails(result);
-        })
-        .catch((cause: unknown) => {
+      .then((result) => {
+        if (active) {
+          setCareerDetails(result);
+        }
+      })
+      .catch((cause: unknown) => {
         if (!active) return;
 
         setCareerDetailError(
-            cause instanceof Error
+          cause instanceof Error
             ? cause.message
             : 'Could not load career resources.'
         );
-        })
-        .finally(() => {
-        if (active) setCareerDetailLoading(false);
-        });
+      })
+      .finally(() => {
+        if (active) {
+          setCareerDetailLoading(false);
+        }
+      });
 
     return () => {
-        active = false;
+      active = false;
     };
-    }, [access, activeTab, selectedCareerKey]);
+  }, [
+    access,
+    activeTab,
+    selectedCareerKey,
+    refreshCount,
+  ]);
 
+  // Conditional returns follow all React hooks.
 
   if (access === 'checking') {
     return (
@@ -325,12 +400,17 @@ export default function AdminPage() {
     return (
       <section className="cf-admin-state">
         <FiShield size={30} />
+
         <h1>Access restricted</h1>
+
         <p>
           This workspace is available only to authorized
           CareerForge administrators.
         </p>
-        <Link to="/dashboard">Return to your workspace</Link>
+
+        <Link to="/dashboard">
+          Return to your workspace
+        </Link>
       </section>
     );
   }
@@ -339,8 +419,12 @@ export default function AdminPage() {
     return (
       <section className="cf-admin-state" role="alert">
         <h1>Administrator check unavailable</h1>
+
         <p>{accessError}</p>
-        <Link to="/profile">Return to My Profile</Link>
+
+        <Link to="/profile">
+          Return to My Profile
+        </Link>
       </section>
     );
   }
@@ -364,6 +448,9 @@ export default function AdminPage() {
     );
   });
 
+  const checkingHealth =
+    healthLoading || (!systemHealth && !healthError);
+
   return (
     <section className="cf-admin">
       <header className="cf-admin-header">
@@ -383,7 +470,9 @@ export default function AdminPage() {
         <div className="cf-admin-header-actions">
           <button
             type="button"
-            onClick={() => setRefreshCount((count) => count + 1)}
+            onClick={() =>
+              setRefreshCount((count) => count + 1)
+            }
             disabled={loading}
           >
             <FiRefreshCw />
@@ -398,9 +487,11 @@ export default function AdminPage() {
 
       <div className="cf-admin-identity">
         <FiShield />
+
         <span>
           Signed in as <strong>{admin?.full_name}</strong>
         </span>
+
         <span className="cf-admin-identity-role">
           Administrator
         </span>
@@ -415,7 +506,9 @@ export default function AdminPage() {
             <button
               key={id}
               type="button"
-              className={activeTab === id ? 'is-active' : ''}
+              className={
+                activeTab === id ? 'is-active' : ''
+              }
               aria-current={
                 activeTab === id ? 'page' : undefined
               }
@@ -429,150 +522,205 @@ export default function AdminPage() {
 
         <main className="cf-admin-content">
           {loading && (
-            <p className="cf-admin-feedback" role="status">
+            <p
+              className="cf-admin-feedback"
+              role="status"
+            >
               Loading data...
             </p>
           )}
 
           {error && (
-            <p className="cf-admin-error" role="alert">
+            <p
+              className="cf-admin-error"
+              role="alert"
+            >
               {error}
             </p>
           )}
 
           {/* OVERVIEW */}
+
           {activeTab === 'overview' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
                 <span>01 / PLATFORM OVERVIEW</span>
+
                 <h2>At a glance</h2>
+
                 <p>
                   Live account and activity totals from PostgreSQL.
                 </p>
               </div>
 
-              {overview && (
-                <>
-                  <div className="cf-admin-metrics">
-                    <Metric
-                      label="Registered users"
-                      value={overview.users.total}
-                    />
-                    <Metric
-                      label="Administrators"
-                      value={overview.users.administrators}
-                    />
-                    <Metric
-                      label="Career profiles"
-                      value={overview.careers.total}
-                    />
-                    <Metric
-                      label="Completed onboarding"
-                      value={overview.users.onboarding_completed}
-                    />
-                  </div>
+              <div
+                className="cf-admin-metrics"
+                aria-busy={!overview && loading}
+              >
+                <Metric
+                  label="Registered users"
+                  value={overview?.users.total}
+                />
 
-                  <div className="cf-admin-panel">
-                    <h3>Recorded platform activity</h3>
+                <Metric
+                  label="Administrators"
+                  value={overview?.users.administrators}
+                />
 
-                    <div className="cf-admin-metrics cf-admin-metrics-small">
-                      <Metric
-                        label="Recorded user skills"
-                        value={overview.activity.recorded_user_skills}
-                      />
-                      <Metric
-                        label="Competency assessments"
-                        value={overview.activity.competency_assessments}
-                      />
-                    </div>
+                <Metric
+                  label="Career profiles"
+                  value={overview?.careers.total}
+                />
 
-                    <p className="cf-admin-note">
-                      These are cumulative records, not usage
-                      statistics or verified learning outcomes.
-                    </p>
-                  </div>
+                <Metric
+                  label="Completed onboarding"
+                  value={overview?.users.onboarding_completed}
+                />
+              </div>
 
-                  
-<div className="cf-admin-panel">
-  <h3>System health</h3>
+              <div className="cf-admin-panel">
+                <h3>Recorded platform activity</h3>
 
-  <p>
-    Live status of CareerForge's supporting services.
-  </p>
+                <div className="cf-admin-metrics cf-admin-metrics-small">
+                  <Metric
+                    label="Recorded user skills"
+                    value={
+                      overview?.activity.recorded_user_skills
+                    }
+                  />
 
-  {healthError && (
-    <p className="cf-admin-error" role="alert">
-      {healthError}
-    </p>
-  )}
+                  <Metric
+                    label="Competency assessments"
+                    value={
+                      overview?.activity.competency_assessments
+                    }
+                  />
+                </div>
 
-  {systemHealth ? (
-    <>
-      <div className="cf-admin-health-summary">
-        <strong>
-          Measured services:{' '}
-          {systemHealth.status === 'healthy'
-            ? 'Healthy'
-            : 'Attention required'}
-        </strong>
+                <p className="cf-admin-note">
+                  These are cumulative records, not usage
+                  statistics or verified learning outcomes.
+                </p>
+              </div>
 
-        <small>
-          Last checked: {formatDate(systemHealth.checked_at)}
-        </small>
-      </div>
+              {/* Independent System Health Panel */}
 
-                <div className="cf-admin-health-list">
-                    {Object.entries(systemHealth.checks).map(
-                    ([name, check]) => (
-                        <div
-                        key={name}
+              <div className="cf-admin-panel">
+                <h3>System health</h3>
+
+                <p>
+                  Live status of CareerForge's supporting
+                  services.
+                </p>
+
+                <div className="cf-admin-health-summary">
+                  <strong>
+                    {healthLoading
+                      ? 'Checking services...'
+                      : systemHealth
+                        ? `Measured services: ${
+                            systemHealth.status === 'healthy'
+                              ? 'Healthy'
+                              : 'Attention required'
+                          }`
+                        : healthError
+                          ? 'Health checks unavailable'
+                          : 'Waiting for health checks'}
+                  </strong>
+
+                  {systemHealth && (
+                    <small>
+                      Last checked:{' '}
+                      {formatDate(systemHealth.checked_at)}
+                    </small>
+                  )}
+                </div>
+
+                {healthError && (
+                  <p
+                    className="cf-admin-error"
+                    role="alert"
+                  >
+                    {healthError}
+                  </p>
+                )}
+
+                <div
+                  className="cf-admin-health-list"
+                  aria-busy={checkingHealth}
+                >
+                  {HEALTH_SERVICES.map(({ key, label }) => {
+                    const check =
+                      systemHealth?.checks[key];
+
+                    return (
+                      <div
+                        key={key}
                         className="cf-admin-health-row"
-                        >
+                      >
                         <div>
-                            <strong>{readable(name)}</strong>
-                            <small>{check.message}</small>
+                          <strong>{label}</strong>
 
-                            {check.latency_ms != null && (
-                            <small>
-                                Response: {check.latency_ms} ms
-                            </small>
+                          <small>
+                            {checkingHealth
+                              ? 'Checking service availability...'
+                              : check?.message ??
+                                'Health information unavailable.'}
+                          </small>
+
+                          {!checkingHealth &&
+                            check?.latency_ms != null && (
+                              <small>
+                                Response:{' '}
+                                {check.latency_ms} ms
+                              </small>
                             )}
                         </div>
 
-                        <span
-                            className={`cf-admin-health-status is-${check.status}`}
-                        >
-                            {check.status === 'not_checked'
-                            ? 'Not checked'
-                            : check.status === 'healthy'
-                                ? 'Healthy'
-                                : 'Unhealthy'}
-                        </span>
-                        </div>
-                    )
-                    )}
-                </div>
-                </>
-            ) : (
-                !healthError && (
-                <p className="cf-admin-note">
-                    Health information has not been loaded.
-                </p>
-                )
-            )}
-            </div>
+                        {checkingHealth ? (
+                          <span
+                            className="cf-admin-health-checking"
+                            role="status"
+                          >
+                            <span
+                              className="cf-admin-health-spinner"
+                              aria-hidden="true"
+                            />
 
-                </>
-              )}
+                            Checking...
+                          </span>
+                        ) : (
+                          <span
+                            className={`cf-admin-health-status is-${
+                              check?.status ?? 'not_checked'
+                            }`}
+                          >
+                            {!check
+                              ? 'Unavailable'
+                              : check.status === 'healthy'
+                                ? 'Healthy'
+                                : check.status === 'unhealthy'
+                                  ? 'Unhealthy'
+                                  : 'Not checked'}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
 
           {/* USERS */}
+
           {activeTab === 'users' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
                 <span>02 / USER MANAGEMENT</span>
+
                 <h2>Registered accounts</h2>
+
                 <p>
                   Read-only user directory. Account modification
                   requires a separate audited workflow.
@@ -588,8 +736,11 @@ export default function AdminPage() {
                     setUserSearch(event.target.value)
                   }
                 />
+
                 <span>
-                  {users ? `${users.total} total accounts` : ''}
+                  {users
+                    ? `${users.total} total accounts`
+                    : ''}
                 </span>
               </div>
 
@@ -616,18 +767,24 @@ export default function AdminPage() {
                             </td>
 
                             <td>{user.role}</td>
+
                             <td>
                               {user.onboarding_completed
                                 ? 'Completed'
                                 : 'Pending'}
                             </td>
-                            <td>{formatDate(user.created_at)}</td>
+
+                            <td>
+                              {formatDate(user.created_at)}
+                            </td>
                           </tr>
                         ))}
 
                         {filteredUsers.length === 0 && (
                           <tr>
-                            <td colSpan={4}>No matching accounts.</td>
+                            <td colSpan={4}>
+                              No matching accounts.
+                            </td>
                           </tr>
                         )}
                       </tbody>
@@ -637,7 +794,9 @@ export default function AdminPage() {
                   <div className="cf-admin-pagination">
                     <button
                       type="button"
-                      disabled={usersPage <= 1 || loading}
+                      disabled={
+                        usersPage <= 1 || loading
+                      }
                       onClick={() =>
                         setUsersPage((page) => page - 1)
                       }
@@ -651,7 +810,8 @@ export default function AdminPage() {
                       type="button"
                       disabled={
                         loading ||
-                        usersPage * users.page_size >= users.total
+                        usersPage * users.page_size >=
+                          users.total
                       }
                       onClick={() =>
                         setUsersPage((page) => page + 1)
@@ -666,11 +826,14 @@ export default function AdminPage() {
           )}
 
           {/* CAREERS */}
+
           {activeTab === 'careers' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
                 <span>03 / CAREER CATALOG</span>
+
                 <h2>Supported career paths</h2>
+
                 <p>
                   Review the career profiles available
                   through CareerForge.
@@ -686,139 +849,172 @@ export default function AdminPage() {
                     setCareerSearch(event.target.value)
                   }
                 />
-                <span>{careers.length} career records</span>
+
+                <span>
+                  {careers.length} career records
+                </span>
               </div>
 
-
-            <div className="cf-admin-careers">
-            {filteredCareers.map((career) => (
-                <button
-                key={career.career_key}
-                type="button"
-                className={
-                    'cf-admin-career' +
-                    (selectedCareerKey === career.career_key
-                    ? ' is-selected'
-                    : '')
-                }
-                aria-expanded={selectedCareerKey === career.career_key}
-                onClick={() => {
-                    setSelectedCareerKey((current) =>
-                    current === career.career_key
-                        ? ''
-                        : career.career_key
-                    );
-                }}
-                >
-                <strong>{career.name}</strong>
-                <code>{career.career_key}</code>
-
-                {career.description && (
-                    <p>{career.description}</p>
-                )}
-
-                <span className="cf-admin-career-view">
-                    {selectedCareerKey === career.career_key
-                    ? 'Hide competencies'
-                    : 'View competencies and resources'}
-                </span>
-                </button>
-            ))}
-
-            {filteredCareers.length === 0 && (
-                <p className="cf-admin-note">
-                No matching career profiles.
-                </p>
-            )}
-            </div>
-
-{selectedCareerKey && (
-  <section className="cf-admin-panel cf-admin-career-details">
-    <h3>Career competencies and learning resources</h3>
-
-    {careerDetailLoading && (
-      <p className="cf-admin-note">
-        Loading resource mappings...
-      </p>
-    )}
-
-    {careerDetailError && (
-      <p className="cf-admin-error" role="alert">
-        {careerDetailError}
-      </p>
-    )}
-
-    {careerDetails && (
-      <>
-        <p className="cf-admin-note">
-          {careerDetails.covered_competencies} of{' '}
-          {careerDetails.competency_count} competencies have
-          catalog resource mappings.
-          {' '}
-          {careerDetails.unique_resources} unique resources.
-        </p>
-
-        <div className="cf-admin-competency-list">
-          {careerDetails.competencies.map((competency) => (
-            <details
-              key={competency.key}
-              className="cf-admin-competency"
-            >
-              <summary>
-                <span>
-                  <strong>{competency.name}</strong>
-                  <small>{competency.level}</small>
-                </span>
-
-                <span>
-                  {competency.resources.length} resources
-                </span>
-              </summary>
-
-              <div className="cf-admin-resource-list">
-                {competency.resources.map((resource) => (
-                  <a
-                    key={resource.url}
-                    href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="cf-admin-resource"
+              <div className="cf-admin-careers">
+                {filteredCareers.map((career) => (
+                  <button
+                    key={career.career_key}
+                    type="button"
+                    className={
+                      'cf-admin-career' +
+                      (selectedCareerKey ===
+                      career.career_key
+                        ? ' is-selected'
+                        : '')
+                    }
+                    aria-expanded={
+                      selectedCareerKey ===
+                      career.career_key
+                    }
+                    onClick={() =>
+                      setSelectedCareerKey((current) =>
+                        current === career.career_key
+                          ? ''
+                          : career.career_key
+                      )
+                    }
                   >
-                    <strong>{resource.title}</strong>
+                    <strong>{career.name}</strong>
 
-                    <small>
-                      {resource.provider} · {resource.resource_type}
-                    </small>
+                    <code>{career.career_key}</code>
 
-                    {resource.description && (
-                      <p>{resource.description}</p>
+                    {career.description && (
+                      <p>{career.description}</p>
                     )}
-                  </a>
+
+                    <span className="cf-admin-career-view">
+                      {selectedCareerKey ===
+                      career.career_key
+                        ? 'Hide competencies'
+                        : 'View competencies and resources'}
+                    </span>
+                  </button>
                 ))}
 
-                {competency.resources.length === 0 && (
+                {filteredCareers.length === 0 && (
                   <p className="cf-admin-note">
-                    No learning resources mapped in the catalog.
+                    No matching career profiles.
                   </p>
                 )}
               </div>
-            </details>
-          ))}
-        </div>
-      </>
-    )}
-  </section>
-)}
 
+              {selectedCareerKey && (
+                <section className="cf-admin-panel cf-admin-career-details">
+                  <h3>
+                    Career competencies and learning resources
+                  </h3>
+
+                  {careerDetailLoading && (
+                    <p className="cf-admin-note">
+                      Loading resource mappings...
+                    </p>
+                  )}
+
+                  {careerDetailError && (
+                    <p
+                      className="cf-admin-error"
+                      role="alert"
+                    >
+                      {careerDetailError}
+                    </p>
+                  )}
+
+                  {careerDetails && (
+                    <>
+                      <p className="cf-admin-note">
+                        {careerDetails.covered_competencies}{' '}
+                        of {careerDetails.competency_count}{' '}
+                        competencies have catalog resource
+                        mappings.{' '}
+                        {careerDetails.unique_resources}{' '}
+                        unique resources.
+                      </p>
+
+                      <div className="cf-admin-competency-list">
+                        {careerDetails.competencies.map(
+                          (competency) => (
+                            <details
+                              key={competency.key}
+                              className="cf-admin-competency"
+                            >
+                              <summary>
+                                <span>
+                                  <strong>
+                                    {competency.name}
+                                  </strong>
+
+                                  <small>
+                                    {competency.level}
+                                  </small>
+                                </span>
+
+                                <span>
+                                  {competency.resources.length}{' '}
+                                  resources
+                                </span>
+                              </summary>
+
+                              <div className="cf-admin-resource-list">
+                                {competency.resources.map(
+                                  (resource) => (
+                                    <a
+                                      key={resource.url}
+                                      href={resource.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="cf-admin-resource"
+                                    >
+                                      <strong>
+                                        {resource.title}
+                                      </strong>
+
+                                      <small>
+                                        {resource.provider} ·{' '}
+                                        {resource.resource_type}
+                                      </small>
+
+                                      {resource.description && (
+                                        <p>
+                                          {resource.description}
+                                        </p>
+                                      )}
+                                    </a>
+                                  )
+                                )}
+
+                                {competency.resources.length ===
+                                  0 && (
+                                  <p className="cf-admin-note">
+                                    No learning resources mapped
+                                    in the catalog.
+                                  </p>
+                                )}
+                              </div>
+                            </details>
+                          )
+                        )}
+                      </div>
+                    </>
+                  )}
+                </section>
+              )}
             </div>
           )}
 
           {/* SYSTEM LOGS */}
+
           {activeTab === 'logs' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
                 <span>04 / OPERATIONAL LOGS</span>
+
                 <h2>System events</h2>
+
                 <p>
                   Recent structured application and
                   administrative events.
@@ -828,6 +1024,7 @@ export default function AdminPage() {
               <div className="cf-admin-filters">
                 <label>
                   Severity
+
                   <select
                     value={severity}
                     onChange={(event) => {
@@ -835,16 +1032,31 @@ export default function AdminPage() {
                       setLogsPage(1);
                     }}
                   >
-                    <option value="">All levels</option>
-                    <option value="INFO">Info</option>
-                    <option value="WARNING">Warning</option>
-                    <option value="ERROR">Error</option>
-                    <option value="CRITICAL">Critical</option>
+                    <option value="">
+                      All levels
+                    </option>
+
+                    <option value="INFO">
+                      Info
+                    </option>
+
+                    <option value="WARNING">
+                      Warning
+                    </option>
+
+                    <option value="ERROR">
+                      Error
+                    </option>
+
+                    <option value="CRITICAL">
+                      Critical
+                    </option>
                   </select>
                 </label>
 
                 <label>
                   Category
+
                   <select
                     value={category}
                     onChange={(event) => {
@@ -852,13 +1064,37 @@ export default function AdminPage() {
                       setLogsPage(1);
                     }}
                   >
-                    <option value="">All categories</option>
-                    <option value="admin">Admin</option>
-                    <option value="application">Application</option>
-                    <option value="security">Security</option>
-                    <option value="model">Machine learning</option>
-                    <option value="mentor">AI mentor</option>
-                    <option value="database">Database</option>
+                    <option value="">
+                      All categories
+                    </option>
+
+                    <option value="admin">
+                      Admin
+                    </option>
+
+                    <option value="application">
+                      Application
+                    </option>
+
+                    <option value="security">
+                      Security
+                    </option>
+
+                    <option value="model">
+                      Machine learning
+                    </option>
+
+                    <option value="ai_mentor">
+                      AI mentor
+                    </option>
+
+                    <option value="mentor">
+                      AI mentor (legacy logs)
+                    </option>
+
+                    <option value="database">
+                      Database
+                    </option>
                   </select>
                 </label>
               </div>
@@ -883,7 +1119,9 @@ export default function AdminPage() {
                   <div className="cf-admin-pagination">
                     <button
                       type="button"
-                      disabled={logsPage <= 1 || loading}
+                      disabled={
+                        logsPage <= 1 || loading
+                      }
                       onClick={() =>
                         setLogsPage((page) => page - 1)
                       }
@@ -895,7 +1133,9 @@ export default function AdminPage() {
 
                     <button
                       type="button"
-                      disabled={!logs.has_more || loading}
+                      disabled={
+                        !logs.has_more || loading
+                      }
                       onClick={() =>
                         setLogsPage((page) => page + 1)
                       }
