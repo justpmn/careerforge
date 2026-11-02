@@ -1,0 +1,696 @@
+
+.cf-admin {
+  width: 100%;
+  color: var(--text);
+}
+
+.cf-admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.cf-admin-eyebrow,
+.cf-admin-section-heading > span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.cf-admin-header h1 {
+  margin: 12px 0;
+  font-size: clamp(28px, 3vw, 38px);
+  letter-spacing: -0.035em;
+}
+
+.cf-admin-header p,
+.cf-admin-section-heading p,
+.cf-admin-panel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.cf-admin-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.cf-admin-header-actions button,
+.cf-admin-header-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cf-admin-header-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-admin-identity {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cf-admin-identity svg {
+  color: var(--accent);
+}
+
+.cf-admin-identity strong {
+  color: var(--text);
+}
+
+.cf-admin-identity-role {
+  margin-left: auto;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.cf-admin-workspace {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.cf-admin-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: sticky;
+  top: 20px;
+}
+
+.cf-admin-navigation button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cf-admin-navigation button:hover {
+  color: var(--text);
+  background: var(--soft);
+}
+
+.cf-admin-navigation button.is-active {
+  background: color-mix(
+    in srgb,
+    var(--accent) 12%,
+    var(--paper)
+  );
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.cf-admin-navigation svg {
+  flex-shrink: 0;
+  font-size: 17px;
+}
+
+.cf-admin-content {
+  min-width: 0;
+}
+
+.cf-admin-section-heading {
+  margin-bottom: 24px;
+}
+
+.cf-admin-section-heading h2 {
+  margin: 10px 0;
+  font-size: 23px;
+  letter-spacing: -0.025em;
+}
+
+.cf-admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.cf-admin-metrics-small {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cf-admin-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.cf-admin-metric strong {
+  font-size: clamp(23px, 2.5vw, 31px);
+  line-height: 1;
+  font-weight: 750;
+  color: var(--text);
+}
+
+.cf-admin-metric span {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.cf-admin-panel {
+  padding: 22px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--paper);
+}
+
+.cf-admin-panel h3 {
+  margin: 0 0 15px;
+  font-size: 16px;
+}
+
+.cf-admin-note {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cf-admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.cf-admin-toolbar input,
+.cf-admin-filters select {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.cf-admin-toolbar input {
+  width: min(100%, 360px);
+}
+
+.cf-admin-toolbar > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-admin-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cf-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.cf-admin-table th {
+  padding: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.cf-admin-table td {
+  padding: 15px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.cf-admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.cf-admin-table td:first-child {
+  min-width: 180px;
+}
+
+.cf-admin-table td strong,
+.cf-admin-table td small {
+  display: block;
+}
+
+.cf-admin-table td small {
+  margin-top: 5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.cf-admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-admin-pagination button {
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cf-admin-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cf-admin-careers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cf-admin-career {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+}
+
+.cf-admin-career strong,
+.cf-admin-career code {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.cf-admin-career strong {
+  margin-bottom: 7px;
+  font-size: 14px;
+}
+
+.cf-admin-career code {
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.cf-admin-career p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cf-admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cf-admin-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-admin-filters select {
+  min-width: 180px;
+}
+
+.cf-admin-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cf-admin-log-row {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+}
+
+.cf-admin-log-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.cf-admin-log-top time {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cf-admin-log-row > strong {
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.cf-admin-log-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 11px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cf-admin-log-details code {
+  overflow-wrap: anywhere;
+}
+
+.cf-admin-severity {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.cf-admin-severity--info {
+  color: var(--muted);
+}
+
+.cf-admin-severity--warning {
+  color: #dca45e;
+}
+
+.cf-admin-severity--error,
+.cf-admin-severity--critical {
+  color: #d47669;
+}
+
+.cf-admin-error,
+.cf-admin-feedback {
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.cf-admin-error {
+  color: #d47669;
+}
+
+.cf-admin-feedback {
+  color: var(--muted);
+}
+
+.cf-admin-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 45px 25px;
+}
+
+.cf-admin-state h1 {
+  margin: 0;
+}
+
+.cf-admin-state p {
+  max-width: 500px;
+  color: var(--muted);
+}
+
+.cf-admin-state a {
+  color: var(--accent);
+  font-weight: 650;
+}
+
+@media (max-width: 1050px) {
+  .cf-admin-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .cf-admin-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cf-admin-navigation {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .cf-admin-navigation button {
+    white-space: nowrap;
+    width: auto;
+  }
+
+  .cf-admin-careers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-admin-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cf-admin-metric {
+    padding: 13px;
+  }
+
+  .cf-admin-filters label,
+  .cf-admin-filters select {
+    width: 100%;
+  }
+}
+
+.cf-admin-career {
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-admin-career:hover,
+.cf-admin-career.is-selected {
+  border-color: var(--accent);
+}
+
+.cf-admin-career-view {
+  display: block;
+  margin-top: 15px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.cf-admin-career-details {
+  margin-top: 22px;
+}
+
+.cf-admin-competency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.cf-admin-competency {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.cf-admin-competency summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px;
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.cf-admin-competency summary > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cf-admin-competency summary strong {
+  font-size: 13px;
+}
+
+.cf-admin-competency summary small,
+.cf-admin-competency summary > span:last-child {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cf-admin-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 15px 15px;
+}
+
+.cf-admin-resource {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.cf-admin-resource:hover {
+  border-color: var(--accent);
+}
+
+.cf-admin-resource strong {
+  font-size: 12px;
+}
+
+.cf-admin-resource small,
+.cf-admin-resource p {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.cf-admin-resource p {
+  margin: 0;
+}
+
+
+.cf-admin-health-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.cf-admin-health-summary strong {
+  font-size: 13px;
+}
+
+.cf-admin-health-summary small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cf-admin-health-list {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.cf-admin-health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cf-admin-health-row:last-child {
+  border-bottom: none;
+}
+
+.cf-admin-health-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.cf-admin-health-row strong {
+  color: var(--text);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.cf-admin-health-row small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cf-admin-health-status {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cf-admin-health-status.is-healthy {
+  color: #53ad80;
+}
+
+.cf-admin-health-status.is-unhealthy {
+  color: #db7769;
+}
+
+.cf-admin-health-status.is-not_checked {
+  color: var(--muted);
+}
+
+@media (max-width: 480px) {
+  .cf-admin-health-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

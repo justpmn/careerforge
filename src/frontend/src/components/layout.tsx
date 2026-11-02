@@ -1,4 +1,3 @@
-
 import { NavLink, Outlet } from 'react-router-dom';
 
 const navigation = [
@@ -8,7 +7,6 @@ const navigation = [
   { path: '/skills-assessment', label: 'Skills Assessment' },
   { path: '/roadmap', label: 'Learning Roadmap' },
   { path: '/mentor', label: 'AI Mentor' },
-  { path: '/settings', label: 'Settings' },
 ];
 
 export default function WorkspaceLayout() {
@@ -38,10 +36,7 @@ export default function WorkspaceLayout() {
         </nav>
       </aside>
 
-      <main
-        className="cf-workspace-content"
-        id="main-content"
-      >
+      <main className="cf-workspace-content" id="main-content">
         <Outlet />
       </main>
     </div>

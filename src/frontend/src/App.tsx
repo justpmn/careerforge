@@ -1,39 +1,39 @@
-
 import { useEffect, useState } from 'react';
-import {
-  BrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  Routes,
-} from 'react-router-dom';
-
+import {BrowserRouter,Navigate,Outlet,Route,Routes,} from 'react-router-dom';
 import AuthLayout from './components/AuthLayout';
 import AppShell from './components/AppShell';
 import WorkspaceLayout from './components/layout';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { MentorJobsProvider } from './context/mentorjobscontext';
 import { postAuthRoute } from './lib/auth';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import DashboardPage from './pages/DashboardPage';
-import FeaturePlaceholderPage from './pages/featureplaceholder';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import SkillsAssessmentPage from './pages/skillassessment';
 import CvPage from './pages/cvpage';
 import MentorPage from './pages/mentorpage';
-import { MentorJobsProvider } from './context/mentorjobscontext';
 import RoadmapPage from './pages/roadmappage';
+import ProfilePage from './pages/profilepage';
+import SettingsPage from './pages/settingpage';
+import AdminPage from './pages/adminpage';
 
 type Theme = 'light' | 'dark';
 
 function LoadingScreen() {
-  return <div className="loading-screen">Loading...</div>;
+  return (
+    <div className="loading-screen">
+      Loading...
+    </div>
+  );
 }
 
 function StartingPage() {
   const { user, loading } = useAuth();
 
-  if (loading) return <LoadingScreen />;
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Navigate
@@ -46,21 +46,29 @@ function StartingPage() {
 function GuestOnly() {
   const { user, loading } = useAuth();
 
-  if (loading) return <LoadingScreen />;
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
-  return user
-    ? <Navigate to={postAuthRoute(user)} replace />
-    : <Outlet />;
+  return user ? (
+    <Navigate to={postAuthRoute(user)} replace />
+  ) : (
+    <Outlet />
+  );
 }
 
 function Protected() {
   const { user, loading } = useAuth();
 
-  if (loading) return <LoadingScreen />;
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
-  return user
-    ? <Outlet />
-    : <Navigate to="/login" replace />;
+  return user ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" replace />
+  );
 }
 
 export default function App() {
@@ -83,30 +91,65 @@ export default function App() {
     );
   };
 
-  const layoutProps = { theme, toggleTheme };
+  const layoutProps = {
+    theme,
+    toggleTheme,
+  };
 
   return (
     <AuthProvider>
       <BrowserRouter>
         <MentorJobsProvider>
           <Routes>
-            <Route index element={<StartingPage />} />
 
+            {/* Default entry */}
+            <Route
+              index
+              element={<StartingPage />}
+            />
+
+            {/* Public authentication */}
             <Route element={<GuestOnly />}>
-              <Route element={<AuthLayout {...layoutProps} />}>
-                <Route path="login" element={<LoginPage />} />
-                <Route path="signup" element={<SignupPage />} />
+              <Route
+                element={<AuthLayout {...layoutProps} />}
+              >
+                <Route
+                  path="login"
+                  element={<LoginPage />}
+                />
+
+                <Route
+                  path="signup"
+                  element={<SignupPage />}
+                />
               </Route>
             </Route>
 
+            {/* OAuth callback */}
             <Route
               path="auth/callback"
               element={<AuthLayout {...layoutProps} />}
             >
-              <Route index element={<AuthCallbackPage />} />
+              <Route
+                index
+                element={<AuthCallbackPage />}
+              />
             </Route>
 
+            {/* Authenticated application */}
             <Route element={<Protected />}>
+
+              {/* Separate administrator workspace */}
+              <Route
+                path="admin"
+                element={
+                  <AppShell {...layoutProps}>
+                    <AdminPage />
+                  </AppShell>
+                }
+              />
+
+              {/* Standard CareerForge workspace */}
               <Route
                 element={
                   <AppShell {...layoutProps}>
@@ -120,18 +163,8 @@ export default function App() {
                 />
 
                 <Route
-                  path="skills-assessment"
-                  element={<SkillsAssessmentPage />}
-                />
-                <Route
                   path="profile"
-                  element={
-                    <FeaturePlaceholderPage
-                      category="MY PROFILE"
-                      title="Your career profile."
-                      description="Manage your information, interests, and professional experience."
-                    />
-                  }
+                  element={<ProfilePage />}
                 />
 
                 <Route
@@ -140,28 +173,44 @@ export default function App() {
                 />
 
                 <Route
-                  path="settings"
-                  element={
-                    <FeaturePlaceholderPage
-                      category="SETTINGS"
-                      title="Account settings."
-                      description="Manage your preferences and connected accounts."
-                    />
-                  }
+                  path="skills-assessment"
+                  element={<SkillsAssessmentPage />}
                 />
 
-                <Route path="roadmap" element={<RoadmapPage />} />
+                <Route
+                  path="roadmap"
+                  element={<RoadmapPage />}
+                />
 
-                <Route path="mentor" element={<MentorPage />} />
+                <Route
+                  path="mentor"
+                  element={<MentorPage />}
+                />
+
+                <Route
+                  path="settings"
+                  element={<SettingsPage />}
+                />
 
                 <Route
                   path="onboarding"
-                  element={<Navigate to="/dashboard" replace />}
+                  element={
+                    <Navigate
+                      to="/dashboard"
+                      replace
+                    />
+                  }
                 />
               </Route>
+
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Unknown routes */}
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+
           </Routes>
         </MentorJobsProvider>
       </BrowserRouter>
