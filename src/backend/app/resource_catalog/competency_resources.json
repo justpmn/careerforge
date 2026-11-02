@@ -840,6 +840,195 @@
       "resource_type": "documentation",
       "url": "https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode-in-Figma",
       "description": "Learning material for guide to dev mode in figma provided by Figma."
+    },
+    {
+      "title": "Java Learning Tutorials",
+      "provider": "Dev.java",
+      "resource_type": "tutorial",
+      "url": "https://dev.java/learn/",
+      "description": "Learn Java programming fundamentals, object-oriented programming and core APIs."
+    },
+    {
+      "title": "Getting Started with MySQL",
+      "provider": "MySQL",
+      "resource_type": "documentation",
+      "url": "https://dev.mysql.com/doc/mysql-getting-started/en/",
+      "description": "Learn relational database setup, SQL queries and fundamental MySQL operations."
+    },
+    {
+      "title": "Terraform AWS Tutorials",
+      "provider": "HashiCorp",
+      "resource_type": "tutorial",
+      "url": "https://developer.hashicorp.com/terraform/tutorials/aws-get-started",
+      "description": "Learn infrastructure as code by provisioning and managing AWS resources with Terraform."
+    },
+    {
+      "title": "JavaScript Guide",
+      "provider": "MDN Web Docs",
+      "resource_type": "documentation",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+      "description": "Learn JavaScript syntax, functions, objects, asynchronous programming and language fundamentals."
+    },
+    {
+      "title": "Getting Started with Ansible",
+      "provider": "Ansible",
+      "resource_type": "tutorial",
+      "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html",
+      "description": "Learn configuration management, infrastructure automation and Ansible playbooks."
+    },
+    {
+      "title": "Getting Started with AWS CloudFormation",
+      "provider": "Amazon Web Services",
+      "resource_type": "tutorial",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.html",
+      "description": "Learn how to provision and manage cloud infrastructure using CloudFormation templates."
+    },
+    {
+      "title": "BigQuery Documentation",
+      "provider": "Google Cloud",
+      "resource_type": "documentation",
+      "url": "https://docs.cloud.google.com/bigquery/docs/",
+      "description": "Learn cloud analytics, BigQuery data warehousing and SQL-based data processing."
+    },
+    {
+      "title": "Getting Started with Snowflake",
+      "provider": "Snowflake",
+      "resource_type": "documentation",
+      "url": "https://docs.snowflake.com/en/user-guide-getting-started",
+      "description": "Introduction to Snowflake cloud data warehousing, storage and querying."
+    },
+    {
+      "title": "Try Jupyter",
+      "provider": "Project Jupyter",
+      "resource_type": "interactive",
+      "url": "https://jupyter.org/try",
+      "description": "Explore interactive notebooks and computational environments in the browser."
+    },
+    {
+      "title": "Introduction to Node.js",
+      "provider": "Node.js",
+      "resource_type": "tutorial",
+      "url": "https://nodejs.org/learn/getting-started/introduction-to-nodejs",
+      "description": "Introduction to JavaScript server-side development with Node.js."
+    },
+    {
+      "title": "NumPy: The Absolute Basics for Beginners",
+      "provider": "NumPy",
+      "resource_type": "tutorial",
+      "url": "https://numpy.org/doc/stable/user/absolute_beginners",
+      "description": "Learn numerical arrays, array operations and scientific computing foundations."
+    },
+    {
+      "title": "Getting Started with pandas",
+      "provider": "pandas",
+      "resource_type": "tutorial",
+      "url": "https://pandas.pydata.org/docs/getting_started/",
+      "description": "Learn data manipulation, DataFrames, cleaning, transformation and analysis."
+    },
+    {
+      "title": "Getting Started with scikit-learn",
+      "provider": "scikit-learn",
+      "resource_type": "tutorial",
+      "url": "https://scikit-learn.org/stable/getting_started",
+      "description": "Introduction to machine learning estimators, preprocessing, training and model evaluation."
+    },
+    {
+      "title": "An Introduction to R",
+      "provider": "R Core Team",
+      "resource_type": "documentation",
+      "url": "https://stat.ethz.ch/CRAN/doc/manuals/r-release/R-intro.html",
+      "description": "Introduction to R programming, data structures, statistical computing and graphics."
+    },
+    {
+      "title": "Getting Started with Vitest",
+      "provider": "Vitest",
+      "resource_type": "tutorial",
+      "url": "https://vitest.dev/guide/",
+      "description": "Introduction to automated JavaScript and TypeScript testing with Vitest."
+    },
+    {
+      "title": "Azure Fundamentals: Cloud Concepts",
+      "provider": "Microsoft Learn",
+      "resource_type": "course",
+      "url": "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/",
+      "description": "Understand cloud platforms, service models and Azure fundamentals."
+    },
+    {
+      "title": "pfSense Firewall Documentation",
+      "provider": "Netgate",
+      "resource_type": "documentation",
+      "url": "https://docs.netgate.com/pfsense/en/latest/firewall/index.html",
+      "description": "Learn firewall configuration, traffic filtering and firewall rules."
+    },
+    {
+      "title": "Grafana Fundamentals",
+      "provider": "Grafana Labs",
+      "resource_type": "tutorial",
+      "url": "https://grafana.com/tutorials/grafana-fundamentals/",
+      "description": "Learn observability dashboards and monitoring visualizations."
+    },
+    {
+      "title": "Your First Website",
+      "provider": "MDN Web Docs",
+      "resource_type": "tutorial",
+      "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website",
+      "description": "Learn HTML structure, CSS styling and basic web development."
+    },
+    {
+      "title": "Overview of HTTP",
+      "provider": "MDN Web Docs",
+      "resource_type": "documentation",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview",
+      "description": "Learn HTTP requests, responses and client-server communication."
+    },
+    {
+      "title": "Learn Kubernetes Basics",
+      "provider": "Kubernetes",
+      "resource_type": "tutorial",
+      "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/index.html",
+      "description": "Learn container orchestration, deployments, scaling and updates."
+    },
+    {
+      "title": "Linux Command Line for Beginners",
+      "provider": "Ubuntu",
+      "resource_type": "tutorial",
+      "url": "https://ubuntu.com/desktop/docs/en/latest/tutorial/the-linux-command-line-for-beginners/",
+      "description": "Learn Linux command-line navigation, commands and administration basics."
+    },
+    {
+      "title": "PowerShell 101",
+      "provider": "Microsoft Learn",
+      "resource_type": "tutorial",
+      "url": "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction",
+      "description": "Learn PowerShell scripting and system administration automation."
+    },
+    {
+      "title": "Getting Started with Prometheus",
+      "provider": "Prometheus",
+      "resource_type": "tutorial",
+      "url": "https://prometheus.io/docs/prometheus/latest/getting_started/",
+      "description": "Learn metric collection, monitoring targets and time-series queries."
+    },
+    {
+      "title": "Learn React",
+      "provider": "React",
+      "resource_type": "tutorial",
+      "url": "https://react.dev/learn",
+      "description": "Learn React components, JSX, state, events and rendering."
+    },
+    {
+      "title": "Getting Started with Microsoft Sentinel",
+      "provider": "Microsoft Learn",
+      "resource_type": "tutorial",
+      "url": "https://learn.microsoft.com/azure/sentinel/quickstart-onboard",
+      "description": "Learn SIEM onboarding, security event ingestion and monitoring. Azure subscription may be required."
+    },
+    {
+      "title": "Getting Started with Vite",
+      "provider": "Vite",
+      "resource_type": "documentation",
+      "url": "https://vite.dev/guide/",
+      "description": "Learn frontend project scaffolding, development servers and builds."
     }
   ],
   "mappings": [
@@ -2339,6 +2528,280 @@
       "competency_key": "design_handoff",
       "urls": [
         "https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode-in-Figma"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "version_control",
+      "urls": [
+        "https://git-scm.com/book/en/v2"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "containers",
+      "urls": [
+        "https://docs.docker.com/get-started/introduction/index.html"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "ci_cd",
+      "urls": [
+        "https://docs.github.com/en/actions/get-started"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "automation_scripting",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "cloud_platform_familiarity",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "iac_tooling",
+      "urls": [
+        "https://developer.hashicorp.com/terraform/tutorials/aws-get-started"
+      ]
+    },
+    {
+      "career_key": "cloud_engineer",
+      "competency_key": "orchestration_tooling",
+      "urls": [
+        "https://kubernetes.io/docs/tutorials/kubernetes-basics/index.html"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "firewall_tooling",
+      "urls": [
+        "https://docs.netgate.com/pfsense/en/latest/firewall/index.html"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_os",
+      "urls": [
+        "https://ubuntu.com/desktop/docs/en/latest/tutorial/the-linux-command-line-for-beginners/"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "security_scripting",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction"
+      ]
+    },
+    {
+      "career_key": "cybersecurity_analyst",
+      "competency_key": "siem_tooling",
+      "urls": [
+        "https://learn.microsoft.com/azure/sentinel/quickstart-onboard"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "automation_platforms",
+      "urls": [
+        "https://docs.ansible.com/projects/ansible/latest/getting_started/index.html"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "automation_scripting",
+      "urls": [
+        "https://docs.python.org/3/tutorial/",
+        "https://learn.microsoft.com/powershell/scripting/learn/ps101/00-introduction"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "cloud_platform",
+      "urls": [
+        "https://learn.microsoft.com/en-us/training/paths/microsoft-azure-fundamentals-describe-cloud-concepts/"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "iac_tooling",
+      "urls": [
+        "https://developer.hashicorp.com/terraform/tutorials/aws-get-started"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "observability_tooling",
+      "urls": [
+        "https://prometheus.io/docs/prometheus/latest/getting_started/",
+        "https://grafana.com/tutorials/grafana-fundamentals/"
+      ]
+    },
+    {
+      "career_key": "devops_sre",
+      "competency_key": "orchestration_tooling",
+      "urls": [
+        "https://kubernetes.io/docs/tutorials/kubernetes-basics/index.html"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "build_tools",
+      "urls": [
+        "https://vite.dev/guide/"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "frontend_framework",
+      "urls": [
+        "https://react.dev/learn"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "testing",
+      "urls": [
+        "https://vitest.dev/guide/"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "web_fundamentals",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website"
+      ]
+    },
+    {
+      "career_key": "frontend_developer",
+      "competency_key": "web_programming",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "api",
+      "urls": [
+        "https://fastapi.tiangolo.com/tutorial/",
+        "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "backend_runtime",
+      "urls": [
+        "https://fastapi.tiangolo.com/tutorial/",
+        "https://nodejs.org/learn/getting-started/introduction-to-nodejs"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "database",
+      "urls": [
+        "https://www.postgresql.org/docs/current/tutorial.html",
+        "https://dev.mysql.com/doc/mysql-getting-started/en/"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "frontend_framework",
+      "urls": [
+        "https://react.dev/learn"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "testing",
+      "urls": [
+        "https://docs.pytest.org/en/stable/getting-started.html",
+        "https://vitest.dev/guide/"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "web_fundamentals",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website"
+      ]
+    },
+    {
+      "career_key": "full_stack_developer",
+      "competency_key": "web_programming",
+      "urls": [
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide"
       ]
     }
   ]
