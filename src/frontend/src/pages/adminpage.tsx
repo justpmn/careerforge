@@ -451,11 +451,8 @@ export default function AdminPage() {
     <section className="cf-admin">
       <header className="cf-admin-header">
         <div>
-          <span className="cf-admin-eyebrow">
-            CAREERFORGE / ADMINISTRATION
-          </span>
 
-          <h1>System Administration</h1>
+          <h1 className="cf-admin-heading">System Administration</h1>
 
           <p>
             Monitor platform activity, users, career profiles
@@ -540,9 +537,7 @@ export default function AdminPage() {
           {activeTab === 'overview' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
-                <span>01 / PLATFORM OVERVIEW</span>
-
-                <h2>At a glance</h2>
+                <h2 className="cf-admin-heading">Overview</h2>
 
                 <p>
                   Live account and activity totals from PostgreSQL.
@@ -713,9 +708,8 @@ export default function AdminPage() {
           {activeTab === 'users' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
-                <span>02 / USER MANAGEMENT</span>
 
-                <h2>Registered accounts</h2>
+                <h2 className="cf-admin-heading">Registered accounts</h2>
 
                 <p>
                   Read-only user directory. Account modification
@@ -826,9 +820,8 @@ export default function AdminPage() {
           {activeTab === 'careers' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
-                <span>03 / CAREER CATALOG</span>
 
-                <h2>Supported career paths</h2>
+                <h2 className="cf-admin-heading">Supported career paths</h2>
 
                 <p>
                   Review the career profiles available
@@ -1014,9 +1007,7 @@ export default function AdminPage() {
           {activeTab === 'logs' && (
             <div className="cf-admin-section">
               <div className="cf-admin-section-heading">
-                <span>04 / OPERATIONAL LOGS</span>
-
-                <h2>System events</h2>
+                <h2 className="cf-admin-heading">System events</h2>
 
                 <p>
                   Recent structured application and

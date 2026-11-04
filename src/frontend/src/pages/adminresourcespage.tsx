@@ -42,11 +42,13 @@ type CareerOption = {
   name: string;
   competencies: { key: string; name: string }[];
 };
+
 type SkillOption = {
   id: number;
   name: string;
-  category: string | null;
+  category?: string | null;
 };
+
 
 type MappingMode = 'global' | 'career' | 'both';
 
@@ -119,6 +121,7 @@ export default function AdminResourcesPage() {
   const [optionsError, setOptionsError] = useState('');
 
   const [showCreate, setShowCreate] = useState(false);
+  const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [draft, setDraft] = useState<ResourceDraft>(emptyDraft);
   const [assignments, setAssignments] = useState<Assignment[]>([
     emptyAssignment(),
@@ -232,22 +235,83 @@ useEffect(() => {
   };
 }, [mappingMode, skillSearch]);
 
-  function updateAssignment(index: number, value: Assignment) {
+function updateAssignment(index: number, value: Assignment) {
     setAssignments((current) =>
       current.map((item, i) => (i === index ? value : item))
     );
   }
+function openCreateForm() {
+  if (saving) return;
 
-  function closeCreateForm() {
-    if (saving) return;
+  setEditingResource(null);
+  setDraft({ ...emptyDraft });
+  setAssignments([emptyAssignment()]);
+  setSelectedSkills([]);
+  setMappingMode('global');
+  setSkillSearch('');
+  setFormError('');
+  setTotpError('');
+  setNotice('');
+  setShowCreate(true);
+}
 
-    setShowCreate(false);
-    setTotpOpen(false);
-    setTotpError('');
-    setFormError('');
-  }
+function openEditForm(resource: Resource) {
+  if (saving || resourceActionBusy || resource.archived_at) return;
 
-  function createResource(event: FormEvent<HTMLFormElement>) {
+  const hasSkills = resource.skills.length > 0;
+  const hasAssignments = resource.assignments.length > 0;
+
+  setEditingResource(resource);
+  setDraft({
+    title: resource.title,
+    provider: resource.provider ?? '',
+    resource_type: resource.resource_type,
+    url: resource.url,
+    description: resource.description ?? '',
+  });
+
+  setSelectedSkills(
+    resource.skills.map((skill) => ({
+      ...skill,
+      category: skill.category ?? null,
+    }))
+  );
+
+  setAssignments(
+    hasAssignments
+      ? resource.assignments.map((item) => ({ ...item }))
+      : [emptyAssignment()]
+  );
+
+  setMappingMode(
+    hasSkills && hasAssignments
+      ? 'both'
+      : hasAssignments
+        ? 'career'
+        : 'global'
+  );
+
+  setSkillSearch('');
+  setFormError('');
+  setTotpError('');
+  setNotice('');
+  setShowCreate(true);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function closeCreateForm() {
+  if (saving) return;
+
+  setShowCreate(false);
+  setEditingResource(null);
+  setTotpOpen(false);
+  setTotpError('');
+  setFormError('');
+}
+
+function createResource(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError('');
     setTotpError('');
@@ -286,50 +350,60 @@ useEffect(() => {
     setTotpOpen(true);
   }
 
-  async function confirmCreateResource(code: string) {
-    if (saving) return;
 
-    setSaving(true);
-    setTotpError('');
+async function confirmCreateResource(code: string) {
+  if (saving) return;
 
-    try {
-      const created = await api<Resource>(
-        '/api/admin/resources',
-        'POST',
-        {
+  const editingId = editingResource?.id;
+  setSaving(true);
+  setTotpError('');
+
+  try {
+    const saved = await api<{ id: number }>(
+      editingId !== undefined
+        ? `/api/admin/resources/${editingId}`
+        : '/api/admin/resources',
+      editingId !== undefined ? 'PATCH' : 'POST',
+      {
         ...draft,
         skill_ids: mappingMode !== 'career'
-            ? selectedSkills.map((skill) => skill.id)
-            : [],
+          ? selectedSkills.map((skill) => skill.id)
+          : [],
         assignments: mappingMode !== 'global'
-            ? assignments
-            : [],
+          ? assignments
+          : [],
         totp_code: code,
-        }
-      );
+      }
+    );
 
-      setTotpOpen(false);
-      setShowCreate(false);
-      setNotice(`Resource #${created.id} created successfully.`);
-      setDraft({ ...emptyDraft });
-      setAssignments([emptyAssignment()]);
-      setSearch('');
-      setPage(1);
-      setIncludeArchived(false);
-      setReload((value) => value + 1);
-      setMappingMode('global');
-      setSelectedSkills([]);
-      setSkillSearch('');
-    } catch (err) {
-      setTotpError(
-        err instanceof Error
-          ? err.message
-          : 'Resource creation failed.'
-      );
-    } finally {
-      setSaving(false);
-    }
+    setTotpOpen(false);
+    setShowCreate(false);
+    setEditingResource(null);
+    setNotice(
+      `Resource #${saved.id} ${
+        editingId !== undefined ? 'updated' : 'created'
+      } successfully.`
+    );
+
+    setDraft({ ...emptyDraft });
+    setAssignments([emptyAssignment()]);
+    setSelectedSkills([]);
+    setMappingMode('global');
+    setSkillSearch('');
+    setSearch('');
+    setPage(1);
+    setIncludeArchived(false);
+    setReload((value) => value + 1);
+  } catch (err) {
+    setTotpError(
+      err instanceof Error
+        ? err.message
+        : 'Unable to save resource.'
+    );
+  } finally {
+    setSaving(false);
   }
+}
   
 function requestResourceAction(resource: Resource) {
   setResourceActionError('');
@@ -392,13 +466,13 @@ async function confirmResourceAction(code: string) {
   return (
     <main className="cf-resources">
       <Link to="/admin" className="cf-resources-back">
-        ← Back to administration
+        ← Back to admin dashboard
       </Link>
 
       <header className="cf-resources-header">
         <div>
           <div className="cf-resources-eyebrow">
-            CAREERFORGE / ADMINISTRATION
+            ADMIN
           </div>
           <h1>Learning resources</h1>
           <p>
@@ -410,17 +484,18 @@ async function confirmResourceAction(code: string) {
           type="button"
           className="cf-resources-primary"
           onClick={() => {
-            if (showCreate) {
-              closeCreateForm();
-            } else {
-              setShowCreate(true);
-              setFormError('');
-              setTotpError('');
-              setNotice('');
-            }
-          }}
+          if (showCreate) {
+            closeCreateForm();
+          } else {
+            openCreateForm();
+          }
+        }}
         >
-          {showCreate ? 'Close form' : '+ Add resource'}
+          {showCreate
+          ? editingResource
+            ? 'Close editor'
+            : 'Close form'
+          : '+ Add resource'}
         </button>
       </header>
 
@@ -436,8 +511,11 @@ async function confirmResourceAction(code: string) {
           aria-labelledby="new-resource-heading"
         >
           <div className="cf-resources-section-header">
-            <h2 id="new-resource-heading">New learning resource</h2>
-            <span>01 / RESOURCE DETAILS</span>
+            <h2 id="new-resource-heading">
+            {editingResource
+              ? `Edit resource #${editingResource.id}`
+              : 'New learning resource'}
+          </h2>
           </div>
 
           <form
@@ -526,7 +604,6 @@ async function confirmResourceAction(code: string) {
                             
                 <div className="cf-resources-section-header">
                 <h3>Resource mapping</h3>
-                <span>02 / SKILLS & CAREERS</span>
                 </div>
                 <div className="cf-resources-scope">
                 {([
@@ -723,7 +800,9 @@ async function confirmResourceAction(code: string) {
                 className="cf-resources-primary"
                 disabled={saving || careers.length === 0}
               >
-                Continue to verification
+                {editingResource
+                ? 'Save changes & verify'
+                : 'Continue to verification'}
               </button>
             </div>
           </form>
@@ -787,6 +866,7 @@ async function confirmResourceAction(code: string) {
                <tr><td colSpan={5}>No resources found.</td></tr>
               )}
 
+
               {resources.map((resource) => (
                 <tr key={resource.id}>
                   <td>
@@ -808,39 +888,60 @@ async function confirmResourceAction(code: string) {
                   <td>
                     <strong>{resource.skills?.length ?? 0} global skills</strong>
                     <small>
-                        {resource.skills?.map((skill) => skill.name).join(', ') || '—'}
+                      {resource.skills?.map((skill) => skill.name).join(', ') || '—'}
                     </small>
-                    <small>{resource.assignments.length} direct assignments</small>
-                    </td>
+                    <small>
+                      {resource.assignments.length} direct assignments
+                    </small>
+                  </td>
 
                   <td>
                     <span className="cf-resources-status">
-                      {resource.archived_at
-                        ? 'Archived'
-                        : 'Active'}
+                      {resource.archived_at ? 'Archived' : 'Active'}
                     </span>
                   </td>
-                  
-                    <td>
-                    <button
+
+                  <td>
+                    <div className="cf-resources-row-actions">
+                      <button
+                        type="button"
+                        className="cf-resources-action-btn"
+                        disabled={
+                          Boolean(resource.archived_at) ||
+                          saving ||
+                          resourceActionBusy
+                        }
+                        onClick={() => openEditForm(resource)}
+                        title={
+                          resource.archived_at
+                            ? 'Restore this resource before editing'
+                            : 'Edit learning resource'
+                        }
+                        aria-label={`Edit ${resource.title}`}
+                      >
+                        Edit
+                      </button>
+
+                      <button
                         type="button"
                         className={`cf-resources-action-btn ${
-                        resource.archived_at
+                          resource.archived_at
                             ? 'cf-resources-action-restore'
                             : 'cf-resources-action-archive'
                         }`}
-                        disabled={resourceActionBusy}
+                        disabled={saving || resourceActionBusy}
                         onClick={() => requestResourceAction(resource)}
                         aria-label={`${
-                        resource.archived_at ? 'Restore' : 'Archive'
+                          resource.archived_at ? 'Restore' : 'Archive'
                         } ${resource.title}`}
-                    >
+                      >
                         {resource.archived_at ? 'Restore' : 'Archive'}
-                    </button>
-                    </td>
-
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
+
             </tbody>
           </table>
         </div>
@@ -877,8 +978,16 @@ async function confirmResourceAction(code: string) {
 
       <AdminTotpModal
         open={totpOpen}
-        title="Confirm resource creation"
-        description="Enter a fresh authenticator code to add this learning resource to CareerForge."
+        title={
+          editingResource
+            ? 'Confirm resource changes'
+            : 'Confirm resource creation'
+        }
+        description={
+          editingResource
+            ? `Enter a fresh authenticator code to save changes to "${editingResource.title}".`
+            : 'Enter a fresh authenticator code to add this learning resource to CareerForge.'
+        }
         busy={saving}
         error={totpError}
         onClose={() => {

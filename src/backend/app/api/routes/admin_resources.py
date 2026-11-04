@@ -86,6 +86,11 @@ class UpdateResourceRequest(BaseModel):
     url: str | None = Field(default=None, min_length=10, max_length=500)
     description: str | None = Field(default=None, max_length=5000)
     totp_code: str = Field(pattern=r"^[0-9]{6}$")
+    skill_ids: list[int] | None = Field(default=None, max_length=50)
+    assignments: list[CompetencyAssignment] | None = Field(
+        default=None, max_length=50
+    )
+
 
     @field_validator("title", "resource_type")
     @classmethod
@@ -302,7 +307,6 @@ def list_resource_skills(
         ]
     }
 
-
 @router.patch("/{resource_id}")
 def update_learning_resource(
     resource_id: int,
@@ -312,25 +316,61 @@ def update_learning_resource(
 ):
     changes = payload.model_dump(
         exclude_unset=True,
-        exclude={"totp_code"},
+        exclude={"totp_code", "skill_ids", "assignments"},
     )
+    replace_skills = payload.skill_ids is not None
+    replace_assignments = payload.assignments is not None
 
-    if not changes:
-        raise HTTPException(
-            status_code=422,
-            detail="No resource changes provided.",
-        )
+    if not changes and not replace_skills and not replace_assignments:
+        raise HTTPException(422, "No resource changes provided.")
+
+    requested_skills = set(payload.skill_ids or [])
+    if replace_skills:
+        if len(requested_skills) != len(payload.skill_ids) or any(
+            skill_id <= 0 for skill_id in requested_skills
+        ):
+            raise HTTPException(422, "Invalid or duplicate skill IDs.")
+
+        found = set(db.scalars(
+            select(Skill.id).where(Skill.id.in_(requested_skills))
+        ).all())
+
+        if found != requested_skills:
+            raise HTTPException(
+                422, "One or more selected skills do not exist."
+            )
+
+    requested_assignments = (
+        set(validate_assignments(payload.assignments))
+        if replace_assignments else set()
+    )
 
     resource = db.get(LearningResource, resource_id)
     if resource is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Learning resource not found.",
-        )
+        raise HTTPException(404, "Learning resource not found.")
     if resource.archived_at is not None:
         raise HTTPException(
-            status_code=409,
-            detail="Restore this resource before modifying it.",
+            409, "Restore this resource before editing it."
+        )
+
+    current_skills = set(db.scalars(
+        select(LearningResourceSkill.skill_id).where(
+            LearningResourceSkill.learning_resource_id == resource_id
+        )
+    ).all())
+    current_assignments = set(db.execute(
+        select(
+            CompetencyResourceLink.career_key,
+            CompetencyResourceLink.competency_key,
+        ).where(CompetencyResourceLink.resource_id == resource_id)
+    ).all())
+
+    if not (
+        (requested_skills if replace_skills else current_skills)
+        or (requested_assignments if replace_assignments else current_assignments)
+    ):
+        raise HTTPException(
+            422, "Choose at least one skill or career competency."
         )
 
     verify_and_consume_admin_totp(
@@ -343,38 +383,88 @@ def update_learning_resource(
         select(LearningResource)
         .where(LearningResource.id == resource_id)
         .with_for_update()
+        .execution_options(populate_existing=True)
     )
 
     if resource is None:
+        raise HTTPException(404, "Learning resource no longer exists.")
+    if resource.archived_at is not None:
         raise HTTPException(
-            status_code=404,
-            detail="Learning resource no longer exists.",
+            409, "Restore this resource before editing it."
+        )
+
+    skill_links = db.scalars(
+        select(LearningResourceSkill).where(
+            LearningResourceSkill.learning_resource_id == resource_id
+        )
+    ).all()
+    assignment_links = db.scalars(
+        select(CompetencyResourceLink).where(
+            CompetencyResourceLink.resource_id == resource_id
+        )
+    ).all()
+
+    old_skills = {link.skill_id for link in skill_links}
+    old_assignments = {
+        (link.career_key, link.competency_key)
+        for link in assignment_links
+    }
+    new_skills = requested_skills if replace_skills else old_skills
+    new_assignments = (
+        requested_assignments if replace_assignments else old_assignments
+    )
+
+    if not new_skills and not new_assignments:
+        raise HTTPException(
+            422, "Choose at least one skill or career competency."
         )
 
     before = {
-        field: getattr(resource, field)
-        for field in changes
+        "fields": {key: getattr(resource, key) for key in changes},
+        "skill_ids": sorted(old_skills),
+        "assignments": [list(item) for item in sorted(old_assignments)],
     }
 
-    for field, value in changes.items():
-        if field in {"provider", "description"}:
+    for key, value in changes.items():
+        if key in {"provider", "description"}:
             value = value.strip() or None if value else None
+        setattr(resource, key, value)
 
-        setattr(resource, field, value)
+    if replace_skills:
+        for link in skill_links:
+            if link.skill_id not in new_skills:
+                db.delete(link)
+
+        for skill_id in new_skills - old_skills:
+            db.add(LearningResourceSkill(
+                learning_resource_id=resource_id,
+                skill_id=skill_id,
+            ))
+
+    if replace_assignments:
+        for link in assignment_links:
+            if (link.career_key, link.competency_key) not in new_assignments:
+                db.delete(link)
+
+        for career_key, competency_key in new_assignments - old_assignments:
+            db.add(CompetencyResourceLink(
+                resource_id=resource_id,
+                career_key=career_key,
+                competency_key=competency_key,
+            ))
 
     after = {
-        field: getattr(resource, field)
-        for field in changes
+        "fields": {key: getattr(resource, key) for key in changes},
+        "skill_ids": sorted(new_skills),
+        "assignments": [list(item) for item in sorted(new_assignments)],
     }
 
-    db.add(
-        AdminResourceAudit(
-            actor_user_id=admin.id,
-            resource_id=resource.id,
-            action="resource_updated",
-            details={"before": before, "after": after},
-        )
-    )
+    db.add(AdminResourceAudit(
+        actor_user_id=admin.id,
+        resource_id=resource_id,
+        action="resource_updated",
+        details={"before": before, "after": after},
+    ))
 
     try:
         db.commit()
@@ -382,8 +472,7 @@ def update_learning_resource(
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(
-            status_code=409,
-            detail="Resource update conflicts with existing data.",
+            409, "Resource update conflicts with existing data."
         ) from exc
 
     return {
@@ -393,6 +482,11 @@ def update_learning_resource(
         "resource_type": resource.resource_type,
         "url": resource.url,
         "description": resource.description,
+        "skill_ids": sorted(new_skills),
+        "assignments": [
+            {"career_key": career_key, "competency_key": competency_key}
+            for career_key, competency_key in sorted(new_assignments)
+        ],
     }
 
 
@@ -428,6 +522,11 @@ def replace_resource_assignments(
             status_code=404,
             detail="Learning resource no longer exists.",
         )
+    if resource.archived_at is not None:
+        raise HTTPException(
+            409, "Restore this resource before modifying assignments."
+        )
+
 
     links = db.scalars(
         select(CompetencyResourceLink).where(
@@ -664,7 +763,6 @@ def archive_learning_resource(
         "id": resource_id,
         "message": "Learning resource archived.",
     }
-
 
 @router.post("/{resource_id}/restore")
 def restore_learning_resource(

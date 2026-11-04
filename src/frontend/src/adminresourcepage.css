@@ -502,3 +502,22 @@
   text-align: right;
   white-space: nowrap;
 }
+
+.cf-resources-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cf-resources-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .cf-resources-row-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
