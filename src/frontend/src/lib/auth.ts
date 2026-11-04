@@ -36,25 +36,61 @@ async function request(path: string, init?: RequestInit): Promise<Response> {
   }
 }
 
-async function messageFrom(response: Response): Promise<string> {
-  try {
-    const body: unknown = await response.json();
-    if (typeof body === 'object' && body !== null) {
-      const error = body as { detail?: unknown; message?: unknown };
-      if (typeof error.detail === 'string') return error.detail;
-      if (typeof error.message === 'string') return error.message;
-    }
-  } catch { /* Not every error response is JSON */ }
-  if (response.status === 404) return 'This authentication endpoint is not available yet. It needs to be connected to FastAPI.';
-  return `Authentication failed (HTTP ${response.status}). Please try again.`;
+export class AuthApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code?: string,
+  ) {
+    super(message);
+    this.name = 'AuthApiError';
+  }
 }
 
+async function errorFrom(response: Response): Promise<AuthApiError> {
+  let message = response.status === 404
+    ? 'This authentication endpoint is not available yet.'
+    : `Authentication failed (HTTP ${response.status}). Please try again.`;
+
+  let code: string | undefined;
+
+  try {
+    const body: unknown = await response.json();
+
+    if (body && typeof body === 'object') {
+      const data = body as { detail?: unknown; message?: unknown };
+
+      if (typeof data.detail === 'string') {
+        message = data.detail;
+      } else if (data.detail && typeof data.detail === 'object') {
+        const detail = data.detail as {
+          code?: unknown;
+          message?: unknown;
+        };
+
+        if (typeof detail.message === 'string') {
+          message = detail.message;
+        }
+
+        if (typeof detail.code === 'string') {
+          code = detail.code;
+        }
+      } else if (typeof data.message === 'string') {
+        message = data.message;
+      }
+    }
+  } catch {
+    // Preserve the fallback message for non-JSON responses.
+  }
+
+  return new AuthApiError(message, response.status, code);
+}
 async function post(path: string, body?: object): Promise<void> {
   const response = await request(path, {
     method: 'POST',
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-  if (!response.ok) throw new Error(await messageFrom(response));
+ if (!response.ok) throw await errorFrom(response);
 }
 
 export const authApi = {
@@ -87,7 +123,7 @@ export const authApi = {
       }
 
       if (!response.ok) {
-        throw new Error(await messageFrom(response));
+        throw await errorFrom(response);
       }
 
       const user: User = await response.json();

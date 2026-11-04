@@ -1,10 +1,8 @@
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, false, func
-from sqlalchemy import Boolean, DateTime, Index, String, false, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.backend.app.database.base import Base
-
 
 class User(Base):
     __tablename__ = "users"
@@ -23,6 +21,10 @@ class User(Base):
 
     password_hash: Mapped[str | None] = mapped_column(
         String(255),
+        nullable=True,
+    )
+    email_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
         nullable=True,
     )
     role: Mapped[str] = mapped_column(

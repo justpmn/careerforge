@@ -1,19 +1,13 @@
-
 import hashlib
 import hmac
 import secrets
-
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
-
-from src.backend.app.core.tokens import (
-    decode_access_token,
-    get_jwt_secret,
-)
+from src.backend.app.core.tokens import (decode_access_token,  get_jwt_secret, get_admin_mfa_version)
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
-
+from src.backend.app.database.models.admin_mfa import AdminMfaCredential
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -106,6 +100,33 @@ def get_current_user_id(
 
     if user is None:
         raise unauthorized
+    
+        if user.role == "admin":
+            mfa = db.get(AdminMfaCredential, user.id)
+
+        if (
+            mfa is None
+            or mfa.enabled_at is None
+            or mfa.totp_secret_encrypted is None
+            or get_admin_mfa_version(token) != mfa.mfa_version
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail={
+                    "code": "ADMIN_MFA_REQUIRED",
+                    "message": "Complete administrator MFA authentication.",
+                },
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    
+    if user.password_hash is not None and user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "Please verify your email before continuing.",
+            },
+        )
 
     # Cookie-authenticated writes require a CSRF token.
     if cookie_auth and request.method.upper() not in {

@@ -11,6 +11,8 @@ from src.backend.app.api.routes import oauth, onboarding, skill_evidence, learni
 from src.backend.app.api.routes.competency_assessment import (router as competency_assessment_router)
 from src.backend.app.api.routes.account_settings import (router as account_settings)
 from src.backend.app.api.routes.admin import router as admin_router
+from src.backend.app.api.routes.email_verification import router as email_verification_router
+from src.backend.app.api.routes.admin_mfa import router as admin_mfa_router
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(health_router)
@@ -28,3 +30,5 @@ api_router.include_router(learning_progress.router)
 api_router.include_router(competency_assessment_router)
 api_router.include_router(account_settings)
 api_router.include_router(admin_router)
+api_router.include_router(email_verification_router)
+api_router.include_router(admin_mfa_router)

@@ -1,5 +1,9 @@
 import hmac
 import secrets
+import logging
+from src.backend.app.database.models.email_verification_token import EmailVerificationToken
+from src.backend.app.services.email_verification_tokens import generate_verification_token
+from src.backend.app.services.email_service import (EmailDeliveryError,send_verification_email)
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
@@ -18,6 +22,7 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+logger = logging.getLogger(__name__)
 
 
 class RegisterRequest(BaseModel):
@@ -44,6 +49,7 @@ class RegisterResponse(BaseModel):
     id: int
     full_name: str
     email: EmailStr
+    verification_email_sent: bool
 
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -67,6 +73,7 @@ class CurrentUserResponse(BaseModel):
     response_model=RegisterResponse,
     status_code=status.HTTP_201_CREATED,
 )
+
 def register_user(
     request: RegisterRequest,
     db: Session = Depends(get_db),
@@ -86,15 +93,28 @@ def register_user(
             detail="Email already registered.",
         )
 
+    token, token_hash, expires_at = generate_verification_token()
+
     user = User(
         full_name=request.full_name,
         email=normalized_email,
         password_hash=hash_password(request.password),
         role="user",
+        email_verified_at=None,
     )
 
     try:
         db.add(user)
+        db.flush()
+
+        db.add(
+            EmailVerificationToken(
+                user_id=user.id,
+                token_hash=token_hash,
+                expires_at=expires_at,
+            )
+        )
+
         db.commit()
         db.refresh(user)
 
@@ -119,12 +139,23 @@ def register_user(
         db.rollback()
         raise
 
+    email_sent = False
+
+    try:
+        send_verification_email(user.email, token)
+        email_sent = True
+    except EmailDeliveryError:
+        logger.exception(
+            "Verification email delivery failed for user %s.",
+            user.id,
+        )
+
     return RegisterResponse(
         id=user.id,
         full_name=user.full_name,
         email=user.email,
+        verification_email_sent=email_sent,
     )
-
 
 @router.post(
     "/login",
@@ -156,10 +187,13 @@ def login_user(
             detail="Invalid email or password.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if user.email_verified_at is None:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password.",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "Please verify your email before signing in.",
+            },
         )
 
     access_token = create_access_token(user_id=user.id)
@@ -170,7 +204,7 @@ def login_user(
         key="careerforge_session",
         value=access_token,
         httponly=True,
-        secure=False,  # Local development only
+        secure=settings.cookie_secure,
         samesite="lax",
         path="/api",
         max_age=max_age,
@@ -181,7 +215,7 @@ def login_user(
         key="csrf_token",
         value=create_csrf_token(access_token),
         httponly=False,
-        secure=False,  # Local development only
+        secure=settings.cookie_secure,
         samesite="lax",
         path="/",
         max_age=max_age,
@@ -240,10 +274,6 @@ def complete_onboarding(
     user.onboarding_completed = True
     db.commit()
 
-@router.post(
-    "/logout",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
 
 @router.post(
     "/logout",

@@ -10,6 +10,8 @@ from src.backend.app.database.models.skill_gap import SkillGap
 from src.backend.app.database.models.user import User
 from src.backend.app.database.models.user_skill import UserSkill
 from src.backend.app.database.models.competency_evidence import CompetencyEvidence
+from src.backend.app.database.models.email_verification_token import EmailVerificationToken
+from src.backend.app.database.models.admin_mfa import (AdminMfaCredential, AdminMfaRecoveryCode)
 
 __all__ = [
     "User",
@@ -24,4 +26,6 @@ __all__ = [
     "LearningResourceSkill",
     "MentorConversation",
     "MentorMessage",
+    "AdminMfaCredential",
+    "AdminMfaRecoveryCode",
 ]

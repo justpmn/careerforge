@@ -17,6 +17,8 @@ import RoadmapPage from './pages/roadmappage';
 import ProfilePage from './pages/profilepage';
 import SettingsPage from './pages/settingpage';
 import AdminPage from './pages/adminpage';
+import VerifyEmailPage from './pages/verifyemailpage';
+import AdminMfaPage from './pages/adminmfapage';
 
 type Theme = 'light' | 'dark';
 
@@ -123,7 +125,9 @@ export default function App() {
                   element={<SignupPage />}
                 />
               </Route>
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
             </Route>
+            <Route path="/auth/mfa" element={<AdminMfaPage />} />
 
             {/* OAuth callback */}
             <Route
