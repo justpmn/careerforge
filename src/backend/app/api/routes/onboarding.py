@@ -37,11 +37,6 @@ class CareerOption(BaseModel):
     "/careers",
     response_model=list[CareerOption],
 )
-
-@router.get(
-    "/careers",
-    response_model=list[CareerOption],
-)
 def list_available_careers(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db),

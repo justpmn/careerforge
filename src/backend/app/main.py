@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 from src.backend.app.api.router import api_router
-from src.backend.app.core.config import settings
 from starlette.middleware.sessions import SessionMiddleware
 from src.backend.app.core.config import settings
 from src.backend.app.core.admin_logging import record_system_event

@@ -109,11 +109,8 @@ def save_resume_analysis(
                 explanation=None,
             )
         )
-    model_skills: list[str] | None = None,
-    ignored_skills: list[str] | None = None,
 
     db.commit()
-
     db.refresh(resume)
 
     return resume

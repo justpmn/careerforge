@@ -84,9 +84,12 @@ class MentorConversationMessage(BaseModel):
     "/chat",
     response_model=MentorChatResponse,
 )
+
 async def chat_with_mentor(
     request: MentorChatRequest,
+    authenticated_user_id: int = Depends(get_current_user_id),
 ) -> MentorChatResponse:
+
 
     if not request.message.strip():
         raise HTTPException(
