@@ -67,12 +67,12 @@
 
 .cf-cv-dropzone:hover,
 .cf-cv-dropzone.is-dragging {
-  border-color: #d18a64;
+  border-color: var(--cf-interactive-highlight, #d18a64);
   background: rgba(209, 138, 100, .09);
 }
 
 .cf-cv-dropzone:focus-visible {
-  outline: 2px solid #d18a64;
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
   outline-offset: 3px;
 }
 
@@ -240,12 +240,12 @@ html[data-theme="light"] .cf-cv-dropzone {
 
 .cf-cv-dropzone:hover,
 .cf-cv-dropzone.is-dragging {
-  border-color: #d18a64;
+  border-color: var(--cf-interactive-highlight, #d18a64);
   background: rgba(209, 138, 100, .09);
 }
 
 .cf-cv-dropzone:focus-visible {
-  outline: 2px solid #d18a64;
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
   outline-offset: 3px;
 }
 

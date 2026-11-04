@@ -521,3 +521,244 @@
     justify-content: flex-start;
   }
 }
+
+/* Resource administration — layout refinements */
+
+.cf-resources {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1600px;
+  min-width: 0;
+  margin-inline: auto;
+  padding: 28px clamp(16px, 3vw, 48px) 64px;
+}
+
+.cf-resources *,
+.cf-resources *::before,
+.cf-resources *::after {
+  box-sizing: border-box;
+}
+
+.cf-resources-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cf-resources-header > div {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.cf-resources-panel,
+.cf-resources-form,
+.cf-resources-fields,
+.cf-resources-skill-picker {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cf-resources-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cf-resources-fields label {
+  min-width: 0;
+}
+
+.cf-resources input:not([type="checkbox"]):not([type="radio"]),
+.cf-resources select,
+.cf-resources textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.cf-resources-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.cf-resources-table {
+  min-width: 780px;
+}
+
+.cf-resources-skill-results,
+.cf-resources-selected-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 700px) {
+  .cf-resources {
+    padding: 20px 16px 48px;
+  }
+
+  .cf-resources-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cf-resources-header {
+    align-items: stretch;
+  }
+
+  .cf-resources-header > .cf-resources-primary {
+    width: 100%;
+  }
+
+  .cf-resources-toolbar,
+  .cf-resources-section-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .cf-resources-toolbar input[type="search"] {
+    width: 100%;
+  }
+
+  .cf-resources-panel {
+    padding: 18px;
+  }
+
+  .cf-resources-actions,
+  .cf-resources-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+/* Neon — Learning resource administration */
+
+html[data-appearance="neon"] .cf-resources {
+  background: #0b101a;
+  color: #f1f5fb;
+}
+
+html[data-appearance="neon"] .cf-resources-back,
+html[data-appearance="neon"] .cf-resources-eyebrow,
+html[data-appearance="neon"] .cf-resources-section-header > span {
+  color: #00ddeb;
+}
+
+html[data-appearance="neon"] .cf-resources-header h1 {
+  color: #f1f5fb;
+}
+
+html[data-appearance="neon"] .cf-resources-panel {
+  background: #141c2a;
+  border-color: #304054;
+}
+
+html[data-appearance="neon"] .cf-resources-primary {
+  background: #00ddeb;
+  border: 1px solid #00ddeb;
+  color: #061820;
+  font-weight: 700;
+}
+
+html[data-appearance="neon"]
+.cf-resources-primary:hover:not(:disabled) {
+  background: #62eaf2;
+  border-color: #62eaf2;
+  box-shadow: 0 0 18px rgba(0, 221, 235, .15);
+}
+
+html[data-appearance="neon"]
+.cf-resources-primary:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+html[data-appearance="neon"]
+.cf-resources :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  background: #101827;
+  border-color: #34485b;
+  color: #f1f5fb;
+}
+
+html[data-appearance="neon"]
+.cf-resources :is(input, select, textarea):focus-visible {
+  outline: 2px solid #00ddeb;
+  outline-offset: 2px;
+  border-color: #00ddeb;
+}
+
+html[data-appearance="neon"]
+.cf-resources input[type="checkbox"],
+html[data-appearance="neon"]
+.cf-resources input[type="radio"] {
+  accent-color: #00ddeb;
+}
+
+/* Resource mapping */
+
+html[data-appearance="neon"]
+.cf-resources-skill-results button,
+html[data-appearance="neon"]
+.cf-resources-selected-skills button {
+  background: #101827;
+  color: #c7d8e8;
+  border-color: #34485b;
+}
+
+html[data-appearance="neon"]
+.cf-resources-skill-results button:hover:not(:disabled) {
+  color: #00ddeb;
+  border-color: #00ddeb;
+  background: #15303b;
+}
+
+html[data-appearance="neon"]
+.cf-resources-selected-skills button {
+  color: #74eaf1;
+  border-color: rgba(0, 221, 235, .45);
+  background: rgba(0, 221, 235, .09);
+}
+
+/* Catalog */
+
+html[data-appearance="neon"] .cf-resources-table {
+  color: #e9eff7;
+}
+
+html[data-appearance="neon"] .cf-resources-table th {
+  color: #91a9be;
+  border-bottom-color: #304054;
+}
+
+html[data-appearance="neon"] .cf-resources-table td {
+  border-bottom-color: #304054;
+}
+
+html[data-appearance="neon"] .cf-resources-table td a {
+  color: #71e5ee;
+}
+
+html[data-appearance="neon"] .cf-resources-table td a:hover {
+  color: #b1faff;
+}
+
+html[data-appearance="neon"]
+.cf-resources-action-btn:hover:not(:disabled) {
+  border-color: #00ddeb;
+  color: #00ddeb;
+}
+
+html[data-appearance="neon"]
+.cf-resources-text-button:hover,
+html[data-appearance="neon"]
+.cf-resources-secondary:hover {
+  border-color: #00ddeb;
+  color: #00ddeb;
+}
+
+html[data-appearance="neon"]
+.cf-resources :focus-visible {
+  outline-color: #00ddeb;
+}

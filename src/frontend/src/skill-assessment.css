@@ -199,7 +199,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #d18a64;
+  background: var(--cf-interactive-highlight, #d18a64);
   flex-shrink: 0;
 }
 
@@ -214,11 +214,11 @@
 }
 
 .cf-career-toggle:hover {
-  border-color: #d18a64;
-  color: #d18a64;
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  color: var(--cf-interactive-highlight, #d18a64);
 }
 
 .cf-career-toggle:focus-visible {
-  outline: 2px solid #d18a64;
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
   outline-offset: 3px;
 }

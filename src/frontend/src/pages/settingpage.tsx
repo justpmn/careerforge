@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { getAccountSettings,  updateAccountSettings} from '../lib/accountsettings';
 import type { AccountSettings} from '../lib/accountsettings';
 import '../settings.css';
+import AppearanceSettings from '../components/AppearanceSettings';
 
 
 
@@ -144,6 +145,7 @@ export default function SettingsPage() {
           </span>
 
           <h1>Your settings.</h1>
+          <AppearanceSettings />
 
           <p>
             Manage your personal information,

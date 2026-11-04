@@ -120,7 +120,7 @@ export default function CvPage() {
 
         <button
           type="button"
-          className="cf-cv-primary"
+          className="cf-cv-primary cf-cv-upload-action"
           disabled={uploading || loadingSaved}
           onClick={() => setCvUploadOpen(true)}
         >
@@ -142,7 +142,7 @@ export default function CvPage() {
         <div className="cf-cv-results" aria-live="polite">
           <div className="cf-cv-results-heading">
             <div>
-              <span className="cf-cv-eyebrow">
+              <span className="cf-cv-eyebrow cf-neon-cv-label">
                 CV ANALYSIS
               </span>
 
@@ -203,7 +203,7 @@ export default function CvPage() {
                       className="cf-cv-recommendation"
                       key={recommendation.career_key}
                     >
-                      <span className="cf-cv-rank">
+                      <span className="cf-cv-rank cf-cv-recommendation-rank">
                         {String(recommendation.rank).padStart(2, '0')}
                       </span>
 

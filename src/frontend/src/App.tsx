@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react';
-import {BrowserRouter,Navigate,Outlet,Route,Routes } from 'react-router-dom';
+
+import {
+  BrowserRouter, Navigate, Outlet, Route, Routes,
+} from 'react-router-dom';
+
 import AuthLayout from './components/AuthLayout';
 import AppShell from './components/AppShell';
 import WorkspaceLayout from './components/layout';
+
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { MentorJobsProvider } from './context/mentorjobscontext';
+import { AppearanceProvider, useAppearance } from './context/appearancecontext';
+
 import { postAuthRoute } from './lib/auth';
+
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
@@ -21,70 +28,36 @@ import VerifyEmailPage from './pages/verifyemailpage';
 import AdminMfaPage from './pages/adminmfapage';
 import AdminResourcesPage from './pages/adminresourcespage';
 import HomePage from './pages/homepage';
-
-
-type Theme = 'light' | 'dark';
+import './neon.css';
+import './responsive.css';
 
 function LoadingScreen() {
-  return (
-    <div className="loading-screen">
-      Loading...
-    </div>
-  );
+  return <div className="loading-screen">Loading...</div>;
 }
 
 function GuestOnly() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
-  return user ? (
-    <Navigate to={postAuthRoute(user)} replace />
-  ) : (
-    <Outlet />
-  );
+  return user
+    ? <Navigate to={postAuthRoute(user)} replace />
+    : <Outlet />;
 }
 
 function Protected() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  if (loading) return <LoadingScreen />;
 
-  return user ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" replace />
-  );
+  return user
+    ? <Outlet />
+    : <Navigate to="/login" replace />;
 }
 
-export default function App() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('careerforge-theme');
-
-    return saved === 'light' || saved === 'dark'
-      ? saved
-      : 'light';
-  });
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('careerforge-theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((current) =>
-      current === 'light' ? 'dark' : 'light'
-    );
-  };
-
-  const layoutProps = {
-    theme,
-    toggleTheme,
-  };
+function AppRoutes() {
+  const { theme, toggleTheme } = useAppearance();
+  const layoutProps = { theme, toggleTheme };
 
   return (
     <AuthProvider>
@@ -92,14 +65,15 @@ export default function App() {
         <MentorJobsProvider>
           <Routes>
 
-            {/* Default entry */}
-            <Route index element={<HomePage {...layoutProps} />} />
+            {/* Public homepage */}
+            <Route
+              index
+              element={<HomePage {...layoutProps} />}
+            />
 
             {/* Public authentication */}
             <Route element={<GuestOnly />}>
-              <Route
-                element={<AuthLayout {...layoutProps} />}
-              >
+              <Route element={<AuthLayout {...layoutProps} />}>
                 <Route
                   path="login"
                   element={<LoginPage />}
@@ -110,9 +84,18 @@ export default function App() {
                   element={<SignupPage />}
                 />
               </Route>
-              <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+              <Route
+                path="verify-email"
+                element={<VerifyEmailPage />}
+              />
             </Route>
-            <Route path="/auth/mfa" element={<AdminMfaPage />} />
+
+            {/* Administrator MFA */}
+            <Route
+              path="auth/mfa"
+              element={<AdminMfaPage />}
+            />
 
             {/* OAuth callback */}
             <Route
@@ -128,7 +111,7 @@ export default function App() {
             {/* Authenticated application */}
             <Route element={<Protected />}>
 
-              {/* Separate administrator workspace */}
+              {/* Administrator workspace */}
               <Route
                 path="admin"
                 element={
@@ -137,9 +120,13 @@ export default function App() {
                   </AppShell>
                 }
               />
-              <Route path="admin/resources" element={<AdminResourcesPage />} />
 
-              {/* Standard CareerForge workspace */}
+              <Route
+                path="admin/resources"
+                element={<AdminResourcesPage />}
+              />
+
+              {/* Standard workspace */}
               <Route
                 element={
                   <AppShell {...layoutProps}>
@@ -185,13 +172,10 @@ export default function App() {
                 <Route
                   path="onboarding"
                   element={
-                    <Navigate
-                      to="/dashboard"
-                      replace
-                    />
+                    <Navigate to="/dashboard" replace />
                   }
                 />
-                </Route>
+              </Route>
             </Route>
 
             {/* Unknown routes */}
@@ -204,5 +188,13 @@ export default function App() {
         </MentorJobsProvider>
       </BrowserRouter>
     </AuthProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AppearanceProvider>
+      <AppRoutes />
+    </AppearanceProvider>
   );
 }
