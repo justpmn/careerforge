@@ -1,17 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-
 import { useAuth } from '../context/AuthContext';
-
-import {
-  uploadResume,
-  getLatestResumeAnalysis,
-} from '../lib/resume';
-
+import {uploadResume, getLatestResumeAnalysis,} from '../lib/resume';
 import type { ResumeAnalysis } from '../lib/resume';
-
-
+import CvUploadModal from '../components/cvuploadmodal';
 
 function careerName(key: string): string {
   return key
@@ -19,27 +11,18 @@ function careerName(key: string): string {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-
 export default function CvPage() {
   const { user } = useAuth();
 
-  // Selected file
-  const [file, setFile] = useState<File | null>(null);
-
-  // CV analysis results
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
   const [analyzedFilename, setAnalyzedFilename] = useState('');
 
-  // Loading states
   const [loadingSaved, setLoadingSaved] = useState(true);
   const [uploading, setUploading] = useState(false);
-
-  // Error handling
-  const [error, setError] = useState('');
+  const [cvUploadOpen, setCvUploadOpen] = useState(false);
   const [savedError, setSavedError] = useState('');
 
-
-  // Load the latest saved CV analysis when the page opens.
+  // Load the latest saved CV analysis.
   useEffect(() => {
     let active = true;
 
@@ -64,9 +47,7 @@ export default function CvPage() {
             : 'Could not load your saved CV analysis.'
         );
       } finally {
-        if (active) {
-          setLoadingSaved(false);
-        }
+        if (active) setLoadingSaved(false);
       }
     }
 
@@ -77,59 +58,30 @@ export default function CvPage() {
     };
   }, []);
 
-
-  function selectFile(event: ChangeEvent<HTMLInputElement>) {
-    const selected = event.target.files?.[0] ?? null;
-
-    setFile(selected);
-    setError('');
-  }
-
-
-  async function handleUpload(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (
-      !file ||
-      !user ||
-      uploading ||
-      loadingSaved
-    ) {
-      return;
+  async function handleCvAnalysis(selectedFile: File): Promise<void> {
+    if (!user?.id) {
+      throw new Error('Please sign in to analyze your CV.');
     }
 
     setUploading(true);
-    setError('');
-    setSavedError('');
 
     try {
-      const result = await uploadResume(file, user.id);
-
-      // Display the new analysis immediately.
-      setAnalysis(result);
-      setAnalyzedFilename(file.name);
-
-      // Clear the selected upload.
-      setFile(null);
-
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Could not analyze your CV.'
+      const result = await uploadResume(
+        selectedFile,
+        String(user.id)
       );
+
+      setAnalysis(result);
+      setAnalyzedFilename(selectedFile.name);
+      setSavedError('');
     } finally {
       setUploading(false);
     }
   }
 
-
   return (
     <section className="cf-cv">
-
       <header className="cf-cv-header">
-        <span className="cf-cv-eyebrow">MY CV</span>
-
         <h1>Your experience, understood.</h1>
 
         <p>
@@ -137,7 +89,6 @@ export default function CvPage() {
           and discover relevant career paths.
         </p>
       </header>
-
 
       {/* Saved analysis loading state */}
 
@@ -153,73 +104,42 @@ export default function CvPage() {
         </p>
       )}
 
-
       {/* Upload section */}
 
-      <article className="cf-cv-panel">
-        <div className="cf-cv-panel-heading">
+      <article className="cf-cv-upload-compact">
+        <div>
           <h2>Upload CV</h2>
-          <span>PDF or DOCX · Max 5 MB</span>
+
+          <p>
+            Add or update your CV to refresh your technical
+            skills and career recommendations.
+          </p>
+
+          <small>PDF or DOCX · Maximum 5 MB</small>
         </div>
 
-        <form onSubmit={handleUpload}>
-
-          <label
-            htmlFor="cv-file"
-            className="cf-cv-upload-area"
-          >
-            <span
-              className="cf-cv-upload-icon"
-              aria-hidden="true"
-            >
-              +
-            </span>
-
-            <strong>
-              {file ? file.name : 'Choose a file'}
-            </strong>
-
-            <span>
-              {file
-                ? `${(file.size / 1024 / 1024).toFixed(2)} MB`
-                : 'Select your PDF or Word document'}
-            </span>
-          </label>
-
-          <input
-            id="cv-file"
-            type="file"
-            accept=".pdf,.docx"
-            onChange={selectFile}
-            disabled={uploading || loadingSaved}
-            className="cf-cv-file-input"
-          />
-
-          {error && (
-            <p role="alert" className="cf-cv-error">
-              {error}
-            </p>
-          )}
-
-          <div className="cf-cv-actions">
-            <button
-              type="submit"
-              disabled={!file || uploading || loadingSaved}
-              className="cf-cv-primary"
-            >
-              {uploading ? 'Analyzing CV...' : 'Analyze CV'}
-            </button>
-          </div>
-
-        </form>
+        <button
+          type="button"
+          className="cf-cv-primary"
+          disabled={uploading || loadingSaved}
+          onClick={() => setCvUploadOpen(true)}
+        >
+          + Upload CV
+        </button>
       </article>
 
+      {/* CV upload modal */}
+
+      <CvUploadModal
+        open={cvUploadOpen}
+        onClose={() => setCvUploadOpen(false)}
+        onAnalyze={handleCvAnalysis}
+      />
 
       {/* Saved or newly generated analysis */}
 
       {analysis && (
         <div className="cf-cv-results" aria-live="polite">
-
           <div className="cf-cv-results-heading">
             <div>
               <span className="cf-cv-eyebrow">
@@ -231,7 +151,6 @@ export default function CvPage() {
               <p>{analyzedFilename}</p>
             </div>
           </div>
-
 
           {/* Extracted skills */}
 
@@ -267,7 +186,6 @@ export default function CvPage() {
             </p>
           </article>
 
-
           {/* Random Forest recommendations */}
 
           <article className="cf-cv-panel">
@@ -278,7 +196,6 @@ export default function CvPage() {
 
             {analysis.recommendations.length > 0 ? (
               <div className="cf-cv-recommendations">
-
                 {[...analysis.recommendations]
                   .sort((a, b) => a.rank - b.rank)
                   .map((recommendation) => (
@@ -312,7 +229,6 @@ export default function CvPage() {
             </p>
           </article>
 
-
           {/* Model vocabulary coverage */}
 
           <article className="cf-cv-panel">
@@ -321,7 +237,6 @@ export default function CvPage() {
             </div>
 
             <div className="cf-cv-coverage">
-
               <div>
                 <strong>
                   {analysis.model_skills.length}
@@ -341,7 +256,6 @@ export default function CvPage() {
                   Extracted skills outside its vocabulary
                 </span>
               </div>
-
             </div>
 
             {analysis.ignored_skills.length > 0 && (
@@ -352,7 +266,6 @@ export default function CvPage() {
               </p>
             )}
           </article>
-
         </div>
       )}
     </section>
