@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from src.backend.app.database.models.skill import Skill
 from src.backend.app.database.models.learning_resource import (LearningResource)
 from src.backend.app.database.models.learning_resource_skill import (LearningResourceSkill)
-
+from src.backend.app.database.models.competency_resource_link import (CompetencyResourceLink)
 
 CATALOG_PATH = (
     Path(__file__).resolve().parents[1]
@@ -123,7 +123,10 @@ def get_resources_for_skills(
             Skill,
             Skill.id == LearningResourceSkill.skill_id,
         )
-        .where(Skill.name.in_(skill_names))
+        .where(
+            Skill.name.in_(skill_names),
+            LearningResource.archived_at.is_(None),
+            )
         .order_by(
             LearningResource.title,
             Skill.name,
@@ -151,90 +154,54 @@ def get_resources_for_skills(
     return list(resources.values())
 
 
+
 def get_resources_for_competencies(
     db: Session,
     competency_keys: list[str],
     career_key: str,
 ) -> dict[str, list[dict]]:
-    """
-    Resolve competency resources from the JSON
-    catalog and retrieve their details from PostgreSQL.
-
-    Existing Python mappings remain as fallbacks.
-    """
-
     competency_keys = sorted(set(competency_keys))
-
-    if not competency_keys:
-        return {}
-
-    catalog_mappings = (
-        load_competency_resource_mappings()
-    )
-
-    resource_urls = {}
-
-    for key in competency_keys:
-        resource_urls[key] = catalog_mappings.get(
-            (career_key, key),
-            CAREER_COMPETENCY_RESOURCE_URLS.get(
-                (career_key, key),
-                COMMON_COMPETENCY_RESOURCE_URLS.get(
-                    key,
-                    [],
-                ),
-            ),
-        )
-
-    requested_urls = {
-        url
-        for urls in resource_urls.values()
-        for url in urls
-    }
 
     results = {
         key: []
         for key in competency_keys
     }
 
-    if not requested_urls:
+    if not competency_keys:
         return results
 
-    resources = db.scalars(
-        select(LearningResource)
+    rows = db.execute(
+        select(
+            CompetencyResourceLink.competency_key,
+            LearningResource,
+        )
+        .join(
+            LearningResource,
+            LearningResource.id
+            == CompetencyResourceLink.resource_id,
+        )
         .where(
-            LearningResource.url.in_(requested_urls)
+            CompetencyResourceLink.career_key == career_key,
+            CompetencyResourceLink.competency_key.in_(competency_keys),
+            LearningResource.archived_at.is_(None),
+        )
+        .order_by(
+            CompetencyResourceLink.competency_key,
+            LearningResource.title,
+            LearningResource.id,
         )
     ).all()
 
-    resources_by_url = {
-        resource.url: resource
-        for resource in resources
-    }
-
-    missing_urls = (
-        requested_urls - resources_by_url.keys()
-    )
-
-    if missing_urls:
-        raise ValueError(
-            "Competency resources not found: "
-            f"{sorted(missing_urls)}"
-        )
-
-    for key in competency_keys:
-        for url in resource_urls[key]:
-            resource = resources_by_url[url]
-
-            results[key].append({
-                "id": resource.id,
-                "title": resource.title,
-                "provider": resource.provider,
-                "resource_type": resource.resource_type,
-                "url": resource.url,
-                "description": resource.description,
-                "matched_competency": key,
-                "matched_skills": [],
-            })
+    for competency_key, resource in rows:
+        results[competency_key].append({
+            "id": resource.id,
+            "title": resource.title,
+            "provider": resource.provider,
+            "resource_type": resource.resource_type,
+            "url": resource.url,
+            "description": resource.description,
+            "matched_competency": competency_key,
+            "matched_skills": [],
+        })
 
     return results

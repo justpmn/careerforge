@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import {BrowserRouter,Navigate,Outlet,Route,Routes,} from 'react-router-dom';
+import {BrowserRouter,Navigate,Outlet,Route,Routes } from 'react-router-dom';
 import AuthLayout from './components/AuthLayout';
 import AppShell from './components/AppShell';
 import WorkspaceLayout from './components/layout';
@@ -19,6 +19,8 @@ import SettingsPage from './pages/settingpage';
 import AdminPage from './pages/adminpage';
 import VerifyEmailPage from './pages/verifyemailpage';
 import AdminMfaPage from './pages/adminmfapage';
+import AdminResourcesPage from './pages/adminresourcespage';
+
 
 type Theme = 'light' | 'dark';
 
@@ -152,6 +154,7 @@ export default function App() {
                   </AppShell>
                 }
               />
+              <Route path="admin/resources" element={<AdminResourcesPage />} />
 
               {/* Standard CareerForge workspace */}
               <Route
@@ -205,8 +208,7 @@ export default function App() {
                     />
                   }
                 />
-              </Route>
-
+                </Route>
             </Route>
 
             {/* Unknown routes */}

@@ -13,6 +13,7 @@ from src.backend.app.api.routes.account_settings import (router as account_setti
 from src.backend.app.api.routes.admin import router as admin_router
 from src.backend.app.api.routes.email_verification import router as email_verification_router
 from src.backend.app.api.routes.admin_mfa import router as admin_mfa_router
+from src.backend.app.api.routes.admin_resources import router as admin_resources_router
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(health_router)
@@ -32,3 +33,4 @@ api_router.include_router(account_settings)
 api_router.include_router(admin_router)
 api_router.include_router(email_verification_router)
 api_router.include_router(admin_mfa_router)
+api_router.include_router(admin_resources_router)

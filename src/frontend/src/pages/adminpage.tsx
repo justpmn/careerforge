@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -9,10 +8,8 @@ import {
   FiShield,
   FiUsers,
 } from 'react-icons/fi';
-
 import { onboardingApi } from '../lib/onboarding';
 import type { Career } from '../lib/onboarding';
-
 import {
   AdminApiError,
   getAdminIdentity,
@@ -22,7 +19,6 @@ import {
   getAdminCareerResources,
   getAdminSystemHealth,
 } from '../lib/admin';
-
 import type {
   AdminIdentity,
   AdminOverview,
@@ -839,6 +835,13 @@ export default function AdminPage() {
                   through CareerForge.
                 </p>
               </div>
+              <Link
+                  to="/admin/resources"
+                  className="cf-admin-manage-resources"
+                >
+                  <FiBookOpen />
+                  Manage learning resources
+                </Link>
 
               <div className="cf-admin-toolbar">
                 <input

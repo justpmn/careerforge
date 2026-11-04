@@ -12,6 +12,9 @@ from src.backend.app.database.models.user_skill import UserSkill
 from src.backend.app.database.models.competency_evidence import CompetencyEvidence
 from src.backend.app.database.models.email_verification_token import EmailVerificationToken
 from src.backend.app.database.models.admin_mfa import (AdminMfaCredential, AdminMfaRecoveryCode)
+from src.backend.app.database.models.competency_resource_link import (CompetencyResourceLink)
+from src.backend.app.database.models.admin_resource_audit import AdminResourceAudit
+
 
 __all__ = [
     "User",
@@ -28,4 +31,6 @@ __all__ = [
     "MentorMessage",
     "AdminMfaCredential",
     "AdminMfaRecoveryCode",
+    "CompetencyResourceLink",
+    "AdminResourceAudit",
 ]

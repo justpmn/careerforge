@@ -1,7 +1,7 @@
-
-from fastapi import APIRouter, Depends, Query, HTTPException
-from sqlalchemy import func, select, text
+from fastapi import APIRouter, Depends, Query, HTTPException, status
+from sqlalchemy import func, select, text, or_
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 import json
 from pathlib import Path
 from datetime import datetime, timezone
@@ -17,6 +17,10 @@ from src.backend.app.database.session import get_db
 from src.backend.app.core.admin_logging import LOG_DIR, LOG_FILE
 from src.backend.app.services.llm_health_service import (check_ollama_health)
 from src.backend.app.services.recommendation_health_service import ( check_recommendation_model_health)
+from src.backend.app.database.models.competency_resource_link import (CompetencyResourceLink)
+from src.backend.app.database.models.learning_resource import (LearningResource)
+from src.backend.app.services.learning_resource_service import get_resources_for_skills
+
 
 
 router = APIRouter(
@@ -157,10 +161,12 @@ def list_admin_logs(
         category=category,
     )
 
+
 @router.get("/careers/{career_key}/resources")
 def get_admin_career_resources(
     career_key: str,
     admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
 ):
     profile = CAREER_COMPETENCY_PROFILES.get(career_key)
 
@@ -170,84 +176,92 @@ def get_admin_career_resources(
             detail="Career profile not found.",
         )
 
-    catalog_path = (
-        Path(__file__).resolve().parents[2]
-        / "resource_catalog"
-        / "competency_resources.json"
-    )
-
-    try:
-        with catalog_path.open("r", encoding="utf-8") as file:
-            catalog = json.load(file)
-    except (OSError, ValueError) as error:
-        raise HTTPException(
-            status_code=503,
-            detail="Resource catalog is unavailable.",
-        ) from error
-
-    resource_index = {
-        item["url"]: item
-        for item in catalog.get("resources", [])
-        if isinstance(item, dict) and item.get("url")
-    }
+    rows = db.execute(
+        select(
+            CompetencyResourceLink.competency_key,
+            LearningResource,
+        )
+        .join(
+            LearningResource,
+            LearningResource.id
+            == CompetencyResourceLink.resource_id,
+        )
+        .where(
+            CompetencyResourceLink.career_key == career_key,
+            LearningResource.archived_at.is_(None),
+        )
+        .order_by(
+            CompetencyResourceLink.competency_key,
+            LearningResource.title,
+            LearningResource.id,
+        )
+    ).all()
 
     mapping_index = {}
 
-    for mapping in catalog.get("mappings", []):
-        if mapping.get("career_key") != career_key:
-            continue
-
-        competency_key = mapping.get("competency_key")
-
-        if not competency_key:
-            continue
-
-        mapping_index.setdefault(competency_key, set()).update(
-            mapping.get("urls", [])
-        )
+    for competency_key, resource in rows:
+        mapping_index.setdefault(
+            competency_key, []
+        ).append({
+            "id": resource.id,
+            "title": resource.title,
+            "provider": resource.provider,
+            "resource_type": resource.resource_type,
+            "url": resource.url,
+            "description": resource.description,
+        })
 
     competencies = []
     covered_count = 0
-    unique_resource_urls = set()
+    unique_resource_ids = set()
+    skill_names = sorted({
+        name
+        for group in profile
+        for name in (group.get("any_of") or [])
+    })
+
+    global_resources = get_resources_for_skills(db, skill_names)
 
     for group in profile:
         competency_key = group["key"]
+        resources = list(mapping_index.get(competency_key, []))
+        existing_ids = {resource["id"] for resource in resources}
+        competency_skills = set(group.get("any_of") or [])
 
-        urls = sorted(
-            mapping_index.get(competency_key, set())
-        )
-
-        resources = []
-
-        for url in urls:
-            definition = resource_index.get(url)
-
-            if definition is None:
+        for resource in global_resources:
+            if resource["id"] in existing_ids:
                 continue
 
-            unique_resource_urls.add(url)
+            if not competency_skills.intersection(
+                resource["matched_skills"]
+            ):
+                continue
 
             resources.append({
-                "title": definition.get("title", "Untitled"),
-                "provider": definition.get("provider", "Unknown"),
-                "resource_type": definition.get(
-                    "resource_type", "resource"
-                ),
-                "url": url,
-                "description": definition.get(
-                    "description", ""
-                ),
+                "id": resource["id"],
+                "title": resource["title"],
+                "provider": resource["provider"],
+                "resource_type": resource["resource_type"],
+                "url": resource["url"],
+                "description": resource["description"],
             })
+
+            existing_ids.add(resource["id"])
+
 
         resources.sort(
             key=lambda item: (
-                item["provider"].lower(),
+                (item["provider"] or "").lower(),
                 item["title"].lower(),
             )
         )
 
         if resources:
             covered_count += 1
+
+        unique_resource_ids.update(
+            resource["id"] for resource in resources
+        )
 
         competencies.append({
             "key": competency_key,
@@ -260,9 +274,10 @@ def get_admin_career_resources(
         "career_key": career_key,
         "competency_count": len(competencies),
         "covered_competencies": covered_count,
-        "unique_resources": len(unique_resource_urls),
+        "unique_resources": len(unique_resource_ids),
         "competencies": competencies,
     }
+
 
 @router.get("/health")
 def get_admin_system_health(
@@ -302,50 +317,35 @@ def get_admin_system_health(
         db.rollback()
 
     # 2. Learning-resource catalog
-    catalog_path = (
-        Path(__file__).resolve().parents[2]
-        / "resource_catalog"
-        / "competency_resources.json"
-    )
-
     try:
-        import json
-
-        with catalog_path.open(
-            "r",
-            encoding="utf-8",
-        ) as file:
-            catalog = json.load(file)
-
-        if not isinstance(catalog, dict):
-            raise ValueError("Invalid catalog structure")
-
-        resources = catalog.get("resources")
-        mappings = catalog.get("mappings")
-
-        if not isinstance(resources, list) or not isinstance(mappings, list):
-            raise ValueError("Missing resource collections")
-
+        resource_count = db.scalar(
+            select(func.count()).select_from(LearningResource)
+        ) or 0
+        mapping_count = db.scalar(
+            select(func.count()).select_from(CompetencyResourceLink)
+        ) or 0
+        healthy = resource_count > 0 and mapping_count > 0
         checks["resource_catalog"] = {
-            "status": "healthy",
-            "message": "Learning-resource catalog loaded.",
-            "resources": len(resources),
-            "mappings": len(mappings),
+            "status": "healthy" if healthy else "unhealthy",
+            "message": (
+                "PostgreSQL resource catalog available."
+                if healthy
+                else "Resource catalog is empty or incomplete."
+            ),
+            "resources": resource_count,
+            "mappings": mapping_count,
         }
-
-    except (OSError, ValueError):
+    except SQLAlchemyError:
+        db.rollback()
         checks["resource_catalog"] = {
             "status": "unhealthy",
-            "message": "Learning-resource catalog unavailable.",
+            "message": "Could not query the resource catalog.",
         }
-
     # 3. System logging
     try:
-        LOG_DIR.mkdir(parents=True, exist_ok=True)
-
-        # Verify the log directory is writable using
-        # a temporary file that is automatically removed.
         import tempfile
+
+        LOG_DIR.mkdir(parents=True, exist_ok=True)
 
         with tempfile.TemporaryFile(dir=LOG_DIR):
             pass
@@ -358,17 +358,18 @@ def get_admin_system_health(
                 else "Log directory is writable; no active log file yet."
             ),
         }
-
     except OSError:
         checks["logging"] = {
             "status": "unhealthy",
             "message": "Logging directory is not writable.",
         }
 
+    # 4. Recommendation model
     checks["recommendation_model"] = (
         check_recommendation_model_health()
     )
 
+    # 5. AI mentor
     checks["ai_mentor"] = check_ollama_health()
 
     measured = [
