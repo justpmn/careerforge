@@ -133,11 +133,10 @@ export default function AdminResourcesPage() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [notice, setNotice] = useState('');
-  
-const [pendingResourceAction, setPendingResourceAction] =
-  useState<ResourceAction | null>(null);
-const [resourceActionBusy, setResourceActionBusy] = useState(false);
-const [resourceActionError, setResourceActionError] = useState('');
+  const [pendingResourceAction, setPendingResourceAction] =
+    useState<ResourceAction | null>(null);
+  const [resourceActionBusy, setResourceActionBusy] = useState(false);
+  const [resourceActionError, setResourceActionError] = useState('');
 
 
   useEffect(() => {
@@ -202,8 +201,6 @@ const [resourceActionError, setResourceActionError] = useState('');
       clearTimeout(timer);
     };
   }, [search, page, includeArchived, reload]);
-
-  
 useEffect(() => {
   if (mappingMode === 'career') return;
 
@@ -256,10 +253,8 @@ useEffect(() => {
     setTotpError('');
     setNotice('');
 
-    
     const useSkills = mappingMode !== 'career';
     const useCareers = mappingMode !== 'global';
-
     if (useSkills && selectedSkills.length === 0) {
     setFormError('Select at least one global skill.');
     return;
@@ -533,7 +528,6 @@ async function confirmResourceAction(code: string) {
                 <h3>Resource mapping</h3>
                 <span>02 / SKILLS & CAREERS</span>
                 </div>
-
                 <div className="cf-resources-scope">
                 {([
                     ['global', 'Global skills'],

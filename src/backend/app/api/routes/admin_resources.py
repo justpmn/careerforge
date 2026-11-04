@@ -176,7 +176,6 @@ def list_learning_resources(
 ):
     query = select(LearningResource)
     count_query = select(func.count()).select_from(LearningResource)
-    
     if not include_archived:
         query = query.where(LearningResource.archived_at.is_(None))
         count_query = count_query.where(
@@ -204,7 +203,6 @@ def list_learning_resources(
     ).all()
 
     resource_ids = [resource.id for resource in resources]
-    
     skills_by_resource = {
         resource_id: [] for resource_id in resource_ids
     }
@@ -488,12 +486,10 @@ def create_learning_resource(
     db: Session = Depends(get_db),
 ):
     assignments = validate_assignments(payload.assignments)
-    
-    
     skill_ids = payload.skill_ids
 
     if len(skill_ids) != len(set(skill_ids)) or any(
-        skill_id <= 0 for skill_id in skill_ids
+    skill_id <= 0 for skill_id in skill_ids
     ):
         raise HTTPException(
             status_code=422,
