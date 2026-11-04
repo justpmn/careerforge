@@ -139,9 +139,9 @@ export default function DashboardPage() {
     <section className="cf-home">
       <header className="cf-home-header">
         <div>
-          <span className="cf-home-label">DASHBOARD</span>
-          <h1>Welcome back, {firstName}.</h1>
-          <p>Your career at a glance.</p>
+          <h1 className="cf-home-welcome">
+          Welcome back, <span className="cf-home-name">{firstName}.</span>
+        </h1>
         </div>
 
         <button
@@ -162,7 +162,6 @@ export default function DashboardPage() {
         data-tour-active={currentTour?.target === 'target'}
       >
         <div>
-          <span className="cf-home-label">TARGET ROLE</span>
           <h2>
             {loading
               ? 'Loading...'
@@ -193,7 +192,7 @@ export default function DashboardPage() {
         >
           <div className="cf-home-card-heading">
             <h2>Career recommendations</h2>
-            <span className="cf-home-index">01</span>
+            <span className="cf-home-index"></span>
           </div>
 
           <p className="cf-home-empty">
@@ -213,7 +212,7 @@ export default function DashboardPage() {
         >
           <div className="cf-home-card-heading">
             <h2>Skill gap summary</h2>
-            <span className="cf-home-index">02</span>
+            <span className="cf-home-index"></span>
           </div>
 
           <p className="cf-home-empty">

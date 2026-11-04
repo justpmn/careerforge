@@ -113,6 +113,7 @@ export default function SkillsAssessmentPage() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState('');
   const [gapFilter, setGapFilter] = useState<GapFilter>('attention');
+  const [careerExpanded, setCareerExpanded] = useState(true);
   useEffect(() => {
     let active = true;
 
@@ -126,6 +127,7 @@ export default function SkillsAssessmentPage() {
         setCareers(available);
         setSelectedCareer(selection.career_key ?? '');
         setSavedCareer(selection.career_key ?? '');
+        setCareerExpanded(!selection.career_key);
       })
       .catch((err: unknown) => {
         if (!active) return;
@@ -317,6 +319,7 @@ export default function SkillsAssessmentPage() {
       );
 
       setSavedCareer(result.career_key ?? '');
+      setCareerExpanded(!result.career_key);
       setMessage('Your target career has been saved.');
     } catch (err) {
       setError(
@@ -344,9 +347,9 @@ async function refreshSkillProfile() {
     <section className="cf-dashboard">
       <header className="cf-dashboard-header">
         <div>
-          <span className="stage-marker">
+          {/* <span className="stage-marker">
             SKILLS ASSESSMENT
-          </span>
+          </span> */}
 
           <h1>Understand your abilities.</h1>
 
@@ -361,129 +364,176 @@ async function refreshSkillProfile() {
 
         {/* SECTION 01: CAREER DIRECTION */}
         <article className="cf-dashboard-card">
-          <span className="cf-eyebrow">
-            01 / CAREER DIRECTION
-          </span>
+          <div className="cf-career-collapse-header">
+          <div>
+            <span className="cf-eyebrow">
+              CAREER DIRECTION
+            </span>
 
-          <h2>Choose your target career</h2>
+            <h2>
+              {savedCareer
+                ? careers.find(
+                    (career) => career.career_key === savedCareer
+                  )?.name ?? savedCareer
+                : 'Choose your target career'}
+            </h2>
+          </div>
 
-          <p>
-            Select the career you want to work toward.
-            Your competency analysis will use this selection.
-          </p>
+          {savedCareer && (
+            <button
+              type="button"
+              className="cf-career-toggle"
+              aria-expanded={careerExpanded}
+              aria-controls="career-direction-options"
+              disabled={saving}
+              onClick={() => {
+                if (careerExpanded) {
+                  setSelectedCareer(savedCareer);
+                  setSearch('');
+                }
 
-          <label
-            className="cf-input-label"
-            htmlFor="career-search"
-          >
-            Search careers
-          </label>
-
-          <input
-            id="career-search"
-            type="search"
-            className="cf-career-search"
-            placeholder="e.g. Backend Developer"
-            value={search}
-            onChange={(event) =>
-              setSearch(event.target.value)
-            }
-          />
-
-          {loading ? (
-            <p>Loading careers...</p>
-          ) : careers.length === 0 ? (
-            <p>
-              No careers are available. Check the
-              onboarding API and database.
-            </p>
-          ) : (
-            <div className="cf-career-options">
-              {filteredCareers.map((career) => (
-                <button
-                  key={career.career_key}
-                  type="button"
-                  aria-pressed={
-                    selectedCareer === career.career_key
-                  }
-                  className={`cf-career-option ${
-                    selectedCareer === career.career_key
-                      ? 'cf-career-selected'
-                      : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedCareer(career.career_key);
-                    setMessage('');
-                    setError(null);
-                  }}
-                >
-                  <strong>{career.name}</strong>
-
-                  {career.description && (
-                    <span>{career.description}</span>
-                  )}
-                </button>
-              ))}
-
-              {filteredCareers.length === 0 && (
-                <p>No matching careers found.</p>
-              )}
-            </div>
+                setCareerExpanded((current) => !current);
+                setError(null);
+                setMessage('');
+              }}
+            >
+              {careerExpanded ? 'Cancel' : 'Change career'}
+            </button>
           )}
+        </div>
 
-          {selected && (
-            <p className="cf-selected-career">
-              Selected: <strong>{selected.name}</strong>
-            </p>
-          )}
-
-          {selectedCareer !== savedCareer && savedCareer && (
+          {!careerExpanded && savedCareer && (
             <p className="cf-assessment-hint">
-              Save your new career selection to refresh
-              the competency analysis below.
+              Your competency analysis and learning roadmap
+              are based on this career.
             </p>
           )}
 
-          {error && (
+          <div
+            id="career-direction-options"
+            hidden={!careerExpanded}
+          >
+            <p>
+              Select the career you want to work toward.
+              Your competency analysis will use this selection.
+            </p>
+
+            <label
+              className="cf-input-label"
+              htmlFor="career-search"
+            >
+              Search careers
+            </label>
+
+            <input
+              id="career-search"
+              type="search"
+              className="cf-career-search"
+              placeholder="e.g. Backend Developer"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+
+            {loading ? (
+              <p>Loading careers...</p>
+            ) : careers.length === 0 ? (
+              <p>
+                No careers are available. Check the
+                onboarding API and database.
+              </p>
+            ) : (
+              <div className="cf-career-options">
+                {filteredCareers.map((career) => (
+                  <button
+                    key={career.career_key}
+                    type="button"
+                    aria-pressed={
+                      selectedCareer === career.career_key
+                    }
+                    className={`cf-career-option ${
+                      selectedCareer === career.career_key
+                        ? 'cf-career-selected'
+                        : ''
+                    }`}
+                    onClick={() => {
+                      setSelectedCareer(career.career_key);
+                      setMessage('');
+                      setError(null);
+                    }}
+                  >
+                    <strong>{career.name}</strong>
+
+                    {career.description && (
+                      <span>{career.description}</span>
+                    )}
+                  </button>
+                ))}
+
+                {filteredCareers.length === 0 && (
+                  <p>No matching careers found.</p>
+                )}
+              </div>
+            )}
+
+            {selected && (
+              <p className="cf-selected-career">
+                Selected: <strong>{selected.name}</strong>
+              </p>
+            )}
+
+            {selectedCareer !== savedCareer && savedCareer && (
+              <p className="cf-assessment-hint">
+                Save your new career selection to refresh
+                the competency analysis below.
+              </p>
+            )}
+
+            {error && (
+              <p role="alert" className="cf-error">
+                {error}
+              </p>
+            )}
+
+            {message && (
+              <p role="status" className="cf-success">
+                {message}
+              </p>
+            )}
+
+            <div className="cf-card-footer">
+              <span className="cf-muted">
+                {savedCareer
+                  ? 'You can change your target career later.'
+                  : 'Select a target career to begin.'}
+              </span>
+
+              <button
+                type="button"
+                className="cf-button cf-button-primary"
+                onClick={() => void saveCareer()}
+                disabled={
+                  !selectedCareer ||
+                  loading ||
+                  saving ||
+                  selectedCareer === savedCareer
+                }
+              >
+                {saving ? 'Saving...' : 'Save target career'}
+              </button>
+            </div>
+          </div>
+
+          {!careerExpanded && error && (
             <p role="alert" className="cf-error">
               {error}
             </p>
           )}
-
-          {message && (
-            <p role="status" className="cf-success">
-              {message}
-            </p>
-          )}
-
-          <div className="cf-card-footer">
-            <span className="cf-muted">
-              {savedCareer
-                ? 'You can change your target career later.'
-                : 'Select a target career to begin.'}
-            </span>
-
-            <button
-              type="button"
-              className="cf-button cf-button-primary"
-              onClick={() => void saveCareer()}
-              disabled={
-                !selectedCareer ||
-                loading ||
-                saving ||
-                selectedCareer === savedCareer
-              }
-            >
-              {saving ? 'Saving...' : 'Save target career'}
-            </button>
-          </div>
         </article>
-
 
         {/* SECTION 02: CURRENT SKILLS */}
         <article className="cf-dashboard-card">
           <span className="cf-eyebrow">
-            02 / CURRENT SKILLS
+            CURRENT SKILLS
           </span>
 
           <h2>Your recorded skills</h2>
@@ -562,7 +612,7 @@ async function refreshSkillProfile() {
         {/* SECTION 03: COMPETENCY GAPS */}
         <article className="cf-dashboard-card">
           <span className="cf-eyebrow">
-            03 / COMPETENCY GAPS
+            COMPETENCY GAPS
           </span>
 
           <h2>Your competency analysis</h2>

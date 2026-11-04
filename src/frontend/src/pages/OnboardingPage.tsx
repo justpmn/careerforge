@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -119,7 +118,7 @@ export default function OnboardingPage() {
   return (
     <section className="workspace-panel">
       <span className="stage-marker">
-        01 / CAREER DIRECTION
+        CAREER DIRECTION
       </span>
 
       <h1>Where do you want to go?</h1>

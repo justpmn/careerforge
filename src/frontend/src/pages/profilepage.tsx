@@ -211,7 +211,6 @@ export default function ProfilePage() {
     <section className="cf-dashboard cf-profile">
       <header className="cf-dashboard-header">
         <div>
-          <span className="stage-marker">MY PROFILE</span>
           <h1>Your career profile.</h1>
           <p>
             View your account details, career direction
@@ -257,7 +256,7 @@ export default function ProfilePage() {
         {/* Personal information */}
         <article className="cf-dashboard-card">
           <span className="cf-eyebrow">
-            01 / PERSONAL INFORMATION
+            PERSONAL INFORMATION
           </span>
 
           <h2>Account details</h2>
@@ -284,7 +283,7 @@ export default function ProfilePage() {
         {/* Career direction */}
         <article className="cf-dashboard-card">
           <span className="cf-eyebrow">
-            02 / CAREER DIRECTION
+            CAREER DIRECTION
           </span>
 
           <h2>Target career</h2>
@@ -329,10 +328,6 @@ export default function ProfilePage() {
 
         {/* Development summary */}
         <article className="cf-dashboard-card cf-profile-wide">
-          <span className="cf-eyebrow">
-            03 / DEVELOPMENT SUMMARY
-          </span>
-
           <h2>Your progress</h2>
 
           <p>
@@ -393,10 +388,6 @@ export default function ProfilePage() {
 
         {/* Skills */}
         <article className="cf-dashboard-card cf-profile-wide">
-          <span className="cf-eyebrow">
-            04 / RECORDED SKILLS
-          </span>
-
           <h2>Your technical skills</h2>
 
           {loading ? (
@@ -429,10 +420,6 @@ export default function ProfilePage() {
 
         {/* CV */}
         <article className="cf-dashboard-card cf-profile-wide">
-          <span className="cf-eyebrow">
-            05 / RESUME
-          </span>
-
           <h2>Resume and experience</h2>
 
           <p>

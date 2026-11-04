@@ -664,7 +664,18 @@ const resources =
                     ? 'Assessment not linked'
                     : readable(selectedStatus))}
               </span>
+
+              {step?.priority_group && (
+                <span
+                  className="cf-priority-tag"
+                  title="Competency priority"
+                  aria-label={`Priority: ${readable(step.priority_group)}`}
+                >
+                  {readable(step.priority_group)}
+                </span>
+              )}
             </div>
+
 
             {selectedItem.requires.length > 0 && (
               <div className="cf-skill-inspector-section">
@@ -730,14 +741,6 @@ const resources =
               )}
 
 
-            {step?.priority_group && (
-              <div className="cf-skill-inspector-section">
-                <h3>Priority</h3>
-
-                <p>{readable(step.priority_group)}</p>
-              </div>
-            )}
-
             <div className="cf-skill-inspector-section">
               <h3>Learning resources</h3>
 
@@ -791,13 +794,14 @@ const resources =
                 </p>
               )}
             </div>
+            <div className="cf-skill-learning-action">
+              <div className="cf-skill-learning-label">
+                <strong>Learning status</strong>
+                <span>
+                  {isLearned ? 'Marked as learned' : 'Not yet marked as learned'}
+                </span>
+              </div>
 
-            <div className="cf-skill-inspector-section cf-learning-section">
-              <h3>Your learning progress</h3>
-              <p className="cf-learning-helper">
-                When you've finished studying, mark this skill as learned.
-                This is self-reported and does not verify proficiency.
-              </p>
               <button
                 type="button"
                 className={`cf-learning-toggle ${isLearned ? 'is-learned' : ''}`}
@@ -811,16 +815,15 @@ const resources =
                     ? '✓ Learned · Undo'
                     : 'Mark as learned'}
               </button>
+
               {learningError && (
-                <p className="cf-learning-error" role="alert">{learningError}</p>
-              )}
-              {isLearned && (
-                <p className="cf-learning-helper">
-                  Next: build something using this skill, then update and upload
-                  your CV so CareerForge can identify supporting evidence.
+                <p className="cf-learning-error" role="alert">
+                  {learningError}
                 </p>
               )}
             </div>
+
+
           </aside>
         )}
       </div>

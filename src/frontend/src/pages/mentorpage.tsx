@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { onboardingApi } from '../lib/onboarding';
@@ -331,7 +330,6 @@ function handleComposerKeyDown(
     <section className="cf-mentor">
       <header className="cf-mentor-page-header">
         <div>
-          <span className="cf-mentor-eyebrow">AI MENTOR</span>
           <h1>Your career mentor.</h1>
           <p>
             Ask questions, explore career paths, and plan your next steps.

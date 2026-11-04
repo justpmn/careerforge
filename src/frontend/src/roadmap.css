@@ -716,3 +716,64 @@
   line-height: 1.35;
   text-align: center;
 }
+
+
+.cf-skill-inspector-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-skill-inspector-tags .cf-priority-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(209, 138, 100, 0.12);
+  border: 1px solid rgba(209, 138, 100, 0.45);
+  color: #e4a274;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+html[data-theme="light"] .cf-skill-inspector-tags .cf-priority-tag {
+  background: rgba(166, 92, 53, 0.08);
+  border-color: rgba(166, 92, 53, 0.3);
+  color: #a65c35;
+}
+.cf-skill-learning-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.cf-skill-learning-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cf-skill-learning-label strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cf-skill-learning-label span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.cf-skill-learning-action .cf-learning-toggle {
+  flex-shrink: 0;
+}
+
+.cf-skill-learning-action .cf-learning-error {
+  flex-basis: 100%;
+  margin: 0;
+}
