@@ -20,6 +20,7 @@ import AdminPage from './pages/adminpage';
 import VerifyEmailPage from './pages/verifyemailpage';
 import AdminMfaPage from './pages/adminmfapage';
 import AdminResourcesPage from './pages/adminresourcespage';
+import HomePage from './pages/homepage';
 
 
 type Theme = 'light' | 'dark';
@@ -29,21 +30,6 @@ function LoadingScreen() {
     <div className="loading-screen">
       Loading...
     </div>
-  );
-}
-
-function StartingPage() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  return (
-    <Navigate
-      to={user ? postAuthRoute(user) : '/login'}
-      replace
-    />
   );
 }
 
@@ -107,10 +93,7 @@ export default function App() {
           <Routes>
 
             {/* Default entry */}
-            <Route
-              index
-              element={<StartingPage />}
-            />
+            <Route index element={<HomePage {...layoutProps} />} />
 
             {/* Public authentication */}
             <Route element={<GuestOnly />}>

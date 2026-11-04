@@ -524,3 +524,19 @@ html[data-theme="dark"] .cf-nav-active {
     white-space: nowrap;
   }
 }
+
+
+.brand .brand-name {
+  font-weight: 760;
+  letter-spacing: -0.055em;
+}
+
+.brand .brand-accent {
+  color: var(--accent);
+  font-weight: 760;
+}
+
+.brand .brand-period {
+  color: var(--accent);
+  font-weight: 760;
+}
