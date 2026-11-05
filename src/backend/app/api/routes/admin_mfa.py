@@ -24,7 +24,7 @@ from src.backend.app.api.auth import create_csrf_token, validate_csrf_token
 from src.backend.app.core.config import settings
 from src.backend.app.core.tokens import (create_access_token, decode_admin_mfa_challenge_token)
 from src.backend.app.services.admin_mfa_verification import (verify_and_consume_admin_totp)
-
+from src.backend.app.services.mfa_qr import build_totp_qr_data_url
 
 router = APIRouter(
     prefix="/auth/admin-mfa",
@@ -48,6 +48,7 @@ class ConfirmEnrollmentRequest(BaseModel):
 class EnrollmentStartResponse(BaseModel):
     provisioning_uri: str
     expires_at: datetime
+    qr_code_data_url: str
 
 
 class EnrollmentConfirmResponse(BaseModel):
@@ -220,6 +221,7 @@ async def complete_google_enrollment_auth(
     "/enroll/start",
     response_model=EnrollmentStartResponse,
 )
+
 def start_enrollment(
     payload: StartEnrollmentRequest,
     request: Request,
@@ -229,12 +231,12 @@ def start_enrollment(
 ):
     response.headers["Cache-Control"] = "no-store"
 
-  
     if admin.password_hash is not None:
         if (
             not payload.password
             or not verify_password(
-                payload.password, admin.password_hash
+                payload.password,
+                admin.password_hash,
             )
         ):
             raise HTTPException(
@@ -257,7 +259,6 @@ def start_enrollment(
             )
 
         request.session.pop("cf_mfa_google_approved", None)
-      
 
     now = datetime.now(timezone.utc)
 
@@ -291,16 +292,22 @@ def start_enrollment(
     record.failed_attempts = 0
     record.locked_until = None
 
+    provisioning_uri = get_totp_provisioning_uri(
+        secret,
+        admin.email,
+    )
+
+    qr_code_data_url = build_totp_qr_data_url(
+        provisioning_uri
+    )
+
     db.commit()
 
     return EnrollmentStartResponse(
-        provisioning_uri=get_totp_provisioning_uri(
-            secret,
-            admin.email,
-        ),
+        provisioning_uri=provisioning_uri,
+        qr_code_data_url=qr_code_data_url,
         expires_at=expires_at,
     )
-
 
 @router.post(
     "/enroll/confirm",
