@@ -7,7 +7,7 @@ import type { AccountSettings} from '../lib/accountsettings';
 import '../settings.css';
 import AppearanceSettings from '../components/AppearanceSettings';
 import AccountDangerZone from '../components/AccountDangerZone';
-import GoogleAccountLink from '../components/GoogleAccountLink';
+import ConnectedAccounts from '../components/ConnectedAccounts';
 
 
 export default function SettingsPage() {
@@ -293,7 +293,7 @@ export default function SettingsPage() {
 
               <section className="cf-settings-connected">
                 <h2>Connected accounts</h2>
-                <GoogleAccountLink />
+                <ConnectedAccounts />
               </section>
 
         </article>

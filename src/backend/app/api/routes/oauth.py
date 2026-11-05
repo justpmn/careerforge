@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import time
+import jwt
 from typing import Literal
 from datetime import datetime, timezone, timedelta
 from authlib.integrations.base_client import OAuthError
@@ -13,7 +14,12 @@ from src.backend.app.database.models.admin_mfa import AdminMfaCredential
 from src.backend.app.api.auth import create_csrf_token
 from src.backend.app.core.config import settings
 from src.backend.app.core.oauth import oauth
-from src.backend.app.core.tokens import create_access_token, create_admin_mfa_challenge_token
+from src.backend.app.core.tokens import (create_access_token,
+                                         create_admin_mfa_challenge_token,
+                                         JWT_ALGORITHM,
+                                         JWT_ISSUER,
+                                         JWT_AUDIENCE,
+                                         get_jwt_secret)
 from src.backend.app.database.models.oauth_identity import OAuthIdentity
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
@@ -117,22 +123,73 @@ def find_or_create_user(
     return user, None
 
 
-class GoogleLinkRequest(BaseModel):
+
+class AccountLinkRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    password: str = Field(min_length=1, max_length=128)
+    provider: Provider
+    password: str | None = Field(default=None, max_length=128)
 
 
-def google_link_redirect(result: str) -> RedirectResponse:
+def account_link_redirect(result: str, provider: Provider):
     return RedirectResponse(
-        f"{settings.oauth_redirect_origin}/settings?google={result}",
+        f"{settings.oauth_redirect_origin}/settings"
+        f"?account_link={result}&provider={provider}",
         status_code=303,
     )
 
 
-def valid_google_link_proof(
+def recent_oauth_session(request: Request) -> bool:
+    token = request.cookies.get("careerforge_session")
+
+    if not token:
+        return False
+
+    try:
+        claims = jwt.decode(
+            token,
+            get_jwt_secret(),
+            algorithms=[JWT_ALGORITHM],
+            issuer=JWT_ISSUER,
+            audience=JWT_AUDIENCE,
+        )
+    except jwt.InvalidTokenError:
+        return False
+
+    issued_at = claims.get("iat")
+
+    return (
+        claims.get("token_type") == "access"
+        and type(issued_at) is int
+        and 0 <= int(time.time()) - issued_at <= 300
+    )
+
+
+def confirm_account_ownership(
+    request: Request,
+    user: User,
+    password: str | None,
+) -> None:
+    if user.password_hash is not None:
+        if (
+            not password
+            or not verify_password(password, user.password_hash)
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Password confirmation failed.",
+            )
+    elif not recent_oauth_session(request):
+        raise HTTPException(
+            status_code=403,
+            detail="Sign in again before changing connected accounts.",
+        )
+
+
+def valid_account_link_proof(
     request: Request,
     proof: object,
     user_id: int,
+    provider: Provider,
 ) -> bool:
     token = request.cookies.get("careerforge_session")
 
@@ -142,13 +199,12 @@ def valid_google_link_proof(
     issued_at = proof.get("issued_at")
     fingerprint = proof.get("session_fingerprint")
 
-    if type(proof.get("user_id")) is not int:
-        return False
-
-    if type(issued_at) is not int:
-        return False
-
-    if not isinstance(fingerprint, str):
+    if (
+        type(proof.get("user_id")) is not int
+        or type(issued_at) is not int
+        or not isinstance(fingerprint, str)
+        or proof.get("provider") != provider
+    ):
         return False
 
     age = int(time.time()) - issued_at
@@ -169,30 +225,123 @@ def valid_google_link_proof(
     )
 
 
-@router.get("/google/link/status")
-def google_link_status(
+@router.get("/link/status")
+def connected_account_status(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    identity = db.scalar(
-        select(OAuthIdentity).where(
-            OAuthIdentity.user_id == user_id,
-            OAuthIdentity.provider == "google",
-        )
+    user = db.get(User, user_id)
+
+    providers = set(
+        db.scalars(
+            select(OAuthIdentity.provider).where(
+                OAuthIdentity.user_id == user_id
+            )
+        ).all()
     )
 
-    return {"linked": identity is not None}
+    return {
+        "google": "google" in providers,
+        "github": "github" in providers,
+        "has_password": user.password_hash is not None,
+    }
 
 
-@router.post("/google/link/prepare")
-def prepare_google_link(
-    payload: GoogleLinkRequest,
+@router.post("/link/disconnect")
+def disconnect_account(
+    payload: AccountLinkRequest,
+    request: Request,
+    response: Response,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = "no-store"
+
+    user = db.scalar(
+        select(User)
+        .where(User.id == user_id)
+        .with_for_update()
+    )
+
+    if user is None or user.suspended_at is not None:
+        raise HTTPException(
+            status_code=403,
+            detail="Account unavailable.",
+        )
+
+    identities = db.scalars(
+        select(OAuthIdentity).where(
+            OAuthIdentity.user_id == user.id
+        )
+    ).all()
+
+    identity = next(
+        (
+            item for item in identities
+            if item.provider == payload.provider
+        ),
+        None,
+    )
+
+    if identity is None:
+        raise HTTPException(
+            status_code=404,
+            detail="This provider is not connected.",
+        )
+
+    remaining_providers = {
+        item.provider for item in identities
+        if item.provider != payload.provider
+    }
+
+    if user.password_hash is None and not remaining_providers:
+        raise HTTPException(
+            status_code=409,
+            detail="You cannot disconnect your only sign-in method.",
+        )
+
+    confirm_account_ownership(
+        request,
+        user,
+        payload.password,
+    )
+
+    db.delete(identity)
+    user.session_version = (user.session_version or 0) + 1
+    db.commit()
+
+    request.session.clear()
+
+    response.delete_cookie(
+        key="careerforge_session",
+        path="/api",
+    )
+
+    response.delete_cookie(
+        key="csrf_token",
+        path="/",
+    )
+
+    response.delete_cookie(
+        key="careerforge_admin_mfa_challenge",
+        path="/api/auth/admin-mfa/challenge",
+    )
+
+    return {
+        "disconnected": payload.provider,
+        "signed_out": True,
+    }
+
+
+@router.post("/link/prepare")
+def prepare_account_link(
+    payload: AccountLinkRequest,
     request: Request,
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-    request.session.pop("cf_google_link", None)
-    request.session.pop("cf_google_link_started", None)
+    request.session.pop("cf_oauth_link", None)
+    request.session.pop("cf_oauth_link_started", None)
 
     user = db.get(User, user_id)
 
@@ -205,35 +354,26 @@ def prepare_google_link(
     if user.email_verified_at is None:
         raise HTTPException(
             status_code=403,
-            detail="Verify your email before linking Google.",
+            detail="Verify your email before linking an account.",
         )
 
-    if user.password_hash is None:
-        raise HTTPException(
-            status_code=409,
-            detail="Password confirmation is required for this linking flow.",
-        )
-
-    if not verify_password(
+    confirm_account_ownership(
+        request,
+        user,
         payload.password,
-        user.password_hash,
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Password confirmation failed.",
-        )
+    )
 
     existing = db.scalar(
         select(OAuthIdentity).where(
             OAuthIdentity.user_id == user.id,
-            OAuthIdentity.provider == "google",
+            OAuthIdentity.provider == payload.provider,
         )
     )
 
-    if existing is not None:
+    if existing:
         raise HTTPException(
             status_code=409,
-            detail="Google is already connected to this account.",
+            detail="This provider is already connected.",
         )
 
     token = request.cookies.get("careerforge_session")
@@ -244,8 +384,9 @@ def prepare_google_link(
             detail="A browser session is required.",
         )
 
-    request.session["cf_google_link"] = {
+    request.session["cf_oauth_link"] = {
         "user_id": user.id,
+        "provider": payload.provider,
         "issued_at": int(time.time()),
         "session_fingerprint": hashlib.sha256(
             token.encode("utf-8")
@@ -255,45 +396,54 @@ def prepare_google_link(
     return {"ready": True}
 
 
-@router.get("/google/link/start")
-async def start_google_link(
+@router.get("/{provider}/link/start")
+async def start_account_link(
+    provider: Provider,
     request: Request,
     user_id: int = Depends(get_current_user_id),
 ):
-    proof = request.session.get("cf_google_link")
+    proof = request.session.get("cf_oauth_link")
 
-    if not valid_google_link_proof(
+    if not valid_account_link_proof(
         request,
         proof,
         user_id,
+        provider,
     ):
         raise HTTPException(
             status_code=403,
-            detail="Confirm your password before connecting Google.",
+            detail="Confirm your account before linking a provider.",
         )
 
-    if not (
-        settings.google_oauth_client_id
-        and settings.google_oauth_client_secret
-    ):
+    if provider == "google":
+        configured = (
+            settings.google_oauth_client_id
+            and settings.google_oauth_client_secret
+        )
+    else:
+        configured = (
+            settings.github_oauth_client_id
+            and settings.github_oauth_client_secret
+        )
+
+    if not configured:
         raise HTTPException(
             status_code=503,
-            detail="Google OAuth is not configured.",
+            detail="OAuth provider is not configured.",
         )
 
-    request.session["cf_google_link_started"] = True
+    request.session["cf_oauth_link_started"] = provider
 
     callback = (
         f"{settings.oauth_redirect_origin}"
-        "/api/auth/oauth/google/callback"
+        f"/api/auth/oauth/{provider}/callback"
     )
 
-    client = oauth.create_client("google")
+    client = oauth.create_client(provider)
 
     return await client.authorize_redirect(
         request,
         callback,
-        prompt="select_account",
     )
 
 
@@ -340,12 +490,10 @@ async def oauth_callback(
     except OAuthError:
         return frontend_redirect("authorization_failed")
 
-    google_link_started = (
-        provider == "google"
-        and request.session.get("cf_google_link_started") is True
+    account_link_started = request.session.get(
+    "cf_oauth_link_started"
     )
-
-    google_link_proof = request.session.get("cf_google_link")
+    account_link_proof = request.session.get("cf_oauth_link")
 
     request.session.clear()
 
@@ -392,7 +540,14 @@ async def oauth_callback(
     if not provider_id:
         return frontend_redirect("provider_error")
 
-    if google_link_started:
+
+    if account_link_started is not None:
+        if account_link_started != provider:
+            return account_link_redirect(
+                "authorization_failed",
+                provider,
+            )
+
         try:
             user_id = get_current_user_id(
                 request=request,
@@ -400,14 +555,21 @@ async def oauth_callback(
                 db=db,
             )
         except HTTPException:
-            return google_link_redirect("session_expired")
+            return account_link_redirect(
+                "session_expired",
+                provider,
+            )
 
-        if not valid_google_link_proof(
+        if not valid_account_link_proof(
             request,
-            google_link_proof,
+            account_link_proof,
             user_id,
+            provider,
         ):
-            return google_link_redirect("session_expired")
+            return account_link_redirect(
+                "session_expired",
+                provider,
+            )
 
         user = db.scalar(
             select(User)
@@ -417,22 +579,31 @@ async def oauth_callback(
 
         if user is None or user.suspended_at is not None:
             db.rollback()
-            return google_link_redirect("account_unavailable")
+            return account_link_redirect(
+                "account_unavailable",
+                provider,
+            )
 
         if user.email_verified_at is None:
             db.rollback()
-            return google_link_redirect("email_unverified")
+            return account_link_redirect(
+                "email_unverified",
+                provider,
+            )
 
         if (
             not isinstance(email, str)
             or email.strip().lower() != user.email.strip().lower()
         ):
             db.rollback()
-            return google_link_redirect("email_mismatch")
+            return account_link_redirect(
+                "email_mismatch",
+                provider,
+            )
 
         linked_identity = db.scalar(
             select(OAuthIdentity).where(
-                OAuthIdentity.provider == "google",
+                OAuthIdentity.provider == provider,
                 OAuthIdentity.provider_user_id == provider_id,
             )
         )
@@ -441,35 +612,44 @@ async def oauth_callback(
             db.rollback()
 
             if linked_identity.user_id == user.id:
-                return google_link_redirect("linked")
+                return account_link_redirect("linked", provider)
 
-            return google_link_redirect("already_linked")
+            return account_link_redirect(
+                "already_linked",
+                provider,
+            )
 
         account_identity = db.scalar(
             select(OAuthIdentity).where(
-                OAuthIdentity.provider == "google",
+                OAuthIdentity.provider == provider,
                 OAuthIdentity.user_id == user.id,
             )
         )
 
         if account_identity is not None:
             db.rollback()
-            return google_link_redirect("already_linked")
+            return account_link_redirect(
+                "already_linked",
+                provider,
+            )
 
         try:
             db.add(
                 OAuthIdentity(
                     user_id=user.id,
-                    provider="google",
+                    provider=provider,
                     provider_user_id=provider_id,
                 )
             )
             db.commit()
         except IntegrityError:
             db.rollback()
-            return google_link_redirect("already_linked")
+            return account_link_redirect(
+                "already_linked",
+                provider,
+            )
 
-        return google_link_redirect("linked")
+        return account_link_redirect("linked", provider)
 
 
     user, error = find_or_create_user(
