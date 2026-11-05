@@ -93,8 +93,43 @@ async function post(path: string, body?: object): Promise<void> {
  if (!response.ok) throw await errorFrom(response);
 }
 
+async function messageFrom(response: Response): Promise<string> {
+  const body = await response.json().catch(() => null);
+
+  const detail = body?.detail;
+
+  if (typeof detail === 'string') {
+    return detail;
+  }
+
+  if (typeof detail?.message === 'string') {
+    return detail.message;
+  }
+
+  return `Authentication failed (HTTP ${response.status}).`;
+}
 export const authApi = {
-  login: (data: Credentials) => post('/login', data),
+  login: async (data: Credentials): Promise<void> => {
+    const response = await request('/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error(await messageFrom(response));
+  }
+
+  const result: {
+    mfa_required?: boolean;
+  } = await response.json();
+
+  if (result.mfa_required) {
+    throw Object.assign(
+      new Error('Complete administrator MFA verification.'),
+      { code: 'ADMIN_MFA_REQUIRED' }
+    );
+  }
+},
   register: (data: Registration) =>
   post('/register', {
     full_name: data.name,
@@ -119,6 +154,31 @@ export const authApi = {
       });
 
       if (response.status === 401) {
+        const body = await response.json().catch(() => null) as {
+          detail?: {
+            code?: string;
+            message?: string;
+          } | string;
+        } | null;
+
+        const detail = body?.detail;
+        const code =
+          detail && typeof detail === 'object'
+            ? detail.code
+            : undefined;
+
+        if (
+          code === 'ADMIN_MFA_ENROLLMENT_REQUIRED' ||
+          code === 'ADMIN_MFA_REQUIRED'
+        ) {
+          const message =
+            detail && typeof detail === 'object'
+              ? detail.message ?? 'Administrator verification required.'
+              : 'Administrator verification required.';
+
+          throw Object.assign(new Error(message), { code });
+        }
+
         return null;
       }
 

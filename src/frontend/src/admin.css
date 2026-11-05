@@ -813,3 +813,6 @@
 .cf-admin-table td {
   vertical-align: middle;
 }
+.cf-admin-security-action {
+  margin: 16px 0 24px;
+}

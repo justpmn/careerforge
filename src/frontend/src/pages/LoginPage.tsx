@@ -37,6 +37,24 @@ export default function LoginPage() {
 
       navigate(postAuthRoute(user), { replace: true });
     } catch (err) {
+      if (err instanceof Error && 'code' in err) {
+        if (err.code === 'ADMIN_MFA_ENROLLMENT_REQUIRED') {
+          navigate('/auth/mfa?enroll=1', { replace: true });
+          return;
+        }
+
+        if (err.code === 'ADMIN_MFA_REQUIRED') {
+          navigate('/auth/mfa', { replace: true });
+          return;
+        }
+      }
+      if (
+        err instanceof AuthApiError &&
+        err.code === 'ADMIN_MFA_ENROLLMENT_REQUIRED'
+      ) {
+        navigate('/auth/mfa?enroll=1', { replace: true });
+        return;
+      }
       if (
         err instanceof AuthApiError &&
         err.code === 'EMAIL_NOT_VERIFIED'

@@ -31,6 +31,7 @@ import type {
 import AdminTotpModal from '../components/AdminTotpModal';
 import { csrfHeader } from '../lib/auth';
 import '../admin.css';
+import MfaQrEnrollment from '../components/MfaQrEnrollment';
 
 type Tab = 'overview' | 'users' | 'careers' | 'logs';
 type Access = 'checking' | 'authorized' | 'denied' | 'error';
@@ -587,6 +588,12 @@ async function confirmUserAction(code: string) {
         <span className="cf-admin-identity-role">
           Administrator
         </span>
+      </div>
+      <div className="cf-admin-security-action">
+        <MfaQrEnrollment
+          mode="replace"
+          onComplete={() => window.location.replace('/login')}
+        />
       </div>
 
       <div className="cf-admin-workspace">

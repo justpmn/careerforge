@@ -12,7 +12,7 @@ from src.backend.app.database.models.oauth_identity import OAuthIdentity
 import pyotp
 from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from src.backend.app.api.admin_auth import require_admin
 from src.backend.app.core.security import verify_password
@@ -25,6 +25,7 @@ from src.backend.app.core.config import settings
 from src.backend.app.core.tokens import (create_access_token, decode_admin_mfa_challenge_token)
 from src.backend.app.services.admin_mfa_verification import (verify_and_consume_admin_totp)
 from src.backend.app.services.mfa_qr import build_totp_qr_data_url
+from src.backend.app.api.admin_auth import require_admin_enrollment
 
 router = APIRouter(
     prefix="/auth/admin-mfa",
@@ -44,6 +45,9 @@ class ConfirmEnrollmentRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     code: str = Field(pattern=r"^[0-9]{6}$")
 
+class ReplaceAuthenticatorRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    current_code: str = Field(pattern=r"^[0-9]{6}$")
 
 class EnrollmentStartResponse(BaseModel):
     provisioning_uri: str
@@ -226,7 +230,7 @@ def start_enrollment(
     payload: StartEnrollmentRequest,
     request: Request,
     response: Response,
-    admin: User = Depends(require_admin),
+    admin: User = Depends(require_admin_enrollment),
     db: Session = Depends(get_db),
 ):
     response.headers["Cache-Control"] = "no-store"
@@ -316,7 +320,7 @@ def start_enrollment(
 def confirm_enrollment(
     payload: ConfirmEnrollmentRequest,
     response: Response,
-    admin: User = Depends(require_admin),
+    admin: User = Depends(require_admin_enrollment),
     db: Session = Depends(get_db),
 ):
     response.headers["Cache-Control"] = "no-store"
@@ -457,6 +461,7 @@ def verify_admin_challenge(
     access_token = create_access_token(
         user_id=user.id,
         admin_mfa_version=mfa_version,
+        session_version=user.session_version,
     )
 
     max_age = settings.jwt_access_token_expire_minutes * 60
@@ -489,3 +494,200 @@ def verify_admin_challenge(
     return {
         "message": "Administrator MFA verified.",
     }
+
+
+@router.post(
+    "/replace/start",
+    response_model=EnrollmentStartResponse,
+)
+def start_authenticator_replacement(
+    payload: ReplaceAuthenticatorRequest,
+    response: Response,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = "no-store"
+    now = datetime.now(timezone.utc)
+
+    record = db.scalar(
+        select(AdminMfaCredential)
+        .where(AdminMfaCredential.user_id == admin.id)
+        .with_for_update()
+    )
+
+    if (
+        record is None
+        or record.enabled_at is None
+        or record.totp_secret_encrypted is None
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="No active authenticator is enrolled.",
+        )
+
+    if record.locked_until and record.locked_until > now:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many attempts. Try again later.",
+        )
+
+    current_secret = decrypt_totp_secret(
+        record.totp_secret_encrypted
+    )
+
+    matched_step = matching_totp_step(
+        current_secret,
+        payload.current_code,
+        now,
+    )
+
+    reused = (
+        matched_step is not None
+        and record.last_accepted_step is not None
+        and matched_step <= record.last_accepted_step
+    )
+
+    if matched_step is None or reused:
+        record.failed_attempts += 1
+
+        if record.failed_attempts >= MAX_ATTEMPTS:
+            record.locked_until = now + LOCKOUT_DURATION
+
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or previously used authenticator code.",
+        )
+
+    new_secret = generate_totp_secret()
+    expires_at = now + ENROLLMENT_LIFETIME
+
+    record.last_accepted_step = matched_step
+    record.pending_secret_encrypted = encrypt_totp_secret(new_secret)
+    record.pending_expires_at = expires_at
+    record.failed_attempts = 0
+    record.locked_until = None
+
+    provisioning_uri = get_totp_provisioning_uri(
+        new_secret,
+        admin.email,
+    )
+
+    qr_code_data_url = build_totp_qr_data_url(
+        provisioning_uri
+    )
+
+    db.commit()
+
+    return EnrollmentStartResponse(
+        provisioning_uri=provisioning_uri,
+        qr_code_data_url=qr_code_data_url,
+        expires_at=expires_at,
+    )
+
+
+@router.post(
+    "/replace/confirm",
+    response_model=EnrollmentConfirmResponse,
+)
+def confirm_authenticator_replacement(
+    payload: ConfirmEnrollmentRequest,
+    response: Response,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = "no-store"
+    now = datetime.now(timezone.utc)
+
+    record = db.scalar(
+        select(AdminMfaCredential)
+        .where(AdminMfaCredential.user_id == admin.id)
+        .with_for_update()
+    )
+
+    if (
+        record is None
+        or record.enabled_at is None
+        or record.totp_secret_encrypted is None
+        or record.pending_secret_encrypted is None
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Start authenticator replacement first.",
+        )
+
+    if (
+        record.pending_expires_at is None
+        or record.pending_expires_at <= now
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Replacement expired. Start again.",
+        )
+
+    if record.locked_until and record.locked_until > now:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many attempts. Try again later.",
+        )
+
+    new_secret = decrypt_totp_secret(
+        record.pending_secret_encrypted
+    )
+
+    matched_step = matching_totp_step(
+        new_secret,
+        payload.code,
+        now,
+    )
+
+    if matched_step is None:
+        record.failed_attempts += 1
+
+        if record.failed_attempts >= MAX_ATTEMPTS:
+            record.locked_until = now + LOCKOUT_DURATION
+
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid replacement authenticator code.",
+        )
+
+    recovery_codes = [
+        secrets.token_hex(16)
+        for _ in range(8)
+    ]
+
+    db.execute(
+        delete(AdminMfaRecoveryCode).where(
+            AdminMfaRecoveryCode.user_id == admin.id
+        )
+    )
+
+    for code in recovery_codes:
+        db.add(
+            AdminMfaRecoveryCode(
+                user_id=admin.id,
+                code_hash=hashlib.sha256(
+                    code.encode("ascii")
+                ).hexdigest(),
+            )
+        )
+
+    record.totp_secret_encrypted = record.pending_secret_encrypted
+    record.pending_secret_encrypted = None
+    record.pending_expires_at = None
+    record.enabled_at = now
+    record.last_accepted_step = matched_step
+    record.failed_attempts = 0
+    record.locked_until = None
+    record.mfa_version += 1
+
+    db.commit()
+
+    return EnrollmentConfirmResponse(
+        message="Authenticator replaced successfully.",
+        recovery_codes=recovery_codes,
+    )

@@ -16,6 +16,7 @@ type EnrollmentResult = {
 };
 
 type Props = {
+  mode?: 'enroll' | 'replace';
   onComplete?: () => void;
 };
 
@@ -51,11 +52,15 @@ async function postMfa<T>(path: string, body?: object): Promise<T> {
 }
 
 
-export default function MfaQrEnrollment({ onComplete }: Props) {
+export default function MfaQrEnrollment({
+  mode = 'enroll',
+  onComplete,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [setup, setSetup] = useState<EnrollmentStart | null>(null);
   const [code, setCode] = useState('');
   const [password, setPassword] = useState('');
+  const [currentCode, setCurrentCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [completed, setCompleted] = useState(false);
@@ -85,39 +90,50 @@ function beginEnrollment() {
   setSetup(null);
   setCode('');
   setPassword('');
+  setCurrentCode('');
   setError('');
   setCompleted(false);
   setRecoveryCodes([]);
 }
 
+
 async function prepareEnrollment() {
   if (busy) return;
+
+  if (mode === 'replace' && !/^\d{6}$/.test(currentCode)) {
+    setError('Enter a fresh six-digit code from your current authenticator.');
+    return;
+  }
 
   setBusy(true);
   setError('');
 
   try {
     const result = await postMfa<EnrollmentStart>(
-      'enroll/start',
-      { password: password || null },
+      mode === 'replace' ? 'replace/start' : 'enroll/start',
+      mode === 'replace'
+        ? { current_code: currentCode }
+        : { password: password || null },
     );
 
     if (!result.provisioning_uri || !result.qr_code_data_url) {
-      throw new Error('Enrollment QR information is unavailable.');
+      throw new Error('Authenticator setup information is unavailable.');
     }
 
     setSetup(result);
     setPassword('');
+    setCurrentCode('');
   } catch (err) {
     setError(
       err instanceof Error
         ? err.message
-        : 'Could not start MFA enrollment.'
+        : 'Could not prepare the authenticator.'
     );
   } finally {
     setBusy(false);
   }
 }
+
 
 
   async function confirmEnrollment(event: FormEvent<HTMLFormElement>) {
@@ -130,9 +146,9 @@ async function prepareEnrollment() {
 
     try {
       const result = await postMfa<EnrollmentResult>(
-        'enroll/confirm',
+        mode === 'replace' ? 'replace/confirm' : 'enroll/confirm',
         { code },
-      );
+        );
 
       setRecoveryCodes(result.recovery_codes ?? []);
       setCode('');
@@ -157,6 +173,7 @@ async function prepareEnrollment() {
     setSetup(null);
     setCode('');
     setPassword('');
+    setCurrentCode('');
     setError('');
     setRecoveryCodes([]);
     setCompleted(false);
@@ -182,218 +199,295 @@ async function prepareEnrollment() {
     ? new URL(setup.provisioning_uri).searchParams.get('secret') ?? ''
     : '';
 
-  return (
-    <>
-      <button
-        type="button"
-        className="cf-mfa-setup-trigger"
-        onClick={() => void beginEnrollment()}
-        disabled={busy}
-      >
-        Set up authenticator app
-      </button>
 
-      {open && (
-        <div className="cf-mfa-qr-overlay">
-          <div
-            className="cf-mfa-qr-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cf-mfa-qr-title"
-            tabIndex={-1}
-            ref={dialogRef}
-          >
-            <div className="cf-mfa-qr-header">
-              <span>CAREERFORGE / ACCOUNT SECURITY</span>
+return (
+  <>
+    <button
+      type="button"
+      className="cf-mfa-setup-trigger"
+      onClick={() => void beginEnrollment()}
+      disabled={busy}
+    >
+      {mode === 'replace'
+        ? 'Replace authenticator'
+        : 'Set up authenticator app'}
+    </button>
+
+    {open && (
+      <div className="cf-mfa-qr-overlay">
+        <div
+          className="cf-mfa-qr-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cf-mfa-qr-title"
+          tabIndex={-1}
+          ref={dialogRef}
+        >
+          <div className="cf-mfa-qr-header">
+            <span>CAREERFORGE / ACCOUNT SECURITY</span>
+            <button
+              type="button"
+              aria-label="Close setup"
+              disabled={busy}
+              onClick={closeModal}
+            >
+              ×
+            </button>
+          </div>
+
+          {completed ? (
+            <div className="cf-mfa-qr-body">
+              <h2 id="cf-mfa-qr-title">
+                {mode === 'replace'
+                  ? 'Authenticator replaced.'
+                  : 'Authenticator connected.'}
+              </h2>
+
+              <p>
+                {mode === 'replace'
+                  ? 'Your new authenticator is now registered with CareerForge. Your previous authenticator can no longer be used.'
+                  : 'Your authenticator app is now registered with CareerForge.'}
+              </p>
+
+              {recoveryCodes.length > 0 && (
+                <section className="cf-mfa-recovery">
+                  <h3>Save your recovery codes</h3>
+
+                  <p>
+                    Store these codes somewhere secure. Each recovery
+                    code is intended for emergency account access.
+                    They may not be shown again.
+                  </p>
+
+                  <div className="cf-mfa-recovery-list">
+                    {recoveryCodes.map((item, index) => (
+                      <code key={index}>{item}</code>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void copyText(recoveryCodes.join('\n'))
+                    }
+                  >
+                    Copy recovery codes
+                  </button>
+                </section>
+              )}
+
               <button
                 type="button"
-                aria-label="Close setup"
-                disabled={busy}
+                className="cf-mfa-qr-primary"
                 onClick={closeModal}
               >
-                ×
+                {recoveryCodes.length > 0
+                  ? "I've saved my recovery codes"
+                  : mode === 'replace'
+                    ? 'Finish replacement'
+                    : 'Finish setup'}
               </button>
             </div>
+          ) : (
+            <div className="cf-mfa-qr-body">
+              <h2 id="cf-mfa-qr-title">
+                {mode === 'replace'
+                  ? 'Replace your authenticator.'
+                  : 'Connect your authenticator.'}
+              </h2>
 
-            {completed ? (
-              <div className="cf-mfa-qr-body">
-                <h2 id="cf-mfa-qr-title">Authenticator connected.</h2>
-                <p>
-                  Your authenticator app is now registered with CareerForge.
-                </p>
+              <p>
+                {mode === 'replace'
+                  ? 'Connect a new authenticator app to replace your current one.'
+                  : 'Connect an authenticator app to secure your CareerForge account.'}
+              </p>
 
-                {recoveryCodes.length > 0 && (
-                  <section className="cf-mfa-recovery">
-                    <h3>Save your recovery codes</h3>
-                    <p>
-                      Store these codes somewhere secure. Each recovery
-                      code is intended for emergency account access.
-                      They may not be shown again.
-                    </p>
+              {!setup && (
+                <div className="cf-mfa-confirm-form">
+                  {mode === 'replace' ? (
+                    <>
+                      <label htmlFor="cf-mfa-current-code">
+                        Current authenticator code
+                      </label>
 
-                    <div className="cf-mfa-recovery-list">
-                      {recoveryCodes.map((item, index) => (
-                        <code key={index}>{item}</code>
-                      ))}
+                      <input
+                        id="cf-mfa-current-code"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        placeholder="000000"
+                        value={currentCode}
+                        disabled={busy}
+                        onChange={(event) =>
+                          setCurrentCode(
+                            event.target.value
+                              .replace(/\D/g, '')
+                              .slice(0, 6)
+                          )
+                        }
+                      />
+
+                      <p>
+                        Enter a fresh code from your currently connected
+                        authenticator. Your existing authenticator will
+                        remain active until replacement is completed.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <label htmlFor="cf-mfa-setup-password">
+                        Confirm your account password
+                      </label>
+
+                      <input
+                        id="cf-mfa-setup-password"
+                        type="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(event) =>
+                          setPassword(event.target.value)
+                        }
+                        placeholder="Account password"
+                        disabled={busy}
+                      />
+
+                      <p>
+                        Google-only administrator accounts require the
+                        existing Google reauthentication process.
+                      </p>
+                    </>
+                  )}
+
+                  {error && <p role="alert">{error}</p>}
+
+                  <button
+                    type="button"
+                    className="cf-mfa-qr-primary"
+                    onClick={() => void prepareEnrollment()}
+                    disabled={
+                      busy ||
+                      (mode === 'replace' && currentCode.length !== 6)
+                    }
+                  >
+                    {busy
+                      ? 'Preparing...'
+                      : mode === 'replace'
+                        ? 'Generate replacement QR code'
+                        : 'Generate setup QR code'}
+                  </button>
+                </div>
+              )}
+
+              {setup && (
+                <>
+                  <p>
+                    Scan the QR code using Google Authenticator,
+                    Microsoft Authenticator, or another compatible app.
+                  </p>
+
+                  <div className="cf-mfa-qr-image">
+                    <img
+                      src={setup.qr_code_data_url}
+                      alt="CareerForge authenticator setup QR code"
+                      width="224"
+                      height="224"
+                    />
+                  </div>
+
+                  <details className="cf-mfa-manual">
+                    <summary>
+                      Can't scan? Enter the key manually
+                    </summary>
+
+                    <div className="cf-mfa-manual-value">
+                      <code>{manualSecret}</code>
+
+                      <button
+                        type="button"
+                        onClick={() => void copyText(manualSecret)}
+                      >
+                        Copy
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        void copyText(recoveryCodes.join('\n'))
-                      }
-                    >
-                      Copy recovery codes
-                    </button>
-                  </section>
-                )}
+                    <p>
+                      Account type: Time-based (TOTP)
+                      <br />
+                      Issuer: CareerForge
+                    </p>
+                  </details>
 
-                <button
-                  type="button"
-                  className="cf-mfa-qr-primary"
-                  onClick={closeModal}
-                >
-                  {recoveryCodes.length > 0
-                    ? "I've saved my recovery codes"
-                    : 'Finish setup'}
-                </button>
-              </div>
-            ) : (
-              <div className="cf-mfa-qr-body">
-                <h2 id="cf-mfa-qr-title">Connect your authenticator.</h2>
-                <p>
-                  Scan the QR code using Google Authenticator,
-                  Microsoft Authenticator, or another compatible app.
-                </p>
-
-                
-                {!setup && (
-                <div className="cf-mfa-confirm-form">
-                    <label htmlFor="cf-mfa-setup-password">
-                    Confirm your account password
+                  <form
+                    className="cf-mfa-confirm-form"
+                    onSubmit={confirmEnrollment}
+                  >
+                    <label htmlFor="cf-enrollment-code">
+                      {mode === 'replace'
+                        ? 'Enter the code from your new authenticator'
+                        : 'Enter the six-digit code to finish setup'}
                     </label>
 
                     <input
-                    id="cf-mfa-setup-password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    placeholder="Account password"
-                    disabled={busy}
+                      id="cf-enrollment-code"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]{6}"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      placeholder="000000"
+                      value={code}
+                      onChange={(event) =>
+                        setCode(
+                          event.target.value
+                            .replace(/\D/g, '')
+                            .slice(0, 6)
+                        )
+                      }
+                      required
                     />
-
-                    <p>
-                    If this is a Google-only administrator account,
-                    complete the required Google reauthentication first.
-                    A local password is not required for that account.
-                    </p>
 
                     {error && <p role="alert">{error}</p>}
 
                     <button
-                    type="button"
-                    className="cf-mfa-qr-primary"
-                    onClick={() => void prepareEnrollment()}
-                    disabled={busy}
+                      type="submit"
+                      className="cf-mfa-qr-primary"
+                      disabled={busy || code.length !== 6}
                     >
-                    {busy ? 'Preparing...' : 'Generate setup QR code'}
+                      {busy
+                        ? 'Verifying...'
+                        : mode === 'replace'
+                          ? 'Verify and replace'
+                          : 'Verify and enable'}
                     </button>
-                </div>
-                )}
+                  </form>
+                </>
+              )}
+            </div>
+          )}
 
+          {completed && error && (
+            <p className="cf-mfa-qr-error" role="alert">
+              {error}
+            </p>
+          )}
 
-                {setup ? (
-                  <>
-                    <div className="cf-mfa-qr-image">
-                      <img
-                        src={setup.qr_code_data_url}
-                        alt="CareerForge authenticator setup QR code"
-                        width="224"
-                        height="224"
-                      />
-                    </div>
-
-                    <details className="cf-mfa-manual">
-                      <summary>Can't scan? Enter the key manually</summary>
-
-                      <div className="cf-mfa-manual-value">
-                        <code>{manualSecret}</code>
-                        <button
-                          type="button"
-                          onClick={() => void copyText(manualSecret)}
-                        >
-                          Copy
-                        </button>
-                      </div>
-
-                      <p>
-                        Account type: Time-based (TOTP)
-                        <br />
-                        Issuer: CareerForge
-                      </p>
-                    </details>
-
-                    <form
-                      className="cf-mfa-confirm-form"
-                      onSubmit={confirmEnrollment}
-                    >
-                      <label htmlFor="cf-enrollment-code">
-                        Enter the six-digit code to finish setup
-                      </label>
-
-                      <input
-                        id="cf-enrollment-code"
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]{6}"
-                        autoComplete="one-time-code"
-                        maxLength={6}
-                        placeholder="000000"
-                        value={code}
-                        onChange={(event) =>
-                          setCode(
-                            event.target.value.replace(/\D/g, '').slice(0, 6)
-                          )
-                        }
-                        required
-                      />
-
-                      {error && <p role="alert">{error}</p>}
-
-                      <button
-                        type="submit"
-                        className="cf-mfa-qr-primary"
-                        disabled={busy || code.length !== 6}
-                      >
-                        {busy ? 'Verifying...' : 'Verify and enable'}
-                      </button>
-                    </form>
-                  </>
-                ) : (
-                  <p role="status">
-                    {busy ? 'Preparing your QR code...' : error}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {completed && error && (
-              <p className="cf-mfa-qr-error" role="alert">{error}</p>
-            )}
-
-            {!completed && !busy && (
-              <button
-                type="button"
-                className="cf-mfa-qr-cancel"
-                onClick={closeModal}
-              >
-                Cancel setup
-              </button>
-            )}
-          </div>
+          {!completed && !busy && (
+            <button
+              type="button"
+              className="cf-mfa-qr-cancel"
+              onClick={closeModal}
+            >
+              {mode === 'replace'
+                ? 'Cancel replacement'
+                : 'Cancel setup'}
+            </button>
+          )}
         </div>
-      )}
-    </>
-  );
+      </div>
+    )}
+  </>
+);
+
 }

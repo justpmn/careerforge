@@ -5,13 +5,14 @@ from src.backend.app.database.models.email_verification_token import EmailVerifi
 from src.backend.app.services.email_verification_tokens import generate_verification_token
 from src.backend.app.services.email_service import (EmailDeliveryError,send_verification_email)
 from typing import Annotated
+from src.backend.app.database.models.admin_mfa import AdminMfaCredential
 from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src.backend.app.core.security import hash_password, verify_password
-from src.backend.app.core.tokens import create_access_token, decode_access_token
+from src.backend.app.core.tokens import create_access_token, decode_access_token, create_admin_mfa_challenge_token
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
 from src.backend.app.core.config import settings
@@ -59,9 +60,9 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    access_token: str
+    access_token: str | None = None
     token_type: str = "bearer"
-
+    mfa_required: bool = False
 class CurrentUserResponse(BaseModel):
     id: str
     name: str
@@ -195,6 +196,51 @@ def login_user(
                 "message": "Please verify your email before signing in.",
             },
         )
+    if user.suspended_at is not None:
+            raise HTTPException(
+            status_code=403,
+            detail="This account has been suspended.",
+        )
+
+    if user.role == "admin":
+        mfa = db.get(AdminMfaCredential, user.id)
+
+        if (
+            mfa is not None
+            and mfa.enabled_at is not None
+            and mfa.totp_secret_encrypted is not None
+        ):
+            challenge_token = create_admin_mfa_challenge_token(
+                user.id
+            )
+
+            response.headers["Cache-Control"] = "no-store"
+            response.delete_cookie(
+                key="careerforge_session",
+                path="/api",
+            )
+
+            response.set_cookie(
+                key="careerforge_admin_mfa_challenge",
+                value=challenge_token,
+                httponly=True,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/api/auth/admin-mfa/challenge",
+                max_age=300,
+            )
+
+            response.set_cookie(
+                key="csrf_token",
+                value=create_csrf_token(challenge_token),
+                httponly=False,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/",
+                max_age=300,
+            )
+
+            return LoginResponse(mfa_required=True)
 
     access_token = create_access_token(
         user_id=user.id,
