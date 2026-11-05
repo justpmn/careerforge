@@ -180,7 +180,6 @@ def test_admin_without_mfa_rejected(harness):
     set_session(client, token_for(state["user"]))
 
     assert client.get("/private").status_code == 401
-    
 
 
 def test_admin_cannot_bypass_mfa(harness):
