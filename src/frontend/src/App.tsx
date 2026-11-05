@@ -62,11 +62,10 @@ function AppRoutes() {
   const { theme, toggleTheme } = useAppearance();
   const layoutProps = { theme, toggleTheme };
 
-  return (
-    <AuthProvider>
-      <BrowserRouter>
-        <MentorJobsProvider>
-          <Routes>
+ return (
+  <BrowserRouter>
+    <MentorJobsProvider>
+      <Routes>
 
             {/* Public homepage */}
             <Route
@@ -201,12 +200,10 @@ function AppRoutes() {
               path="*"
               element={<Navigate to="/" replace />}
             />
-
-          </Routes>
-        </MentorJobsProvider>
-      </BrowserRouter>
-    </AuthProvider>
-  );
+            </Routes>
+    </MentorJobsProvider>
+  </BrowserRouter>
+);
 }
 
 export default function App() {

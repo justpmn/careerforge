@@ -1,14 +1,23 @@
+
 import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
 
+import { useAuth } from './AuthContext';
+import { csrfHeader } from '../lib/auth';
+
 export type Appearance = 'cozy' | 'neon';
 export type CozyTheme = 'light' | 'dark';
-import { useAuth } from './AuthContext';
+
+type Preferences = {
+  appearance: Appearance;
+  cozy_theme: CozyTheme;
+};
 
 type AppearanceContextType = {
   appearance: Appearance;
@@ -19,17 +28,17 @@ type AppearanceContextType = {
   toggleTheme: () => void;
 };
 
-const AppearanceContext = createContext<AppearanceContextType | null>(null);
+const AppearanceContext =
+  createContext<AppearanceContextType | null>(null);
 
 const APPEARANCE_KEY = 'careerforge-appearance';
 const COZY_THEME_KEY = 'careerforge-cozy-theme';
 const LEGACY_THEME_KEY = 'careerforge-theme';
 
 function loadAppearance(): Appearance {
-  const saved = localStorage.getItem(APPEARANCE_KEY);
-
-  return saved === 'neon' ? 'neon' : 'cozy';
-
+  return localStorage.getItem(APPEARANCE_KEY) === 'neon'
+    ? 'neon'
+    : 'cozy';
 }
 
 function loadCozyTheme(): CozyTheme {
@@ -46,54 +55,68 @@ export function AppearanceProvider({
   children: ReactNode;
 }) {
   const { user, loading } = useAuth();
-  const [appearance, setAppearance] = useState<Appearance>(loadAppearance);
-  const [cozyTheme, setCozyTheme] = useState<CozyTheme>(loadCozyTheme);
 
-useEffect(() => {
-  if (loading || !user) return;
+  const [appearance, setAppearanceState] =
+    useState<Appearance>(loadAppearance);
 
-  let active = true;
+  const [cozyTheme, setCozyThemeState] =
+    useState<CozyTheme>(loadCozyTheme);
 
-  async function loadPreferences() {
-    try {
-      const response = await fetch('/api/appearance', {
-        credentials: 'include',
-        cache: 'no-store',
-      });
+  const valuesRef = useRef<Preferences>({
+    appearance,
+    cozy_theme: cozyTheme,
+  });
 
-      if (!response.ok) {
-        throw new Error('Could not load appearance preferences.');
-      }
+  const changeVersion = useRef(0);
+  const writeQueue = useRef<Promise<void>>(Promise.resolve());
+  const currentUserId = useRef(user?.id ?? null);
 
-      const data: {
-        appearance: Appearance;
-        cozy_theme: CozyTheme;
-      } = await response.json();
+  currentUserId.current = user?.id ?? null;
 
-      if (!active) return;
+  useEffect(() => {
+    if (loading || !user) return;
 
-      setAppearance(
-        data.appearance === 'neon' ? 'neon' : 'cozy'
-      );
+    let active = true;
+    const version = changeVersion.current;
 
-      setCozyTheme(
-        data.cozy_theme === 'dark' ? 'dark' : 'light'
-      );
-    } catch (error) {
-      if (active) {
-        console.error('Appearance preferences:', error);
+    async function loadPreferences() {
+      try {
+        const response = await fetch('/api/appearance', {
+          credentials: 'include',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error('Could not load appearance preferences.');
+        }
+
+        const data: Preferences = await response.json();
+
+        if (!active || changeVersion.current !== version) {
+          return;
+        }
+
+        const next: Preferences = {
+          appearance: data.appearance === 'neon' ? 'neon' : 'cozy',
+          cozy_theme: data.cozy_theme === 'dark' ? 'dark' : 'light',
+        };
+
+        valuesRef.current = next;
+        setAppearanceState(next.appearance);
+        setCozyThemeState(next.cozy_theme);
+      } catch (error) {
+        if (active) {
+          console.error('Appearance preferences:', error);
+        }
       }
     }
-  }
 
-  void loadPreferences();
+    void loadPreferences();
 
-  return () => {
-    active = false;
-  };
-}, [user?.id, loading]);
-
-
+    return () => {
+      active = false;
+    };
+  }, [user?.id, loading]);
 
   const theme: CozyTheme =
     appearance === 'neon' ? 'dark' : cozyTheme;
@@ -107,11 +130,71 @@ useEffect(() => {
     localStorage.setItem(LEGACY_THEME_KEY, cozyTheme);
   }, [appearance, cozyTheme, theme]);
 
-  function toggleTheme() {
-    if (appearance !== 'cozy') return;
+  function persistPreferences(next: Preferences) {
+    if (loading || !user) return;
 
-    setCozyTheme((current) =>
-      current === 'light' ? 'dark' : 'light'
+    const accountId = user.id;
+
+    writeQueue.current = writeQueue.current
+      .catch(() => {})
+      .then(async () => {
+        if (currentUserId.current !== accountId) return;
+
+        const response = await fetch('/api/appearance', {
+          method: 'PUT',
+          credentials: 'include',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            ...csrfHeader(),
+          },
+          body: JSON.stringify(next),
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Could not save appearance (HTTP ${response.status}).`
+          );
+        }
+      });
+
+    void writeQueue.current.catch((error) => {
+      console.error('Appearance save failed:', error);
+    });
+  }
+
+  function applyPreferences(next: Preferences) {
+    valuesRef.current = next;
+    changeVersion.current += 1;
+
+    setAppearanceState(next.appearance);
+    setCozyThemeState(next.cozy_theme);
+    persistPreferences(next);
+  }
+
+  function setAppearance(value: Appearance) {
+    if (valuesRef.current.appearance === value) return;
+
+    applyPreferences({
+      ...valuesRef.current,
+      appearance: value,
+    });
+  }
+
+  function setCozyTheme(value: CozyTheme) {
+    if (valuesRef.current.cozy_theme === value) return;
+
+    applyPreferences({
+      ...valuesRef.current,
+      cozy_theme: value,
+    });
+  }
+
+  function toggleTheme() {
+    if (valuesRef.current.appearance !== 'cozy') return;
+
+    setCozyTheme(
+      valuesRef.current.cozy_theme === 'light' ? 'dark' : 'light'
     );
   }
 
