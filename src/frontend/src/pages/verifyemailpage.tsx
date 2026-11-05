@@ -48,6 +48,13 @@ export default function VerifyEmailPage() {
         );
       });
   }, []);
+  useEffect(() => {
+  if (status !== 'verified') return;
+
+  const channel = new BroadcastChannel('careerforge-verification');
+  channel.postMessage({ type: 'verification-complete' });
+  channel.close();
+}, [status]);
 
   async function resend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

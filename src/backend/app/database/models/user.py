@@ -1,7 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, false, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, false, func, Integer
 from sqlalchemy.orm import Mapped, mapped_column
-
 from src.backend.app.database.base import Base
 
 class User(Base):
@@ -49,6 +48,35 @@ class User(Base):
     ForeignKey("careers.id", ondelete="SET NULL"),
     nullable=True,
     )
+    appearance: Mapped[str] = mapped_column(
+        String(10),
+        default="cozy",
+        server_default="cozy",
+        nullable=False,
+    )
+
+    cozy_theme: Mapped[str] = mapped_column(
+        String(5),
+        default="light",
+        server_default="light",
+        nullable=False,
+    )
+    suspended_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    suspension_reason: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+    session_version: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        nullable=False,
+    )
+
+
 
 
 Index(

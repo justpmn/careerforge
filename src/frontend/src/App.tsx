@@ -30,6 +30,9 @@ import AdminResourcesPage from './pages/adminresourcespage';
 import HomePage from './pages/homepage';
 import './neon.css';
 import './responsive.css';
+import ConfirmAccountDeletionPage from './pages/ConfirmAccountDeletionPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 function LoadingScreen() {
   return <div className="loading-screen">Loading...</div>;
@@ -84,12 +87,27 @@ function AppRoutes() {
                   element={<SignupPage />}
                 />
               </Route>
-
               <Route
                 path="verify-email"
                 element={<VerifyEmailPage />}
               />
             </Route>
+            <Route element={<AuthLayout {...layoutProps} />}>
+            <Route
+              path="delete-account"
+              element={<ConfirmAccountDeletionPage />}
+            />
+          </Route>
+          <Route element={<AuthLayout {...layoutProps} />}>
+          <Route
+            path="forgot-password"
+            element={<ForgotPasswordPage />}
+          />
+          <Route
+            path="reset-password"
+            element={<ResetPasswordPage />}
+          />
+        </Route>
 
             {/* Administrator MFA */}
             <Route
@@ -193,8 +211,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AppearanceProvider>
-      <AppRoutes />
-    </AppearanceProvider>
+    <AuthProvider>
+      <AppearanceProvider>
+        <AppRoutes />
+      </AppearanceProvider>
+    </AuthProvider>
   );
 }

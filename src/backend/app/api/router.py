@@ -14,6 +14,10 @@ from src.backend.app.api.routes.admin import router as admin_router
 from src.backend.app.api.routes.email_verification import router as email_verification_router
 from src.backend.app.api.routes.admin_mfa import router as admin_mfa_router
 from src.backend.app.api.routes.admin_resources import router as admin_resources_router
+from src.backend.app.api.routes.appearance import router as appearance_router
+from src.backend.app.api.routes.account_lifecycle import (account_router,  admin_users_router)
+from src.backend.app.api.routes.email_account_deletion import (router as email_account_deletion_router)
+from src.backend.app.api.routes.password_recovery import (router as password_recovery_router)
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(health_router)
@@ -34,3 +38,8 @@ api_router.include_router(admin_router)
 api_router.include_router(email_verification_router)
 api_router.include_router(admin_mfa_router)
 api_router.include_router(admin_resources_router)
+api_router.include_router(appearance_router)
+api_router.include_router(account_router)
+api_router.include_router(admin_users_router)
+api_router.include_router(email_account_deletion_router)
+api_router.include_router(password_recovery_router)
