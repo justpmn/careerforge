@@ -268,7 +268,7 @@ export default function DashboardPage() {
 
         {currentTour && (
           <aside
-            className="cf-home-tour"
+            className="cf-home-tour  cf-tour-popover"
             role="dialog"
             aria-modal="false"
             aria-labelledby="tour-title"

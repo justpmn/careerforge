@@ -6,7 +6,7 @@ import { getAccountSettings,  updateAccountSettings} from '../lib/accountsetting
 import type { AccountSettings} from '../lib/accountsettings';
 import '../settings.css';
 import AppearanceSettings from '../components/AppearanceSettings';
-
+import AccountDangerZone from '../components/AccountDangerZone';
 
 
 export default function SettingsPage() {
@@ -306,6 +306,7 @@ export default function SettingsPage() {
           </span>
 
           <h2>Your current session</h2>
+          <AccountDangerZone />
 
           <p>
             Sign out of CareerForge on this browser.

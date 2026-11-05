@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 
 export type Appearance = 'cozy' | 'neon';
 export type CozyTheme = 'light' | 'dark';
+import { useAuth } from './AuthContext';
 
 type AppearanceContextType = {
   appearance: Appearance;
@@ -26,7 +27,9 @@ const LEGACY_THEME_KEY = 'careerforge-theme';
 
 function loadAppearance(): Appearance {
   const saved = localStorage.getItem(APPEARANCE_KEY);
+
   return saved === 'neon' ? 'neon' : 'cozy';
+
 }
 
 function loadCozyTheme(): CozyTheme {
@@ -42,8 +45,55 @@ export function AppearanceProvider({
 }: {
   children: ReactNode;
 }) {
+  const { user, loading } = useAuth();
   const [appearance, setAppearance] = useState<Appearance>(loadAppearance);
   const [cozyTheme, setCozyTheme] = useState<CozyTheme>(loadCozyTheme);
+
+useEffect(() => {
+  if (loading || !user) return;
+
+  let active = true;
+
+  async function loadPreferences() {
+    try {
+      const response = await fetch('/api/appearance', {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Could not load appearance preferences.');
+      }
+
+      const data: {
+        appearance: Appearance;
+        cozy_theme: CozyTheme;
+      } = await response.json();
+
+      if (!active) return;
+
+      setAppearance(
+        data.appearance === 'neon' ? 'neon' : 'cozy'
+      );
+
+      setCozyTheme(
+        data.cozy_theme === 'dark' ? 'dark' : 'light'
+      );
+    } catch (error) {
+      if (active) {
+        console.error('Appearance preferences:', error);
+      }
+    }
+  }
+
+  void loadPreferences();
+
+  return () => {
+    active = false;
+  };
+}, [user?.id, loading]);
+
+
 
   const theme: CozyTheme =
     appearance === 'neon' ? 'dark' : cozyTheme;

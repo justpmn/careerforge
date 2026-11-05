@@ -275,3 +275,8 @@
 .cf-home-name {
   color: #cf9371;
 }
+html[data-appearance="neon"] .cf-home-tour.cf-tour-popover {
+  background: #141c2a;
+  color: #f1f5fb;
+  border-color: #34485b;
+}
