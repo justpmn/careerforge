@@ -28,11 +28,17 @@ import type {
   AdminCareerDetails,
   AdminSystemHealth,
 } from '../lib/admin';
-
+import AdminTotpModal from '../components/AdminTotpModal';
+import { csrfHeader } from '../lib/auth';
 import '../admin.css';
 
 type Tab = 'overview' | 'users' | 'careers' | 'logs';
 type Access = 'checking' | 'authorized' | 'denied' | 'error';
+type UserAction = {
+  user: AdminUsersPage['users'][number];
+  mode: 'suspend' | 'reactivate' | 'delete';
+  reason: string;
+};
 
 const navigation = [
   { id: 'overview', label: 'Overview', Icon: FiGrid },
@@ -174,8 +180,101 @@ export default function AdminPage() {
 
   const [careerDetailError, setCareerDetailError] =
     useState('');
+  const [pendingUserAction, setPendingUserAction] =
+  useState<UserAction | null>(null);
+  const [userActionBusy, setUserActionBusy] = useState(false);
+  const [userActionError, setUserActionError] = useState('');
+  const [userActionNotice, setUserActionNotice] = useState('');
 
   // 1. Verify administrator authorization.
+
+function requestUserAction(
+  user: AdminUsersPage['users'][number],
+  mode: UserAction['mode'],
+) {
+  if (user.role === 'admin' || user.id === admin?.id) return;
+
+  setUserActionError('');
+  setUserActionNotice('');
+
+  let reason = '';
+
+  if (mode === 'delete') {
+    const typed = window.prompt(
+      `Permanently delete ${user.email}?\n\n` +
+      'This cannot be undone.\n\n' +
+      'Type the account email to continue:'
+    );
+
+    if (typed !== user.email) {
+      if (typed !== null) {
+        setUserActionError('Email confirmation did not match.');
+      }
+      return;
+    }
+  }
+
+  if (mode === 'suspend') {
+    const entered = window.prompt('Reason for suspension:', '');
+    if (entered === null) return;
+    reason = entered.trim().slice(0, 500);
+  }
+
+  setPendingUserAction({ user, mode, reason });
+}
+
+async function confirmUserAction(code: string) {
+  if (!pendingUserAction || userActionBusy) return;
+
+  const { user, mode, reason } = pendingUserAction;
+  setUserActionBusy(true);
+  setUserActionError('');
+
+  try {
+    const endpoint = `/api/admin/users/${user.id}` +
+      (mode === 'delete' ? '' : `/${mode}`);
+
+    const response = await fetch(endpoint, {
+      method: mode === 'delete' ? 'DELETE' : 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...csrfHeader(),
+      },
+      body: JSON.stringify(
+        mode === 'delete'
+          ? { totp_code: code, confirm_email: user.email }
+          : { totp_code: code, reason }
+      ),
+    });
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(
+        typeof result?.detail === 'string'
+          ? result.detail
+          : `Action failed (HTTP ${response.status}).`
+      );
+    }
+
+    setPendingUserAction(null);
+    setUserActionNotice(
+      mode === 'delete'
+        ? 'Account deleted successfully.'
+        : mode === 'suspend'
+          ? 'Account suspended successfully.'
+          : 'Account reactivated successfully.'
+    );
+    setRefreshCount((count) => count + 1);
+  } catch (err) {
+    setUserActionError(
+      err instanceof Error ? err.message : 'Could not update account.'
+    );
+  } finally {
+    setUserActionBusy(false);
+  }
+}
+
 
   useEffect(() => {
     let active = true;
@@ -712,8 +811,9 @@ export default function AdminPage() {
                 <h2 className="cf-admin-heading">Registered accounts</h2>
 
                 <p>
-                  Read-only user directory. Account modification
-                  requires a separate audited workflow.
+                  Review registered accounts, manage access, and remove
+                  users when necessary. Sensitive actions require
+                  authenticator verification.
                 </p>
               </div>
 
@@ -734,6 +834,21 @@ export default function AdminPage() {
                 </span>
               </div>
 
+
+
+              {userActionNotice && (
+                <p className="cf-admin-note" role="status">
+                  {userActionNotice}
+                </p>
+              )}
+
+              {userActionError && !pendingUserAction && (
+                <p className="cf-admin-error" role="alert">
+                  {userActionError}
+                </p>
+              )}
+
+
               {users && (
                 <>
                   <div className="cf-admin-table-scroll">
@@ -744,6 +859,8 @@ export default function AdminPage() {
                           <th>Role</th>
                           <th>Onboarding</th>
                           <th>Registered</th>
+                          <th>Status</th>
+                          <th>Actions</th>
                         </tr>
                       </thead>
 
@@ -767,12 +884,52 @@ export default function AdminPage() {
                             <td>
                               {formatDate(user.created_at)}
                             </td>
+                            <td>
+                              <span
+                                className={
+                                  user.suspended_at
+                                    ? 'cf-admin-user-status is-suspended'
+                                    : 'cf-admin-user-status is-active'
+                                }
+                              >
+                                {user.suspended_at ? 'Suspended' : 'Active'}
+                              </span>
+                            </td>
+
+                            <td>
+                              {user.role === 'admin' || user.id === admin?.id ? (
+                                <span className="cf-admin-user-protected">
+                                  Protected
+                                </span>
+                              ) : (
+                                <div className="cf-admin-user-actions">
+                                  <button
+                                    type="button"
+                                    onClick={() => requestUserAction(
+                                      user,
+                                      user.suspended_at ? 'reactivate' : 'suspend'
+                                    )}
+                                  >
+                                    {user.suspended_at ? 'Reactivate' : 'Suspend'}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    className="cf-admin-user-delete"
+                                    onClick={() => requestUserAction(user, 'delete')}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+
                           </tr>
-                        ))}
+                            ))}
 
                         {filteredUsers.length === 0 && (
                           <tr>
-                            <td colSpan={4}>
+                            <td colSpan={6}>
                               No matching accounts.
                             </td>
                           </tr>
@@ -1149,6 +1306,29 @@ export default function AdminPage() {
           )}
         </main>
       </div>
+
+      <AdminTotpModal
+        open={pendingUserAction !== null}
+        title={
+          pendingUserAction?.mode === 'delete'
+            ? 'Permanently delete account'
+            : pendingUserAction?.mode === 'suspend'
+              ? 'Suspend account'
+              : 'Reactivate account'
+        }
+        description={
+          `Enter a fresh authenticator code to confirm this action for ` +
+          `${pendingUserAction?.user.email ?? 'the selected account'}.`
+        }
+        busy={userActionBusy}
+        error={userActionError}
+        onClose={() => {
+          if (userActionBusy) return;
+          setPendingUserAction(null);
+          setUserActionError('');
+        }}
+        onConfirm={confirmUserAction}
+      />
     </section>
   );
 }

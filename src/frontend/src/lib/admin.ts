@@ -1,4 +1,3 @@
-
 const BASE = '/api/admin';
 
 export type AdminIdentity = {
@@ -29,6 +28,8 @@ export type AdminUser = {
   role: string;
   onboarding_completed: boolean;
   created_at: string;
+  suspended_at: string | null;
+  suspension_reason: string | null;
 };
 
 export type AdminUsersPage = {
@@ -36,6 +37,8 @@ export type AdminUsersPage = {
   page_size: number;
   total: number;
   users: AdminUser[];
+  suspended_at: string | null;
+  suspension_reason: string | null;
 };
 
 export type AdminLogEvent = {

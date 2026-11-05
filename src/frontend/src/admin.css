@@ -756,3 +756,60 @@
   letter-spacing: -0.02em;
   margin: 0;
 }
+
+/* Admin account management */
+
+.cf-admin-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cf-admin-user-actions button {
+  padding: 9px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cf-admin-user-actions button:hover {
+  background: rgba(128, 128, 128, .1);
+}
+
+.cf-admin-user-actions .cf-admin-user-delete {
+  border-color: #bf615b;
+  color: #ed8178;
+}
+
+.cf-admin-user-status {
+  display: inline-block;
+  padding: 6px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cf-admin-user-status.is-active {
+  color: #65c9b7;
+  background: rgba(60, 180, 145, .1);
+}
+
+.cf-admin-user-status.is-suspended {
+  color: #ec9a68;
+  background: rgba(220, 130, 65, .12);
+}
+
+.cf-admin-user-protected {
+  font-size: 12px;
+  opacity: .65;
+}
+
+.cf-admin-table th,
+.cf-admin-table td {
+  vertical-align: middle;
+}

@@ -134,6 +134,8 @@ def list_admin_users(
                 "role": user.role,
                 "onboarding_completed": user.onboarding_completed,
                 "created_at": user.created_at,
+                "suspended_at": user.suspended_at,
+                "suspension_reason": user.suspension_reason,
             }
             for user in users
         ],
