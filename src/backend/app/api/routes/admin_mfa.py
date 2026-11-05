@@ -248,7 +248,7 @@ def start_enrollment(
                 detail="Password confirmation failed.",
             )
     else:
-        proof = request.session.get("cf_mfa_google_approved")
+        proof = request.session.get("cf_mfa_oauth_approved")
         now_ts = int(time.time())
 
         if (
@@ -256,13 +256,14 @@ def start_enrollment(
             or proof.get("user_id") != admin.id
             or type(proof.get("verified_at")) is not int
             or not 0 <= now_ts - proof["verified_at"] <= 300
+            or proof.get("provider") not in ("google", "github")
         ):
             raise HTTPException(
                 status_code=403,
                 detail="Reauthenticate with Google before enrollment.",
             )
 
-        request.session.pop("cf_mfa_google_approved", None)
+        request.session.pop("cf_mfa_oauth_approved", None)
 
     now = datetime.now(timezone.utc)
 
@@ -319,6 +320,7 @@ def start_enrollment(
 )
 def confirm_enrollment(
     payload: ConfirmEnrollmentRequest,
+    request: Request,
     response: Response,
     admin: User = Depends(require_admin_enrollment),
     db: Session = Depends(get_db),
@@ -400,6 +402,17 @@ def confirm_enrollment(
     record.mfa_version += 1
 
     db.commit()
+    request.session.pop("cf_mfa_google_approved", None)
+
+    response.delete_cookie(
+        key="careerforge_session",
+        path="/api",
+    )
+
+    response.delete_cookie(
+        key="csrf_token",
+        path="/",
+    )
 
     return EnrollmentConfirmResponse(
         message="Authenticator enrollment completed.",

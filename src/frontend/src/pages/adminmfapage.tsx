@@ -13,6 +13,13 @@ export default function AdminMfaPage() {
   const { refresh } = useAuth();
 
   const enrollmentMode = searchParams.get('enroll') === '1';
+  const providerParam = searchParams.get('oauth');
+  const oauthProvider =
+  providerParam === 'google' ||
+  providerParam === 'github' ||
+  providerParam === 'both'
+    ? providerParam
+    : undefined;
 
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -86,6 +93,8 @@ export default function AdminMfaPage() {
             </p>
 
             <MfaQrEnrollment
+              oauthOnly={oauthProvider !== undefined}
+              oauthProvider={oauthProvider}
               onComplete={() => navigate('/login', { replace: true })}
             />
 

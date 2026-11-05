@@ -1,5 +1,8 @@
+import hashlib
+import hmac
+import time
 from typing import Literal
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from authlib.integrations.base_client import OAuthError
 from fastapi import APIRouter, Depends, HTTPException, Request, status, Response
 from fastapi.responses import RedirectResponse
@@ -14,9 +17,6 @@ from src.backend.app.core.tokens import create_access_token, create_admin_mfa_ch
 from src.backend.app.database.models.oauth_identity import OAuthIdentity
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
-import hashlib
-import hmac
-import time
 from pydantic import BaseModel, ConfigDict, Field
 from src.backend.app.api.auth import get_current_user_id
 from src.backend.app.core.security import verify_password
@@ -484,6 +484,9 @@ async def oauth_callback(
         return frontend_redirect(error or "provider_error")
 
     
+    if user.suspended_at is not None:
+        return frontend_redirect("account_unavailable")
+
     if user.role == "admin":
         mfa = db.get(AdminMfaCredential, user.id)
 
@@ -492,7 +495,66 @@ async def oauth_callback(
             or mfa.enabled_at is None
             or mfa.totp_secret_encrypted is None
         ):
-            return frontend_redirect("admin_mfa_enrollment_required")
+            if user.password_hash is not None:
+                return frontend_redirect("admin_mfa_enrollment_required")
+
+            enrollment_token = create_access_token(
+                user_id=user.id,
+                session_version=user.session_version,
+                expires_delta=timedelta(minutes=15),
+            )
+
+            request.session["cf_mfa_oauth_approved"] = {
+                "user_id": user.id,
+                "provider": provider,
+                "verified_at": int(time.time()),
+            }
+            linked_providers = set(
+                db.scalars(
+                    select(OAuthIdentity.provider).where(
+                        OAuthIdentity.user_id == user.id,
+                        OAuthIdentity.provider.in_(("google", "github")),
+                    )
+                ).all()
+            )
+
+            display_provider = (
+                "both"
+                if {"google", "github"}.issubset(linked_providers)
+                else provider
+            )
+            response = RedirectResponse(
+                f"{settings.oauth_redirect_origin}/auth/mfa?enroll=1&oauth={display_provider}",
+                status_code=303,
+            )
+            response.headers["Cache-Control"] = "no-store"
+
+            response.set_cookie(
+                key="careerforge_session",
+                value=enrollment_token,
+                httponly=True,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/api",
+                max_age=900,
+            )
+
+            response.set_cookie(
+                key="csrf_token",
+                value=create_csrf_token(enrollment_token),
+                httponly=False,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/",
+                max_age=900,
+            )
+
+            response.delete_cookie(
+                key="careerforge_admin_mfa_challenge",
+                path="/api/auth/admin-mfa/challenge",
+            )
+
+            return response
 
         challenge_token = create_admin_mfa_challenge_token(user.id)
 
@@ -500,10 +562,8 @@ async def oauth_callback(
             f"{settings.oauth_redirect_origin}/auth/mfa",
             status_code=303,
         )
-
         response.headers["Cache-Control"] = "no-store"
 
-        # Clear any existing full session.
         response.delete_cookie(
             key="careerforge_session",
             path="/api",
@@ -535,14 +595,16 @@ async def oauth_callback(
         user_id=user.id,
         session_version=user.session_version,
     )
+
     max_age = settings.jwt_access_token_expire_minutes * 60
 
     response = frontend_redirect()
-    
+    response.headers["Cache-Control"] = "no-store"
+
     response.delete_cookie(
-    key="careerforge_admin_mfa_challenge",
-    path="/api/auth/admin-mfa/challenge",
-)
+        key="careerforge_admin_mfa_challenge",
+        path="/api/auth/admin-mfa/challenge",
+    )
 
     response.set_cookie(
         key="careerforge_session",

@@ -18,6 +18,9 @@ type EnrollmentResult = {
 type Props = {
   mode?: 'enroll' | 'replace';
   onComplete?: () => void;
+  oauthOnly?: boolean;
+  oauthProvider?: 'google' | 'github' | 'both';
+
 };
 
 async function postMfa<T>(path: string, body?: object): Promise<T> {
@@ -55,6 +58,8 @@ async function postMfa<T>(path: string, body?: object): Promise<T> {
 export default function MfaQrEnrollment({
   mode = 'enroll',
   onComplete,
+  oauthOnly = false,
+  oauthProvider,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [setup, setSetup] = useState<EnrollmentStart | null>(null);
@@ -110,9 +115,11 @@ async function prepareEnrollment() {
 
   try {
     const result = await postMfa<EnrollmentStart>(
-      mode === 'replace' ? 'replace/start' : 'enroll/start',
-      mode === 'replace'
+    mode === 'replace' ? 'replace/start' : 'enroll/start',
+    mode === 'replace'
         ? { current_code: currentCode }
+        : oauthOnly
+        ? {}
         : { password: password || null },
     );
 
@@ -335,30 +342,34 @@ return (
                         remain active until replacement is completed.
                       </p>
                     </>
-                  ) : (
+                  ) : oauthOnly ? (
+                    <p>
+                        {oauthProvider === 'google'
+                        ? 'Your Google account has been verified.'
+                        : oauthProvider === 'github'
+                            ? 'Your GitHub account has been verified.'
+                            : 'Your account has been verified.'}
+                        {' '}Continue to set up your authenticator.
+                    </p>
+                    ) : (
                     <>
-                      <label htmlFor="cf-mfa-setup-password">
+                        <label htmlFor="cf-mfa-setup-password">
                         Confirm your account password
-                      </label>
+                        </label>
 
-                      <input
+                        <input
                         id="cf-mfa-setup-password"
                         type="password"
                         autoComplete="current-password"
                         value={password}
                         onChange={(event) =>
-                          setPassword(event.target.value)
+                            setPassword(event.target.value)
                         }
                         placeholder="Account password"
                         disabled={busy}
-                      />
-
-                      <p>
-                        Google-only administrator accounts require the
-                        existing Google reauthentication process.
-                      </p>
+                        />
                     </>
-                  )}
+                    )}
 
                   {error && <p role="alert">{error}</p>}
 
