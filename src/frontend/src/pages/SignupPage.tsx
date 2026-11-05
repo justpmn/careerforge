@@ -98,8 +98,7 @@ export default function SignupPage() {
         </p>
 
         <div className="field-group">
-          <label>Email address</label>
-          <p>{registeredEmail}</p>
+          <label>A verification email has been sent to {registeredEmail}</label>
         </div>
 
         <p className="auth-subtitle">
@@ -107,12 +106,6 @@ export default function SignupPage() {
           The link expires after 24 hours.
         </p>
 
-        {import.meta.env.DEV && (
-          <p className="auth-subtitle">
-            Development mode: if console email delivery is enabled,
-            find the verification link in your FastAPI terminal.
-          </p>
-        )}
 
         <button
           className="primary-button"

@@ -1,8 +1,7 @@
-
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-
+import '../verify-email.css';
 import { emailVerificationApi } from '../lib/emailVerification';
 
 type Status = 'checking' | 'verified' | 'invalid';
