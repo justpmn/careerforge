@@ -153,12 +153,12 @@ def get_current_user_id(
             )
 
         # Cookie-authenticated writes require a CSRF token.
-        if cookie_auth and request.method.upper() not in {
+    if cookie_auth and request.method.upper() not in {
             "GET", "HEAD", "OPTIONS"
         }:
             validate_csrf_token(request, token)
 
-        return user.id
+    return user.id
 
 
 def get_admin_enrollment_user_id(
