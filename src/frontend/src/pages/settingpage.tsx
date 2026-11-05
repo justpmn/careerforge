@@ -7,6 +7,7 @@ import type { AccountSettings} from '../lib/accountsettings';
 import '../settings.css';
 import AppearanceSettings from '../components/AppearanceSettings';
 import AccountDangerZone from '../components/AccountDangerZone';
+import GoogleAccountLink from '../components/GoogleAccountLink';
 
 
 export default function SettingsPage() {
@@ -255,6 +256,7 @@ export default function SettingsPage() {
               Account information is unavailable.
             </p>
           )}
+
         </article>
         {/* ACCOUNT SECURITY */}
         <article className="cf-dashboard-card">
@@ -280,7 +282,6 @@ export default function SettingsPage() {
                     : 'No local password is configured.'}
               </span>
             </div>
-
             <span className="cf-settings-status">
               {loading
                 ? 'Checking'
@@ -290,13 +291,11 @@ export default function SettingsPage() {
             </span>
           </div>
 
-          <p className="cf-settings-helper">
-            Google and GitHub sign-in are managed through
-            their respective providers. We will add secure
-            password changes and linked-account management
-            after completing the authentication security
-            workflow.
-          </p>
+              <section className="cf-settings-connected">
+                <h2>Connected accounts</h2>
+                <GoogleAccountLink />
+              </section>
+
         </article>
 
 
