@@ -4,7 +4,7 @@ import secrets
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
-from src.backend.app.core.tokens import (decode_access_token,  get_jwt_secret, get_admin_mfa_version)
+from src.backend.app.core.tokens import (decode_access_token,  get_jwt_secret, get_admin_mfa_version, decode_access_token_version)
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
 from src.backend.app.database.models.admin_mfa import AdminMfaCredential
@@ -100,9 +100,26 @@ def get_current_user_id(
 
     if user is None:
         raise unauthorized
-    
-        if user.role == "admin":
-            mfa = db.get(AdminMfaCredential, user.id)
+
+    if user.suspended_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "ACCOUNT_SUSPENDED",
+                "message": "This account has been suspended.",
+            },
+        )
+
+    try:
+        token_version = decode_access_token_version(token)
+    except ValueError as exc:
+        raise unauthorized from exc
+
+    if token_version != user.session_version:
+        raise unauthorized
+
+    if user.role == "admin":
+        mfa = db.get(AdminMfaCredential, user.id)
 
         if (
             mfa is None
@@ -118,7 +135,8 @@ def get_current_user_id(
                 },
                 headers={"WWW-Authenticate": "Bearer"},
             )
-    
+
+
     if user.password_hash is not None and user.email_verified_at is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

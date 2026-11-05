@@ -26,11 +26,14 @@ def get_jwt_secret() -> str:
 def create_access_token(
     user_id: int,
     expires_delta: timedelta | None = None,
-    *,
     admin_mfa_version: int | None = None,
+    session_version: int = 0,
 ) -> str:
     if type(user_id) is not int or user_id <= 0:
         raise ValueError("Invalid user ID.")
+
+    if type(session_version) is not int or session_version < 0:
+        raise ValueError("Invalid session version.")
 
     now = datetime.now(timezone.utc)
 
@@ -49,7 +52,9 @@ def create_access_token(
         "iat": now,
         "exp": now + lifetime,
         "token_type": "access",
+        "sv": session_version,
     }
+
     if admin_mfa_version is not None:
         if type(admin_mfa_version) is not int or admin_mfa_version < 1:
             raise ValueError("Invalid MFA version.")
@@ -101,6 +106,42 @@ def decode_access_token(token: str) -> int:
             raise ValueError("Invalid token subject.")
 
         return user_id
+
+    except InvalidTokenError as exc:
+        raise ValueError(
+            "Invalid or expired access token."
+        ) from exc
+
+
+def decode_access_token_version(token: str) -> int:
+    try:
+        payload = jwt.decode(
+            token,
+            get_jwt_secret(),
+            algorithms=[JWT_ALGORITHM],
+            issuer=JWT_ISSUER,
+            audience=JWT_AUDIENCE,
+            options={
+                "require": [
+                    "sub",
+                    "iss",
+                    "aud",
+                    "iat",
+                    "exp",
+                    "token_type",
+                ]
+            },
+        )
+
+        if payload.get("token_type") != "access":
+            raise ValueError("Invalid token type.")
+
+        version = payload.get("sv", 0)
+
+        if type(version) is not int or version < 0:
+            raise ValueError("Invalid session version.")
+
+        return version
 
     except InvalidTokenError as exc:
         raise ValueError(
@@ -167,7 +208,6 @@ def decode_admin_mfa_challenge_token(token: str) -> int:
         raise ValueError(
             "Invalid or expired MFA challenge."
         ) from exc
-
 
 
 def get_admin_mfa_version(token: str) -> int | None:

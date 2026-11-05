@@ -196,7 +196,10 @@ def login_user(
             },
         )
 
-    access_token = create_access_token(user_id=user.id)
+    access_token = create_access_token(
+        user_id=user.id,
+        session_version=user.session_version,
+    )
 
     max_age = settings.jwt_access_token_expire_minutes * 60
 
