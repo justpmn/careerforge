@@ -401,6 +401,11 @@ async function refreshSkillProfile() {
             </button>
           )}
         </div>
+        {message && (
+              <p role="status" className="cf-success">
+                {message}
+              </p>
+            )}
 
           {!careerExpanded && savedCareer && (
             <p className="cf-assessment-hint">
@@ -491,12 +496,6 @@ async function refreshSkillProfile() {
             {error && (
               <p role="alert" className="cf-error">
                 {error}
-              </p>
-            )}
-
-            {message && (
-              <p role="status" className="cf-success">
-                {message}
               </p>
             )}
 
