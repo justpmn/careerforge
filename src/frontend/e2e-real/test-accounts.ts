@@ -14,3 +14,66 @@ export function activateTestAccount(email: string): void {
     stdio: 'pipe',
   });
 }
+export function takeVerificationToken(email: string): string {
+  const python = fileURLToPath(
+    new URL('../../../.venv-new/Scripts/python.exe', import.meta.url)
+  );
+
+  return execFileSync(
+    python,
+    [HELPER, 'take-token', email],
+    {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+    }
+  ).trim();
+}
+export function updateVerificationToken(
+  action: 'expire-token' | 'age-token',
+  email: string
+): void {
+  const python = fileURLToPath(
+    new URL('../../../.venv-new/Scripts/python.exe', import.meta.url)
+  );
+
+  execFileSync(
+    python,
+    [HELPER, action, email],
+    {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+    }
+  );
+}
+export function promoteTestAdmin(email: string): void {
+  const python = fileURLToPath(
+    new URL('../../../.venv-new/Scripts/python.exe', import.meta.url)
+  );
+
+  execFileSync(
+    python,
+    [HELPER, 'promote-admin', email],
+    {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+    }
+  );
+}
+export function getExpiredAdminMfaChallenge(email: string): string {
+  const python = fileURLToPath(
+    new URL('../../../.venv-new/Scripts/python.exe', import.meta.url)
+  );
+
+  return execFileSync(
+    python,
+    [HELPER, 'expired-mfa-challenge', email],
+    {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+    }
+  ).trim();
+}

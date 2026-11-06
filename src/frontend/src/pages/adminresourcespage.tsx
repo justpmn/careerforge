@@ -615,6 +615,7 @@ async function confirmResourceAction(code: string) {
                     <input
                         type="radio"
                         name="mapping-mode"
+                        value={value}
                         checked={mappingMode === value}
                         onChange={() => setMappingMode(value)}
                     />
