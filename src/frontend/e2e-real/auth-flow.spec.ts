@@ -1,6 +1,7 @@
 
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
+import { activateTestAccount } from './test-accounts';
 
 const PASSWORD = 'CareerForge-E2E-2026!';
 
@@ -40,9 +41,29 @@ test.describe('CareerForge real authentication', () => {
     }).click();
 
     // Registration intentionally redirects to login.
-    await expect(page).toHaveURL(/\/login$/);
+    // Registration requires email verification.
+await expect(
+  page.getByText(/verification email has been sent to/i)
+).toBeVisible();
 
-    // 2. Login with the newly created account.
+    // Registration requires email verification.
+    await expect(
+      page.getByText(/verification email has been sent to/i)
+    ).toBeVisible();
+
+    // Check that unverified users cannot log in.
+    const unverified = await page.request.post('/api/auth/login', {
+      data: { email, password: PASSWORD },
+    });
+
+    expect(unverified.status()).toBe(403);
+
+    // Activate only this disposable test account.
+    activateTestAccount(email);
+
+    // 2. Login with the newly verified account.
+    await page.goto('/login');
+
     await page.getByLabel('Email address').fill(email);
 
     await page.getByLabel('Password', {

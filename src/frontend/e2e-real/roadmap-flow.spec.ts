@@ -1,4 +1,4 @@
-
+import { activateTestAccount } from './test-accounts';
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
@@ -22,6 +22,7 @@ async function createAuthenticatedUser(page: Page) {
   );
 
   expect(response.status()).toBe(201);
+  activateTestAccount(email);
 
   // Establish a real authenticated browser session.
   await page.goto('/login');
@@ -174,29 +175,30 @@ test.describe('CareerForge competency and roadmap E2E', () => {
       .locator('h2')
       .innerText();
 
+    // Verify the current learning-status interface.
     await expect(
-      inspector.getByRole('heading', {
-        name: 'Your learning progress',
+      inspector.getByText('Learning status', {
+        exact: true,
       })
     ).toBeVisible();
 
-    // 8. Save the skill's learned status.
-    const learnedButton = inspector.locator(
-      '.cf-learning-toggle'
-    );
+    await expect(
+      inspector.getByText('Not yet marked as learned')
+    ).toBeVisible();
 
-    await expect(learnedButton).toHaveAttribute(
-      'aria-pressed',
-      'false'
-    );
+    // Mark the selected competency as learned.
+    await inspector.getByRole('button', {
+      name: 'Mark as learned',
+    }).click();
 
-    await learnedButton.click();
-
-    await expect(learnedButton).toHaveAttribute(
-      'aria-pressed',
-      'true',
-      { timeout: 20_000 }
-    );
+    // Wait for the saved learning state.
+    await expect(
+      inspector.getByRole('button', {
+        name: /Learned.*Undo/i,
+      })
+    ).toBeVisible({
+      timeout: 20_000,
+    });
 
     console.log('SKILL TREE INTERACTION: PASS');
     console.log('LEARNING PROGRESS SAVE: PASS');
@@ -236,15 +238,14 @@ test.describe('CareerForge competency and roadmap E2E', () => {
       restoredInspector.locator('h2')
     ).toHaveText(selectedSkillTitle);
 
+    // Verify the learned status survived a full reload.
     await expect(
-      restoredInspector.locator(
-        '.cf-learning-toggle'
-      )
-    ).toHaveAttribute(
-      'aria-pressed',
-      'true',
-      { timeout: 20_000 }
-    );
+      restoredInspector.getByRole('button', {
+        name: /Learned.*Undo/i,
+      })
+    ).toBeVisible({
+      timeout: 20_000,
+    });
 
     console.log('POSTGRESQL PROGRESS RESTORATION: PASS');
     console.log(`Test account: ${email}`);

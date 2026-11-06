@@ -1,4 +1,4 @@
-
+import { activateTestAccount } from './test-accounts';
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
@@ -31,6 +31,7 @@ async function createAuthenticatedUser(page: Page) {
   );
 
   expect(registration.status()).toBe(201);
+  activateTestAccount(email);
 
   // Establish authentication through the React UI.
   await page.goto('/login');
@@ -67,7 +68,11 @@ test.describe('CareerForge real CV analysis', () => {
     ).toBeVisible();
 
     // 2. Upload an actual DOCX document.
-    await page.locator('#cv-file').setInputFiles(
+    await page.getByRole('button', {
+      name: '+ Upload CV',
+    }).click();
+
+    await page.locator('input[type="file"]').setInputFiles(
       DOCX_PATH
     );
 
@@ -168,7 +173,11 @@ test.describe('CareerForge real CV analysis', () => {
     await page.goto('/cv');
 
     // 1. Upload a valid PDF.
-    await page.locator('#cv-file').setInputFiles(
+    await page.getByRole('button', {
+      name: '+ Upload CV',
+    }).click();
+
+    await page.locator('input[type="file"]').setInputFiles(
       PDF_PATH
     );
 
@@ -200,15 +209,30 @@ test.describe('CareerForge real CV analysis', () => {
       0x20
     );
 
-    await page.locator('#cv-file').setInputFiles({
+// Reopen the upload modal for the oversized-file test.
+    await page.getByRole('button', {
+      name: '+ Upload CV',
+    }).click();
+
+    await page.locator('input[type="file"]').setInputFiles({
       name: 'oversized.pdf',
       mimeType: 'application/pdf',
       buffer: oversizedBuffer,
     });
 
-    await page.getByRole('button', {
-      name: 'Analyze CV',
-    }).click();
+    // The upload modal must reject files larger than 5 MB.
+    const uploadDialog = page.getByRole('dialog');
+
+    await expect(
+      uploadDialog.getByRole('alert')
+    ).toHaveText('Your CV must be between 1 byte and 5 MB.');
+
+// An invalid file must not be submitted for analysis.
+    await expect(
+      uploadDialog.getByRole('button', {
+        name: 'Analyze CV',
+      })
+    ).toBeDisabled();
 
     // 3. The UI must communicate the upload failure.
     await expect(

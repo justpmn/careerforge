@@ -1,6 +1,7 @@
 import { test, expect, request as apiRequest } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
+import { activateTestAccount } from './test-accounts';
 
 const PASSWORD = 'CareerForge-E2E-2026!';
 
@@ -22,6 +23,8 @@ async function createAuthenticatedUser(page: Page) {
   );
 
   expect(registration.status()).toBe(201);
+
+  activateTestAccount(email);
 
   await page.goto('/login');
 

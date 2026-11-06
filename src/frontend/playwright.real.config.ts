@@ -63,13 +63,12 @@ export default defineConfig({
 
   webServer: [
     {
-      command:
-        'python -m uvicorn src.backend.app.main:app ' +
-        '--host 127.0.0.1 --port 18080',
+      command: 'python tests/e2e_account_support.py serve',
       cwd: ROOT,
       env: {
         ...process.env,
         DATABASE_URL: databaseUrl,
+        COOKIE_SECURE: 'false',
       },
       url: 'http://127.0.0.1:18080/openapi.json',
       reuseExistingServer: false,

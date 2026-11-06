@@ -1,4 +1,4 @@
-
+import { activateTestAccount } from './test-accounts';
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
@@ -21,6 +21,7 @@ async function createAuthenticatedUser(page: Page) {
   );
 
   expect(registration.status()).toBe(201);
+  activateTestAccount(email);
 
   await page.goto('/login');
 

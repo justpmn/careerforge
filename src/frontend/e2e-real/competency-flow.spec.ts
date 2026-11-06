@@ -1,4 +1,4 @@
-
+import { activateTestAccount } from './test-accounts';
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 
@@ -39,6 +39,7 @@ test('competency assessment and evidence persist after reload', async ({
   );
 
   expect(registration.status()).toBe(201);
+  activateTestAccount(email);
 
   // =====================================================
   // 2. LOGIN THROUGH THE REAL FRONTEND
@@ -97,11 +98,22 @@ test('competency assessment and evidence persist after reload', async ({
     name: 'Save target career',
   }).click();
 
-  await expect(
-    page.getByText(
-      'Your target career has been saved.'
-    )
-  ).toBeVisible({
+    // Verify the saved career appears in the collapsed header.
+  const savedCareerHeading = page
+    .locator('.cf-career-collapse-header')
+    .getByRole('heading', {
+      name: 'Data Engineer',
+      exact: true,
+    });
+
+  await expect(savedCareerHeading).toBeVisible({
+    timeout: 20_000,
+  });
+
+  // Reload to verify the selection persisted in PostgreSQL.
+  await page.reload();
+
+  await expect(savedCareerHeading).toBeVisible({
     timeout: 20_000,
   });
 
