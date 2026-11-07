@@ -1,6 +1,4 @@
-
 import { useEffect, useRef, useState } from 'react';
-import '../cv-upload-modal.css';
 
 type Props = {
   open: boolean;

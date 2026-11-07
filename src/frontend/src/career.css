@@ -1,0 +1,1169 @@
+﻿/* ===== cv.css ===== */
+
+
+.cf-cv {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 0 60px;
+}
+
+.cf-cv-header {
+  margin-bottom: 28px;
+}
+
+.cf-cv-eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.cf-cv-header h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(27px, 3vw, 36px);
+  letter-spacing: -1px;
+  line-height: 1.2;
+}
+
+.cf-cv-header p,
+.cf-cv-results-heading p,
+.cf-cv-muted {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cf-cv-panel {
+  padding: 24px;
+  margin-bottom: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cf-cv-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cf-cv-panel-heading h2,
+.cf-cv-panel-heading h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.cf-cv-panel-heading > span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cf-cv-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  cursor: pointer;
+}
+
+.cf-cv-upload-area:hover,
+.cf-cv-upload-area:focus-within {
+  border-color: var(--accent);
+}
+
+.cf-cv-upload-icon {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  width: 36px;
+  border-radius: 8px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 24px;
+}
+
+.cf-cv-upload-area strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.cf-cv-upload-area > span:last-child {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-cv-file-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-cv-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.cf-cv-primary {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.cf-cv-primary:hover {
+  background: var(--accent-hover);
+}
+
+.cf-cv-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-cv-error {
+  margin-top: 12px;
+  color: var(--error-text);
+  font-size: 13px;
+}
+
+.cf-cv-results {
+  margin-top: 32px;
+}
+
+.cf-cv-results-heading {
+  margin-bottom: 18px;
+}
+
+.cf-cv-results-heading h2 {
+  margin: 7px 0 4px;
+  font-size: 23px;
+}
+
+.cf-cv-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cf-cv-skill {
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--soft);
+  font-size: 12px;
+}
+
+.cf-cv-recommendation {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.cf-cv-recommendation:last-child {
+  border-bottom: 0;
+}
+
+.cf-cv-rank {
+  font-family: monospace;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.cf-cv-recommendation strong {
+  flex: 1;
+  font-size: 14px;
+}
+
+.cf-cv-score {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-cv-coverage {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cf-cv-coverage > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 18px;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.cf-cv-coverage strong {
+  font-size: 25px;
+}
+
+.cf-cv-coverage span,
+.cf-cv-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cf-cv-note {
+  margin: 16px 0 0;
+}
+
+@media (max-width: 600px) {
+  .cf-cv-panel {
+    padding: 18px;
+  }
+
+  .cf-cv-recommendation {
+    flex-wrap: wrap;
+  }
+
+  .cf-cv-coverage {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== cv-upload-modal.css ===== */
+
+
+.cf-cv-dialog {
+  position: fixed;
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid #484848;
+  border-radius: 14px;
+  background: #222323;
+  color: #f1eee8;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+}
+
+.cf-cv-dialog::backdrop {
+  background: rgba(0, 0, 0, .74);
+  backdrop-filter: blur(3px);
+}
+
+.cf-cv-dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.cf-cv-dialog-heading h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 650;
+}
+
+.cf-cv-dialog-heading p {
+  margin: 8px 0 0;
+  color: #aaa7a2;
+  line-height: 1.6;
+}
+
+.cf-cv-dialog-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone {
+  width: 100%;
+  min-height: 245px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px;
+  border: 1px dashed #625951;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.cf-cv-dropzone:hover,
+.cf-cv-dropzone.is-dragging {
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  background: rgba(209, 138, 100, .09);
+}
+
+.cf-cv-dropzone:focus-visible {
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
+  outline-offset: 3px;
+}
+
+.cf-cv-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(209, 138, 100, .16);
+  color: #e4a274;
+  font-size: 2rem;
+}
+
+.cf-cv-dropzone span:not(.cf-cv-drop-icon),
+.cf-cv-dropzone small {
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cf-cv-dialog-actions button {
+  padding: 11px 20px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-cv-cancel {
+  background: transparent;
+  color: inherit;
+  border: 1px solid #555;
+}
+
+.cf-cv-analyze {
+  background: #c77b54;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.cf-cv-dialog button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.cf-cv-dialog-error {
+  color: #ef9999;
+  margin-top: 14px;
+}
+
+html[data-theme="light"] .cf-cv-dialog {
+  background: #faf8f5;
+  color: #262320;
+  border-color: #ded8d0;
+}
+
+html[data-theme="light"] .cf-cv-dialog-heading p,
+html[data-theme="light"] .cf-cv-dropzone span:not(.cf-cv-drop-icon),
+html[data-theme="light"] .cf-cv-dropzone small {
+  color: #69635d;
+}
+
+html[data-theme="light"] .cf-cv-dropzone {
+  background: rgba(0, 0, 0, .02);
+}
+
+
+.cf-cv-upload-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px 32px;
+  background: var(--surface, #242424);
+  border: 1px solid var(--line, #404040);
+  border-radius: 12px;
+}
+
+.cf-cv-upload-compact h2 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+}
+
+.cf-cv-upload-compact p {
+  margin: 0 0 8px;
+  color: var(--muted, #aaa7a2);
+}
+
+.cf-cv-upload-compact small {
+  color: var(--muted, #aaa7a2);
+}
+
+.cf-cv-file-input[hidden] {
+  display: none !important;
+}
+
+.cf-cv-dialog {
+  position: fixed;
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  background: #222323;
+  color: #f1eee8;
+  border: 1px solid #484848;
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+}
+
+.cf-cv-dialog::backdrop {
+  background: rgba(0, 0, 0, .74);
+  backdrop-filter: blur(3px);
+}
+
+.cf-cv-dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.cf-cv-dialog-heading h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.cf-cv-dialog-heading p {
+  margin: 8px 0 0;
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone {
+  width: 100%;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px;
+  border: 1px dashed #625951;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone:hover,
+.cf-cv-dropzone.is-dragging {
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  background: rgba(209, 138, 100, .09);
+}
+
+.cf-cv-dropzone:focus-visible {
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
+  outline-offset: 3px;
+}
+
+.cf-cv-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(209, 138, 100, .16);
+  color: #e4a274;
+  font-size: 2rem;
+}
+
+.cf-cv-dropzone span:not(.cf-cv-drop-icon),
+.cf-cv-dropzone small {
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cf-cv-dialog-actions button {
+  padding: 11px 20px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-cv-cancel {
+  border: 1px solid #555;
+  background: transparent;
+  color: inherit;
+}
+
+.cf-cv-analyze {
+  border: 1px solid transparent;
+  background: #c77b54;
+  color: white;
+}
+
+.cf-cv-dialog button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+html[data-theme="light"] .cf-cv-dialog {
+  background: #faf8f5;
+  color: #262320;
+  border-color: #ded8d0;
+}
+
+html[data-theme="light"] .cf-cv-dialog-heading p,
+html[data-theme="light"] .cf-cv-dropzone span:not(.cf-cv-drop-icon),
+html[data-theme="light"] .cf-cv-dropzone small {
+  color: #69635d;
+}
+
+html[data-theme="light"] .cf-cv-dropzone {
+  background: rgba(0, 0, 0, .02);
+}
+
+@media (max-width: 640px) {
+  .cf-cv-upload-compact {
+    padding: 22px;
+  }
+
+  .cf-cv-upload-compact .cf-cv-primary {
+    width: 100%;
+  }
+
+  .cf-cv-dialog {
+    padding: 20px;
+  }
+}
+
+/* Cozy Light â€” CV upload panel */
+
+html[data-appearance="cozy"][data-theme="light"] .cf-cv-upload-compact {
+  background: #fffdf9;
+  color: #292521;
+  border: 1px solid #ded8d0;
+}
+
+html[data-appearance="cozy"][data-theme="light"] .cf-cv-upload-compact h2 {
+  color: #292521;
+}
+
+html[data-appearance="cozy"][data-theme="light"] .cf-cv-upload-compact p,
+html[data-appearance="cozy"][data-theme="light"] .cf-cv-upload-compact small {
+  color: #716b64;
+}
+
+/* ===== careerpreferences.css ===== */
+
+.cf-cv-match-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.cf-cv-match-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+.cf-cv-match-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cf-cv-match-title {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.cf-cv-match-state {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.cf-pref-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cf-cv-match-card .cf-pref-actions {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.cf-pref-btn {
+  flex: 1;
+  min-width: 82px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cf-pref-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.cf-pref-btn[aria-pressed="true"] {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.cf-pref-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.cf-pref-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.cf-profile-preference-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.cf-profile-preference-group {
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  border-radius: 12px;
+}
+
+.cf-profile-preference-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+.cf-profile-pref-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.cf-profile-preference-items {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.cf-profile-preference-item {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 10px;
+}
+
+.cf-profile-preference-item strong {
+  font-size: 0.85rem;
+}
+
+@media (max-width: 520px) {
+  .cf-cv-match-grid,
+  .cf-profile-preference-lists {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.cf-cv-match-card {
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease,
+    border-color 180ms ease;
+  animation: cf-cv-match-enter 320ms ease;
+}
+
+.cf-cv-match-card--exiting {
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  pointer-events: none;
+}
+
+.cf-cv-match-card:has(.cf-pref-btn[aria-pressed="true"]) {
+  border-color: color-mix(
+    in srgb,
+    currentColor 35%,
+    transparent
+  );
+}
+
+@keyframes cf-cv-match-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-cv-match-card {
+    animation: none;
+    transition: none;
+  }
+}
+.cf-pref-section-heading,
+.cf-pref-dialog-header,
+.cf-pref-heading-actions,
+.cf-pref-card-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.cf-pref-text-link {
+  border: 0;
+  padding: 0.2rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.cf-pref-text-link:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+.cf-pref-text-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cf-pref-carousel-groups {
+  display: grid;
+  gap: 1.5rem;
+  margin: 1.25rem 0;
+  min-width: 0;
+}
+
+.cf-pref-carousel-section {
+  min-width: 0;
+}
+
+.cf-pref-carousel-section h3,
+.cf-pref-dialog-group h3 {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.cf-pref-navigation {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.cf-pref-navigation button {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cf-pref-navigation button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cf-pref-carousel-track {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+  padding-bottom: 0.6rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.cf-pref-carousel-card {
+  display: flex;
+  flex: 0 0 calc((100% - 1.5rem) / 3);
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 12px;
+  scroll-snap-align: start;
+}
+
+.cf-pref-carousel-card strong {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.cf-pref-carousel-card .cf-pref-actions {
+  margin-top: auto;
+}
+
+.cf-pref-dialog {
+  width: min(850px, calc(100vw - 32px));
+  max-height: 85vh;
+  margin: auto;
+  padding: 1.5rem;
+  overflow-y: auto;
+  border-radius: 16px;
+  color: inherit;
+}
+
+.cf-pref-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.cf-pref-dialog-group {
+  margin-top: 1.5rem;
+}
+
+.cf-pref-dialog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.cf-pref-dialog-grid .cf-pref-carousel-card {
+  width: 100%;
+}
+
+.cf-pref-ranking-list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 1.2rem 0;
+}
+
+.cf-pref-ranking-item {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+@media (max-width: 900px) {
+  .cf-pref-carousel-card {
+    flex-basis: calc((100% - 0.75rem) / 2);
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-pref-carousel-card {
+    flex-basis: 88%;
+  }
+
+  .cf-pref-dialog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-pref-carousel-track {
+    scroll-behavior: auto;
+  }
+}
+.cf-cv-score-display {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.cf-cv-score-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+}
+
+.cf-cv-score-heading span {
+  opacity: 0.7;
+}
+
+.cf-cv-score-heading strong {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cf-cv-score-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.cf-cv-score-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cf-accent-color, currentColor);
+  opacity: 0.8;
+  transition: width 300ms ease;
+}
+
+.cf-cv-match-card {
+  min-height: 190px;
+}
+
+.cf-cv-match-card .cf-pref-actions {
+  margin-top: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-cv-score-track > span {
+    transition: none;
+  }
+}
+.cf-pref-dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cf-pref-reset-link {
+  border: none;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.cf-pref-reset-link:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+.cf-pref-reset-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cf-pref-reset-confirm {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid color-mix(
+    in srgb,
+    currentColor 20%,
+    transparent
+  );
+  border-radius: 12px;
+  background: color-mix(
+    in srgb,
+    currentColor 4%,
+    transparent
+  );
+}
+
+.cf-pref-reset-confirm p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.cf-pref-reset-confirm .cf-pref-actions {
+  justify-content: flex-start;
+}
+
+.cf-pref-reset-confirm .cf-pref-btn {
+  flex: 0 1 auto;
+  min-width: 120px;
+}
+.cf-cv-coverage-detail {
+  font-size: 0.74rem;
+  opacity: 0.65;
+}
+
+.cf-cv-model-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.6rem;
+  margin-top: 0.4rem;
+  border-top: 1px solid color-mix(
+    in srgb,
+    currentColor 12%,
+    transparent
+  );
+  font-size: 0.78rem;
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.cf-pref-ranking-metrics {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: end;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cf-pref-ranking-metrics strong {
+  font-size: 0.86rem;
+}
+
+.cf-pref-ranking-metrics span {
+  font-size: 0.74rem;
+  opacity: 0.65;
+}
+.cf-pref-ranking-item {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.cf-pref-ranking-name {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.cf-pref-ranking-name strong {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.cf-pref-ranking-name small {
+  font-size: 0.72rem;
+  opacity: 0.65;
+}
+
+.cf-pref-ranking-metrics {
+  display: grid;
+  justify-items: end;
+  gap: 0.3rem;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .cf-pref-ranking-item {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .cf-pref-ranking-metrics {
+    grid-column: 2;
+    justify-items: start;
+    text-align: left;
+  }
+}
+/* Cozy Light */
+
+html[data-appearance="cozy"][data-theme="light"] .cf-career-sort {
+  color-scheme: light;
+  background: #fffdf9;
+  color: #292521;
+  border-color: #d7d0c8;
+}
+
+html[data-appearance="cozy"][data-theme="light"] .cf-career-sort option {
+  background: #fffdf9;
+  color: #292521;
+}
+
+/* Cozy Dark */
+
+html[data-appearance="cozy"][data-theme="dark"] .cf-career-sort {
+  color-scheme: dark;
+}
+
+html[data-appearance="cozy"][data-theme="dark"] .cf-career-sort option {
+  background: #292725;
+  color: #f0e9e2;
+}
+
+/* Neon */
+
+html[data-appearance="neon"] .cf-career-sort {
+  color-scheme: dark;
+  background: #101827;
+  color: #f1f5fb;
+  border-color: #34485b;
+}
+
+html[data-appearance="neon"] .cf-career-sort option {
+  background: #141c2a;
+  color: #f1f5fb;
+}
+
+html[data-appearance="neon"] .cf-career-sort:focus-visible {
+  outline: 2px solid #00ddeb;
+  outline-offset: 2px;
+}

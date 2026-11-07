@@ -5,7 +5,7 @@ import App from './App';
 
 import './styles.css';
 import './dashboard.css';
-import './cv.css';
+import './career.css';
 import './notifications.css';
 
 ReactDOM.createRoot(
