@@ -182,7 +182,7 @@ def test_llm_receives_complete_history(mock_ollama):
     assert payload["stream"] is False
     assert payload["think"] is False
     assert payload["options"]["num_ctx"] == 4096
-    assert payload["options"]["num_predict"] == 320
+    assert payload["options"]["num_predict"] == 1024
 
 
 def test_ollama_timeout_handled(mock_ollama):
