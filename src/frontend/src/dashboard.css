@@ -1,0 +1,282 @@
+
+/* CareerForge dashboard */
+
+.cf-home {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 22px 0 56px;
+}
+
+.cf-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.cf-home-label {
+  display: block;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.cf-home-header h1 {
+  margin: 10px 0 7px;
+  font-size: clamp(27px, 3vw, 36px);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.cf-home-header p,
+.cf-home-target p,
+.cf-home-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cf-home-tour-link {
+  flex-shrink: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  background: var(--paper);
+  font-size: 12px;
+}
+
+/* Target role */
+
+.cf-home-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 21px 24px;
+  margin-bottom: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cf-home-target h2 {
+  margin: 9px 0 4px;
+  font-size: 21px;
+  font-weight: 650;
+}
+
+/* Dashboard cards */
+
+.cf-home-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.cf-home-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+  padding: 23px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cf-home-card-heading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.cf-home-card h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.3px;
+}
+
+.cf-home-index {
+  font-family: monospace;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cf-home-card .cf-home-empty {
+  max-width: 340px;
+  padding: 9px 0;
+}
+
+.cf-home-card > .cf-home-link {
+  margin-top: auto;
+}
+
+.cf-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cf-home-link:hover {
+  text-decoration: underline;
+}
+
+/* Roadmap and mentor */
+
+.cf-home-bottom {
+  display: grid;
+  gap: 16px;
+}
+
+.cf-home-horizontal {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cf-home-horizontal h2 {
+  margin-bottom: 6px;
+}
+
+.cf-home-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 39px;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cf-home-primary:hover {
+  background: var(--accent-hover);
+}
+
+/* Tutorial */
+
+.cf-home [data-tour-active="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.cf-home-tour {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 50;
+  width: min(350px, calc(100vw - 32px));
+  padding: 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 35px #0004;
+}
+
+.cf-home-tour h3 {
+  margin: 12px 0 8px;
+  font-size: 17px;
+}
+
+.cf-home-tour p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cf-home-error {
+  color: var(--error-text) !important;
+}
+
+.cf-home-tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.cf-home-tour-actions button:not(.cf-home-primary) {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--text);
+  background: var(--paper);
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .cf-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-home-header,
+  .cf-home-target,
+  .cf-home-horizontal {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cf-home-tour {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+.cf-workspace-sidebar {
+  padding-top: 12px;
+}
+
+.cf-workspace-nav {
+  gap: 3px;
+}
+
+.cf-workspace-nav .cf-nav-link {
+  padding: 10px 13px;
+  font-size: 13px;
+  border-radius: 7px;
+}
+
+.cf-sidebar-label {
+  margin-bottom: 15px;
+}
+
+.cf-home-welcome {
+  color: #f1eee8;
+  font-size: clamp(2.3rem, 4vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.cf-home-name {
+  color: #cf9371;
+}
+html[data-appearance="neon"] .cf-home-tour.cf-tour-popover {
+  background: #141c2a;
+  color: #f1f5fb;
+  border-color: #34485b;
+}

@@ -1,0 +1,327 @@
+
+.cf-cv-dialog {
+  position: fixed;
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid #484848;
+  border-radius: 14px;
+  background: #222323;
+  color: #f1eee8;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+}
+
+.cf-cv-dialog::backdrop {
+  background: rgba(0, 0, 0, .74);
+  backdrop-filter: blur(3px);
+}
+
+.cf-cv-dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.cf-cv-dialog-heading h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 650;
+}
+
+.cf-cv-dialog-heading p {
+  margin: 8px 0 0;
+  color: #aaa7a2;
+  line-height: 1.6;
+}
+
+.cf-cv-dialog-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone {
+  width: 100%;
+  min-height: 245px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px;
+  border: 1px dashed #625951;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.cf-cv-dropzone:hover,
+.cf-cv-dropzone.is-dragging {
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  background: rgba(209, 138, 100, .09);
+}
+
+.cf-cv-dropzone:focus-visible {
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
+  outline-offset: 3px;
+}
+
+.cf-cv-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(209, 138, 100, .16);
+  color: #e4a274;
+  font-size: 2rem;
+}
+
+.cf-cv-dropzone span:not(.cf-cv-drop-icon),
+.cf-cv-dropzone small {
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cf-cv-dialog-actions button {
+  padding: 11px 20px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-cv-cancel {
+  background: transparent;
+  color: inherit;
+  border: 1px solid #555;
+}
+
+.cf-cv-analyze {
+  background: #c77b54;
+  color: white;
+  border: 1px solid transparent;
+}
+
+.cf-cv-dialog button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.cf-cv-dialog-error {
+  color: #ef9999;
+  margin-top: 14px;
+}
+
+html[data-theme="light"] .cf-cv-dialog {
+  background: #faf8f5;
+  color: #262320;
+  border-color: #ded8d0;
+}
+
+html[data-theme="light"] .cf-cv-dialog-heading p,
+html[data-theme="light"] .cf-cv-dropzone span:not(.cf-cv-drop-icon),
+html[data-theme="light"] .cf-cv-dropzone small {
+  color: #69635d;
+}
+
+html[data-theme="light"] .cf-cv-dropzone {
+  background: rgba(0, 0, 0, .02);
+}
+
+
+.cf-cv-upload-compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 28px 32px;
+  background: var(--surface, #242424);
+  border: 1px solid var(--line, #404040);
+  border-radius: 12px;
+}
+
+.cf-cv-upload-compact h2 {
+  margin: 0 0 10px;
+  font-size: 1.5rem;
+}
+
+.cf-cv-upload-compact p {
+  margin: 0 0 8px;
+  color: var(--muted, #aaa7a2);
+}
+
+.cf-cv-upload-compact small {
+  color: var(--muted, #aaa7a2);
+}
+
+.cf-cv-file-input[hidden] {
+  display: none !important;
+}
+
+.cf-cv-dialog {
+  position: fixed;
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  background: #222323;
+  color: #f1eee8;
+  border: 1px solid #484848;
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .32);
+}
+
+.cf-cv-dialog::backdrop {
+  background: rgba(0, 0, 0, .74);
+  backdrop-filter: blur(3px);
+}
+
+.cf-cv-dialog-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.cf-cv-dialog-heading h2 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.cf-cv-dialog-heading p {
+  margin: 8px 0 0;
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-close {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone {
+  width: 100%;
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px;
+  border: 1px dashed #625951;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cf-cv-dropzone:hover,
+.cf-cv-dropzone.is-dragging {
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  background: rgba(209, 138, 100, .09);
+}
+
+.cf-cv-dropzone:focus-visible {
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
+  outline-offset: 3px;
+}
+
+.cf-cv-drop-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(209, 138, 100, .16);
+  color: #e4a274;
+  font-size: 2rem;
+}
+
+.cf-cv-dropzone span:not(.cf-cv-drop-icon),
+.cf-cv-dropzone small {
+  color: #aaa7a2;
+}
+
+.cf-cv-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.cf-cv-dialog-actions button {
+  padding: 11px 20px;
+  border-radius: 8px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-cv-cancel {
+  border: 1px solid #555;
+  background: transparent;
+  color: inherit;
+}
+
+.cf-cv-analyze {
+  border: 1px solid transparent;
+  background: #c77b54;
+  color: white;
+}
+
+.cf-cv-dialog button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+html[data-theme="light"] .cf-cv-dialog {
+  background: #faf8f5;
+  color: #262320;
+  border-color: #ded8d0;
+}
+
+html[data-theme="light"] .cf-cv-dialog-heading p,
+html[data-theme="light"] .cf-cv-dropzone span:not(.cf-cv-drop-icon),
+html[data-theme="light"] .cf-cv-dropzone small {
+  color: #69635d;
+}
+
+html[data-theme="light"] .cf-cv-dropzone {
+  background: rgba(0, 0, 0, .02);
+}
+
+@media (max-width: 640px) {
+  .cf-cv-upload-compact {
+    padding: 22px;
+  }
+
+  .cf-cv-upload-compact .cf-cv-primary {
+    width: 100%;
+  }
+
+  .cf-cv-dialog {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "spreadsheet_tools",
+      "title": "Spreadsheets",
+      "requires": [],
+      "skillAliases": [
+        "Microsoft Excel"
+      ]
+    },
+    {
+      "id": "sql",
+      "title": "SQL",
+      "requires": [],
+      "skillAliases": [
+        "Oracle PL/SQL",
+        "SQL",
+        "Transact-SQL"
+      ]
+    },
+    {
+      "id": "analysis_programming",
+      "title": "Analysis Programming",
+      "requires": [],
+      "skillAliases": [
+        "Python",
+        "R"
+      ]
+    },
+    {
+      "id": "requirements_analysis",
+      "title": "Requirements Analysis",
+      "requires": []
+    },
+    {
+      "id": "analytical_databases",
+      "title": "Analytical Databases",
+      "requires": [
+        "sql"
+      ],
+      "skillAliases": [
+        "BigQuery",
+        "Microsoft SQL Server",
+        "MySQL",
+        "PostgreSQL",
+        "Snowflake"
+      ]
+    },
+    {
+      "id": "data_quality",
+      "title": "Data Quality",
+      "requires": [
+        "sql"
+      ]
+    },
+    {
+      "id": "analysis_interpretation",
+      "title": "Data Analysis",
+      "requires": [
+        "spreadsheet_tools",
+        "sql"
+      ]
+    },
+    {
+      "id": "bi_tools",
+      "title": "BI Tools",
+      "requires": [
+        "spreadsheet_tools"
+      ],
+      "skillAliases": [
+        "Google Looker Analytics",
+        "Microsoft Power BI",
+        "Microsoft SQL Server Reporting Services SSRS",
+        "Tableau"
+      ]
+    },
+    {
+      "id": "business_metrics",
+      "title": "Business Metrics",
+      "requires": [
+        "requirements_analysis",
+        "analysis_interpretation"
+      ]
+    },
+    {
+      "id": "reporting_dashboards",
+      "title": "Dashboards",
+      "requires": [
+        "analysis_interpretation",
+        "bi_tools"
+      ]
+    },
+    {
+      "id": "data_communication",
+      "title": "Communicating Insights",
+      "requires": [
+        "reporting_dashboards",
+        "business_metrics"
+      ]
+    }
+  ]
+}

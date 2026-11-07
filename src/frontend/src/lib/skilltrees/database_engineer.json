@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "sql",
+      "title": "SQL",
+      "requires": [],
+      "skillAliases": [
+        "Oracle PL/SQL",
+        "SQL",
+        "Transact-SQL"
+      ]
+    },
+    {
+      "id": "db_platform",
+      "title": "Database Platforms",
+      "requires": [],
+      "skillAliases": [
+        "MariaDB",
+        "Microsoft SQL Server",
+        "MySQL",
+        "Oracle",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "nosql_db",
+      "title": "NoSQL",
+      "requires": [],
+      "skillAliases": [
+        "MongoDB",
+        "NoSQL",
+        "Redis"
+      ]
+    },
+    {
+      "id": "db_automation",
+      "title": "DB Scripting",
+      "requires": [
+        "sql"
+      ],
+      "skillAliases": [
+        "Bash/Shell (all shells)",
+        "PowerShell",
+        "Python"
+      ]
+    },
+    {
+      "id": "database_architecture",
+      "title": "Database Design",
+      "requires": [
+        "sql",
+        "db_platform"
+      ]
+    },
+    {
+      "id": "database_administration",
+      "title": "DB Administration",
+      "requires": [
+        "db_platform"
+      ]
+    },
+    {
+      "id": "query_optimization",
+      "title": "Query Optimization",
+      "requires": [
+        "sql",
+        "database_architecture"
+      ]
+    },
+    {
+      "id": "database_migrations",
+      "title": "DB Migrations",
+      "requires": [
+        "database_architecture",
+        "version_control"
+      ]
+    },
+    {
+      "id": "database_security",
+      "title": "Database Security",
+      "requires": [
+        "database_administration"
+      ]
+    },
+    {
+      "id": "backup_recovery",
+      "title": "Backup and Recovery",
+      "requires": [
+        "database_administration"
+      ]
+    },
+    {
+      "id": "database_monitoring",
+      "title": "DB Monitoring",
+      "requires": [
+        "database_administration",
+        "query_optimization"
+      ]
+    }
+  ]
+}

@@ -10,6 +10,16 @@ from src.backend.app.database.models.skill_gap import SkillGap
 from src.backend.app.database.models.user import User
 from src.backend.app.database.models.user_skill import UserSkill
 from src.backend.app.database.models.competency_evidence import CompetencyEvidence
+from src.backend.app.database.models.email_verification_token import EmailVerificationToken
+from src.backend.app.database.models.admin_mfa import (AdminMfaCredential, AdminMfaRecoveryCode)
+from src.backend.app.database.models.competency_resource_link import (CompetencyResourceLink)
+from src.backend.app.database.models.admin_resource_audit import AdminResourceAudit
+from src.backend.app.database.models.user_competency_assessment import UserCompetencyAssessment
+from src.backend.app.database.models.user_learning_progress import UserLearningProgress
+from src.backend.app.database.models.oauth_identity import OAuthIdentity
+from src.backend.app.database.models.password_reset_token import PasswordResetToken
+from src.backend.app.database.models.account_deletion_token import AccountDeletionToken
+
 
 __all__ = [
     "User",
@@ -24,4 +34,10 @@ __all__ = [
     "LearningResourceSkill",
     "MentorConversation",
     "MentorMessage",
+    "AdminMfaCredential",
+    "AdminMfaRecoveryCode",
+    "CompetencyResourceLink",
+    "AdminResourceAudit",
+    "PasswordResetToken",
+    "AccountDeletionToken"
 ]

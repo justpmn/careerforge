@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "delivery_methodologies",
+      "title": "Delivery Methods",
+      "requires": []
+    },
+    {
+      "id": "project_management_tools",
+      "title": "Project Tools",
+      "requires": [],
+      "skillAliases": [
+        "Atlassian Confluence",
+        "Atlassian JIRA",
+        "Microsoft Project",
+        "Microsoft Visio"
+      ]
+    },
+    {
+      "id": "project_reporting_tools",
+      "title": "Reporting Tools",
+      "requires": [],
+      "skillAliases": [
+        "Google Sheets",
+        "Microsoft Excel",
+        "Microsoft Power BI"
+      ]
+    },
+    {
+      "id": "project_planning",
+      "title": "Project Planning",
+      "requires": [
+        "delivery_methodologies"
+      ]
+    },
+    {
+      "id": "scope_management",
+      "title": "Scope Management",
+      "requires": [
+        "project_planning"
+      ]
+    },
+    {
+      "id": "stakeholder_management",
+      "title": "Stakeholder Management",
+      "requires": [
+        "project_planning"
+      ]
+    },
+    {
+      "id": "project_scheduling",
+      "title": "Scheduling",
+      "requires": [
+        "scope_management",
+        "project_management_tools"
+      ]
+    },
+    {
+      "id": "budget_management",
+      "title": "Project Budgeting",
+      "requires": [
+        "project_scheduling"
+      ]
+    },
+    {
+      "id": "project_risk_management",
+      "title": "Risk Management",
+      "requires": [
+        "project_planning"
+      ]
+    },
+    {
+      "id": "project_communication",
+      "title": "Project Communication",
+      "requires": [
+        "stakeholder_management",
+        "project_reporting_tools"
+      ]
+    },
+    {
+      "id": "project_quality_management",
+      "title": "Quality Management",
+      "requires": [
+        "scope_management"
+      ]
+    },
+    {
+      "id": "project_change_management",
+      "title": "Change Management",
+      "requires": [
+        "scope_management",
+        "project_risk_management"
+      ]
+    },
+    {
+      "id": "project_delivery",
+      "title": "Project Delivery",
+      "requires": [
+        "project_scheduling",
+        "project_risk_management",
+        "project_quality_management"
+      ]
+    }
+  ]
+}

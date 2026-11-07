@@ -1,31 +1,59 @@
+
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
 import { postAuthRoute } from '../lib/auth';
 
+const errorMessages: Record<string, string> = {
+  authorization_failed: 'Authorization was cancelled or could not be completed.',
+  verified_email_required: 'A verified email address is required.',
+  account_exists: 'An account with this email already exists. Sign in using your existing method.',
+  account_unavailable: 'This account is no longer available.',
+  provider_error: 'Could not retrieve your account details. Please try again.',
+};
+
 export default function AuthCallbackPage() {
-  const { refresh } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const { refresh } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('error');
+
+    if (code) {
+      setError(errorMessages[code] ?? 'Authentication failed.');
+      return;
+    }
+
     let active = true;
+
     refresh()
       .then((user) => {
         if (!active) return;
-        if (user) navigate(postAuthRoute(user), { replace: true });
-        else setError('Sign in could not be completed. No active session was found.');
+
+        if (user) {
+          navigate(postAuthRoute(user), { replace: true });
+        } else {
+          setError('No authenticated session was found.');
+        }
       })
-      .catch((err: unknown) => { if (active) setError(err instanceof Error ? err.message : 'OAuth sign in failed.'); });
-    return () => { active = false; };
+      .catch(() => {
+        if (active) setError('Could not verify your session.');
+      });
+
+    return () => {
+      active = false;
+    };
   }, [refresh, navigate]);
 
   return (
-    <section className="auth-card" aria-live="polite">
-      <div className="form-brow">AUTHENTICATION</div>
-      <h2>{error ? 'Unable to sign in' : 'Finishing your sign in…'}</h2>
-      <p className="auth-subtitle">{error || 'Checking your session securely.'}</p>
-      {error && <p className="form-bottom"><Link to="/login">Return to login</Link></p>}
+    <section className="workspace-panel">
+      <h1>{error ? 'Sign-in unsuccessful' : 'Signing you in...'}</h1>
+      <p>{error ?? 'Verifying your CareerForge account.'}</p>
+
+      {error && <Link to="/login">Return to login</Link>}
     </section>
   );
 }

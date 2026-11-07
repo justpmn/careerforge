@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "user_research",
+      "title": "User Research",
+      "requires": []
+    },
+    {
+      "id": "design_tooling",
+      "title": "Design Tools",
+      "requires": [],
+      "skillAliases": [
+        "Adobe XD",
+        "Figma"
+      ]
+    },
+    {
+      "id": "graphics_tooling",
+      "title": "Graphics Tools",
+      "requires": [],
+      "skillAliases": [
+        "Adobe Creative Cloud software",
+        "Adobe Illustrator",
+        "Adobe Photoshop"
+      ]
+    },
+    {
+      "id": "frontend_fundamentals",
+      "title": "Frontend Basics",
+      "requires": [],
+      "skillAliases": [
+        "HTML/CSS"
+      ]
+    },
+    {
+      "id": "information_architecture",
+      "title": "Information Architecture",
+      "requires": [
+        "user_research"
+      ]
+    },
+    {
+      "id": "wireframing",
+      "title": "Wireframing",
+      "requires": [
+        "information_architecture"
+      ]
+    },
+    {
+      "id": "visual_design",
+      "title": "Visual Design",
+      "requires": [
+        "graphics_tooling"
+      ]
+    },
+    {
+      "id": "interaction_design",
+      "title": "Interaction Design",
+      "requires": [
+        "wireframing"
+      ]
+    },
+    {
+      "id": "prototyping",
+      "title": "Prototyping",
+      "requires": [
+        "wireframing",
+        "design_tooling"
+      ]
+    },
+    {
+      "id": "ux_accessibility",
+      "title": "Accessibility",
+      "requires": [
+        "interaction_design"
+      ]
+    },
+    {
+      "id": "usability_testing",
+      "title": "Usability Testing",
+      "requires": [
+        "prototyping",
+        "user_research"
+      ]
+    },
+    {
+      "id": "design_systems",
+      "title": "Design Systems",
+      "requires": [
+        "visual_design",
+        "interaction_design"
+      ]
+    },
+    {
+      "id": "design_handoff",
+      "title": "Developer Handoff",
+      "requires": [
+        "design_systems",
+        "prototyping",
+        "frontend_fundamentals"
+      ]
+    }
+  ]
+}

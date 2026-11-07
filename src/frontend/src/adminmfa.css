@@ -1,0 +1,44 @@
+
+.cf-mfa-methods {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  margin: 20px 0;
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 12px;
+  background: rgba(128, 128, 128, 0.06);
+}
+
+.cf-mfa-method {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.cf-mfa-method:hover:not(:disabled) {
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.cf-mfa-method.is-active {
+  background: rgba(128, 128, 128, 0.2);
+  border-color: rgba(128, 128, 128, 0.22);
+  font-weight: 700;
+}
+
+.cf-mfa-method:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.cf-mfa-method:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

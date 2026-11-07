@@ -1,0 +1,243 @@
+
+.cf-mfa-setup-trigger {
+  padding: 12px 18px;
+  border: 1px solid var(--accent, #df9776);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--accent, #d98562);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cf-mfa-qr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 8, 14, .78);
+  backdrop-filter: blur(5px);
+}
+
+.cf-mfa-qr-dialog {
+  width: min(100%, 480px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid #e6d9ce;
+  border-radius: 16px;
+  background: #fffaf6;
+  color: #292521;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .35);
+}
+
+.cf-mfa-qr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.cf-mfa-qr-header span {
+  color: #c47759;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.cf-mfa-qr-header button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.cf-mfa-qr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cf-mfa-qr-body h2 {
+  margin: 0;
+  font-size: 27px;
+  letter-spacing: -.7px;
+}
+
+.cf-mfa-qr-body p {
+  margin: 0;
+  line-height: 1.65;
+  opacity: .8;
+}
+
+.cf-mfa-qr-image {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.cf-mfa-qr-image img {
+  width: 224px;
+  height: 224px;
+  max-width: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.cf-mfa-manual {
+  padding: 14px;
+  border: 1px solid rgba(128, 128, 128, .28);
+  border-radius: 10px;
+}
+
+.cf-mfa-manual summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cf-mfa-manual-value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.cf-mfa-manual-value code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+
+.cf-mfa-manual-value button,
+.cf-mfa-recovery button {
+  padding: 9px 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cf-mfa-confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cf-mfa-confirm-form label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cf-mfa-confirm-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid #b8a9a0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 19px;
+  letter-spacing: 5px;
+  text-align: center;
+}
+
+.cf-mfa-qr-primary {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #df9776;
+  color: #231b16;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cf-mfa-qr-primary:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.cf-mfa-qr-cancel {
+  display: block;
+  margin: 18px auto 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cf-mfa-recovery {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cf-mfa-recovery h3 {
+  margin: 0;
+}
+
+.cf-mfa-recovery-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cf-mfa-recovery-list code {
+  padding: 10px;
+  border: 1px solid rgba(128, 128, 128, .25);
+  border-radius: 7px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.cf-mfa-qr-body [role="alert"],
+.cf-mfa-qr-error {
+  color: #dc695e;
+}
+
+/* Cozy Dark */
+
+html[data-appearance="cozy"][data-theme="dark"]
+.cf-mfa-qr-dialog {
+  background: #292725;
+  color: #f0e9e2;
+  border-color: #50433c;
+}
+
+/* Neon */
+
+html[data-appearance="neon"] .cf-mfa-qr-dialog {
+  background: #141c2a;
+  color: #f1f5fb;
+  border-color: #34485b;
+}
+
+html[data-appearance="neon"] .cf-mfa-qr-header span {
+  color: #00ddeb;
+}
+
+html[data-appearance="neon"] .cf-mfa-qr-primary {
+  background: #00ddeb;
+  color: #08131c;
+}
+
+@media (max-width: 600px) {
+  .cf-mfa-qr-dialog {
+    padding: 20px;
+  }
+
+  .cf-mfa-recovery-list {
+    grid-template-columns: 1fr;
+  }
+}

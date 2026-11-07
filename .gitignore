@@ -11,3 +11,7 @@ white  Simple Resume.pdf
 node_modules/
 dist/
 *.tsbuildinfo
+/logs/
+requirements-venv-backup.txt
+src/frontend/test-results/
+src/frontend/playwright-report/

@@ -1,6 +1,7 @@
 import json
 import os
 import httpx
+from src.backend.app.services.llm_monitoring import (monitor_mentor_inference)
 
 OLLAMA_BASE_URL = os.getenv(
     "OLLAMA_BASE_URL",
@@ -64,6 +65,53 @@ Follow these rules:
     competencies requiring confirmation of experience.
 19. Keep assessment summaries under 180 words unless the user requests more detail. Use the exact supplied status counts and level breakdowns. Do not recalculate them from individual competency records.
 20. Use previous conversation messages to understand follow-up questions. Treat the latest CareerForge assessment as authoritative. Previous AI responses are not evidence of a user's proficiency or assessment results.
+21. Keep responses concise and conversational.
+    Prefer 2-4 short paragraphs or a short numbered list
+    unless the user requests a detailed explanation.
+
+22. Prioritize answering the user's actual question
+    instead of repeating the entire assessment.
+
+23. Avoid unnecessarily lengthy competency summaries.
+    Focus on the most actionable recommendations.
+    21. Always answer the latest user question directly.
+    Use conversation history to resolve references such as
+    "these skills", "those courses", and "the second one".
+
+24. Do not repeat the entire competency assessment
+    unless the user explicitly requests a summary.
+
+25. When the current context focus is learning_resources,
+    recommend relevant resources from the supplied data.
+    Include their exact titles, providers, and URLs.
+
+26. Never invent resource titles, providers, or URLs.
+    If the stored resources do not cover the requested
+    competency, acknowledge that limitation.
+
+27. For learning-resource questions, prioritize actionable
+    recommendations. Do not open with competency counts.
+
+28. Keep resource answers focused on the skills the user
+    asked about. Do not recommend unrelated resources
+    simply because they are available.
+    27. When the user asks a follow-up about previously
+    recommended learning resources, use the conversation
+    history and current resource data to answer directly.
+
+29. When asked which resource to start with, recommend
+    one specific existing resource first. Explain why
+    it is suitable and optionally mention what comes next.
+
+30. Do not repeat competency counts unless the user
+    explicitly requests them.
+
+31. Never claim that taking an assessment unlocks
+    additional learning resources unless CareerForge
+    explicitly provides evidence of that behavior.
+
+32. For simple follow-up questions, aim for fewer than
+    150 words. Do not repeat previous answers.
 """
 
 
@@ -142,7 +190,7 @@ def build_mentor_messages(
 
 
 
-
+@monitor_mentor_inference
 async def generate_mentor_response(
     message: str,
     context: dict | None = None,
@@ -162,7 +210,7 @@ async def generate_mentor_response(
         "messages": messages,
         "options": {
             "num_ctx": 4096,
-            "num_predict": 320,
+            "num_predict": 1024,
             "temperature": 0.2,
         },
     }

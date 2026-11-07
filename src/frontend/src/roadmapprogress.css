@@ -1,0 +1,55 @@
+/* User-reported learning progress: separate from CV evidence. */
+.cf-orb-node.is-learned:not(.cf-orb-node--evidenced) .cf-orb-circle {
+  border-color: #d5a454;
+  background: radial-gradient(circle at 38% 27%, rgba(232, 170, 78, .22), transparent 78%), var(--orb-face);
+  box-shadow: 0 0 0 4px rgba(213, 164, 84, .10), 0 0 18px rgba(213, 164, 84, .16);
+}
+.cf-orb-learned-mark {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--paper);
+  background: #b47d2a;
+  color: white;
+}
+.cf-orb-circle .cf-orb-learned-mark svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 3;
+}
+.cf-learning-helper {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+.cf-learning-toggle {
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cf-learning-toggle.is-learned {
+  border-color: #b47d2a;
+  background: transparent;
+  color: var(--text);
+}
+.cf-learning-toggle:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+.cf-learning-error {
+  margin: 10px 0 0;
+  color: #c55d52;
+  font-size: 12px;
+}

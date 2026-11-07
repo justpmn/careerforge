@@ -44,16 +44,33 @@ def analyze_competency_gaps(
     )
 
     # Skills recorded for the user.
-    user_skills = set(
-        db.scalars(
-            select(Skill.name)
-            .join(
-                UserSkill,
-                UserSkill.skill_id == Skill.id,
-            )
-            .where(UserSkill.user_id == user_id)
-        ).all()
-    )
+
+    # Separate manually declared skills from other recorded
+    # sources. A manual skill must not automatically count
+    # as CV evidence or independently verified proficiency.
+    user_skill_records = db.execute(
+        select(
+            Skill.name,
+            UserSkill.source,
+        )
+        .join(
+            UserSkill,
+            UserSkill.skill_id == Skill.id,
+        )
+        .where(UserSkill.user_id == user_id)
+    ).all()
+
+    user_skills = {
+        name
+        for name, source in user_skill_records
+        if source != "manual"
+    }
+
+    manual_skills = {
+        name
+        for name, source in user_skill_records
+        if source == "manual"
+    }
 
     # Skills connected to the career in our KG.
     graph_skills = set(
@@ -116,8 +133,8 @@ def analyze_competency_gaps(
 
     results = []
 
+
     for group in profile:
-        # Only use skills that exist in our vocabulary.
         if group.get("assessment") == "manual_review":
 
             evidence = resume_evidence.get(
@@ -131,13 +148,13 @@ def analyze_competency_gaps(
                 else "not_assessed"
             )
 
-            
             results.append({
                 "competency_key": group["key"],
                 "competency": group["name"],
                 "level": group["level"],
                 "status": status,
                 "matched_skills": [],
+                "manual_skills": [],
                 "possible_skills": [],
                 "graph_supported_skills": [],
                 "evidence": evidence,
@@ -146,7 +163,6 @@ def analyze_competency_gaps(
                     [],
                 ),
             })
-
 
             continue
         alternatives = [
@@ -159,20 +175,23 @@ def analyze_competency_gaps(
             raise ValueError(
                 f"No catalog skills for group '{group['key']}'."
             )
-
+        # Skills recorded from non-manual sources.
         matched = [
             skill
             for skill in alternatives
             if skill in user_skills
         ]
-
+        # Skills explicitly declared by the user.
+        manual_matched = [
+            skill
+            for skill in alternatives
+            if skill in manual_skills
+        ]
         supported_by_graph = [
             skill
             for skill in alternatives
             if skill in graph_skills
         ]
-
-
         results.append({
             "competency_key": group["key"],
             "competency": group["name"],
@@ -180,9 +199,12 @@ def analyze_competency_gaps(
             "status": (
                 "evidenced"
                 if matched
+                else "self_reported"
+                if manual_matched
                 else "not_evidenced"
             ),
             "matched_skills": matched,
+            "manual_skills": manual_matched,
             "possible_skills": alternatives,
             "graph_supported_skills": supported_by_graph,
             "submitted_evidence": submitted_evidence.get(
@@ -190,7 +212,6 @@ def analyze_competency_gaps(
                 [],
             ),
         })
-    
     for item in results:
 
         if item["status"] == "evidenced":
@@ -198,7 +219,8 @@ def analyze_competency_gaps(
 
         elif item["submitted_evidence"]:
             next_action = "review_submitted_evidence"
-
+        elif item["status"] == "self_reported":
+            next_action = "confirm_self_reported_skill"
         elif item["status"] == "evidence_found":
             next_action = "review_resume_evidence"
 
@@ -209,24 +231,19 @@ def analyze_competency_gaps(
             next_action = "confirm_skill_experience"
 
         item["next_action"] = next_action
-
-
     # Collect skills for competencies that may benefit
     # from optional learning resources.
     resource_skill_names = set()
-
     for item in results:
         if item["next_action"] == "confirm_skill_experience":
             resource_skill_names.update(
                 item["possible_skills"]
             )
-
     # Retrieve matching resources in one database query.
     available_resources = get_resources_for_skills(
         db,
         list(resource_skill_names),
     )
-
     # Associate resources with relevant competencies.
     for item in results:
         item["learning_resources"] = []
@@ -235,7 +252,6 @@ def analyze_competency_gaps(
             continue
 
         possible_skills = set(item["possible_skills"])
-
         item["learning_resources"] = [
             resource
             for resource in available_resources
@@ -243,7 +259,6 @@ def analyze_competency_gaps(
                 resource["matched_skills"]
             )
         ]
-    
     # Find competency-level resources for items that
     # may require further assessment or development.
     competency_keys = [
@@ -251,7 +266,6 @@ def analyze_competency_gaps(
         for item in results
         if item["next_action"] != "no_immediate_action"
     ]
-
     competency_resources = get_resources_for_competencies(
         db,
         competency_keys,
