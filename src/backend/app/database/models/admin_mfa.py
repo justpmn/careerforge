@@ -49,6 +49,12 @@ class AdminMfaCredential(Base):
         server_default=func.now(),
         nullable=False,
     )
+    recovery_grant_hash: Mapped[str | None] = mapped_column(
+    String(64), nullable=True
+)
+    recovery_grant_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
 
 class AdminMfaRecoveryCode(Base):

@@ -77,3 +77,18 @@ export function getExpiredAdminMfaChallenge(email: string): string {
     }
   ).trim();
 }
+export function expireAdminRecoveryGrant(email: string): void {
+  const python = fileURLToPath(
+    new URL('../../../.venv-new/Scripts/python.exe', import.meta.url)
+  );
+
+  execFileSync(
+    python,
+    [HELPER, 'expire-recovery-grant', email],
+    {
+      cwd: ROOT,
+      env: process.env,
+      encoding: 'utf8',
+    }
+  );
+}

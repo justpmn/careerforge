@@ -35,6 +35,9 @@ router = APIRouter(
 ENROLLMENT_LIFETIME = timedelta(minutes=10)
 LOCKOUT_DURATION = timedelta(minutes=15)
 MAX_ATTEMPTS = 5
+RECOVERY_GRANT_LIFETIME = timedelta(minutes=5)
+RECOVERY_GRANT_COOKIE = "careerforge_admin_recovery_grant"
+RECOVERY_GRANT_PATH = "/api/auth/admin-mfa/replace/recovery/start"
 
 
 class StartEnrollmentRequest(BaseModel):
@@ -63,6 +66,10 @@ class VerifyAdminChallengeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     code: str = Field(pattern=r"^[0-9]{6}$")
 
+class VerifyAdminRecoveryRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    recovery_code: str = Field(pattern=r"^[0-9a-fA-F]{32}$")
+
 def matching_totp_step(
     secret: str,
     code: str,
@@ -82,7 +89,6 @@ def matching_totp_step(
     ]
 
     return max(matches) if matches else None
-
 
 @router.get("/enroll/google/start")
 async def start_google_enrollment(
@@ -296,6 +302,8 @@ def start_enrollment(
     record.pending_expires_at = expires_at
     record.failed_attempts = 0
     record.locked_until = None
+    record.recovery_grant_hash = None
+    record.recovery_grant_expires_at = None
 
     provisioning_uri = get_totp_provisioning_uri(
         secret,
@@ -509,6 +517,274 @@ def verify_admin_challenge(
     }
 
 
+@router.post("/challenge/recovery")
+def verify_admin_recovery(
+    payload: VerifyAdminRecoveryRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = "no-store"
+
+    challenge_token = request.cookies.get(
+        "careerforge_admin_mfa_challenge"
+    )
+
+    if not challenge_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Administrator MFA challenge required.",
+        )
+
+    try:
+        user_id = decode_admin_mfa_challenge_token(challenge_token)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired MFA challenge.",
+        ) from exc
+
+    validate_csrf_token(request, challenge_token)
+
+    user = db.get(User, user_id)
+
+    if user is None or user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Administrator access required.",
+        )
+
+    if user.email_verified_at is None:
+        raise HTTPException(
+            status_code=403,
+            detail="Email verification required.",
+        )
+
+    now = datetime.now(timezone.utc)
+
+    record = db.scalar(
+        select(AdminMfaCredential)
+        .where(AdminMfaCredential.user_id == user.id)
+        .with_for_update()
+    )
+
+    if (
+        record is None
+        or record.enabled_at is None
+        or record.totp_secret_encrypted is None
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="Administrator MFA is not enrolled.",
+        )
+
+    if record.locked_until and record.locked_until > now:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many attempts. Try again later.",
+        )
+
+    if record.locked_until and record.locked_until <= now:
+        record.failed_attempts = 0
+        record.locked_until = None
+
+    submitted_hash = hashlib.sha256(
+        payload.recovery_code.lower().encode("ascii")
+    ).hexdigest()
+
+    codes = db.scalars(
+        select(AdminMfaRecoveryCode)
+        .where(AdminMfaRecoveryCode.user_id == user.id)
+    ).all()
+
+    matched = None
+
+    for code in codes:
+        if hmac.compare_digest(code.code_hash, submitted_hash):
+            matched = code
+
+    if matched is None:
+        record.failed_attempts += 1
+
+        if record.failed_attempts >= MAX_ATTEMPTS:
+            record.locked_until = now + LOCKOUT_DURATION
+
+        db.commit()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or previously used recovery code.",
+        )
+
+    # Consume the code while holding the MFA credential row lock.
+    db.delete(matched)
+
+    grant = secrets.token_urlsafe(32)
+
+    record.recovery_grant_hash = hashlib.sha256(
+        grant.encode("ascii")
+    ).hexdigest()
+    record.recovery_grant_expires_at = now + RECOVERY_GRANT_LIFETIME
+    record.failed_attempts = 0
+    record.locked_until = None
+
+    mfa_version = record.mfa_version
+    db.commit()
+
+    response.set_cookie(
+        key=RECOVERY_GRANT_COOKIE,
+        value=grant,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path=RECOVERY_GRANT_PATH,
+        max_age=300,
+    )
+
+    access_token = create_access_token(
+        user_id=user.id,
+        admin_mfa_version=mfa_version,
+        session_version=user.session_version,
+    )
+
+    max_age = settings.jwt_access_token_expire_minutes * 60
+
+    response.set_cookie(
+        key="careerforge_session",
+        value=access_token,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/api",
+        max_age=max_age,
+    )
+
+    response.set_cookie(
+        key="csrf_token",
+        value=create_csrf_token(access_token),
+        httponly=False,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/",
+        max_age=max_age,
+    )
+
+    response.delete_cookie(
+        key="careerforge_admin_mfa_challenge",
+        path="/api/auth/admin-mfa/challenge",
+    )
+
+    return {
+        "message": "Administrator recovery verified.",
+    }
+
+
+@router.post(
+    "/replace/recovery/start",
+    response_model=EnrollmentStartResponse,
+)
+def start_recovery_replacement(
+    request: Request,
+    response: Response,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    response.headers["Cache-Control"] = "no-store"
+
+    session_token = request.cookies.get("careerforge_session")
+    grant = request.cookies.get(RECOVERY_GRANT_COOKIE)
+
+    if not session_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Administrator session required.",
+        )
+
+    validate_csrf_token(request, session_token)
+
+    if not grant:
+        raise HTTPException(
+            status_code=403,
+            detail="Sign in with a recovery code first.",
+        )
+
+    now = datetime.now(timezone.utc)
+
+    record = db.scalar(
+        select(AdminMfaCredential)
+        .where(AdminMfaCredential.user_id == admin.id)
+        .with_for_update()
+    )
+
+    if (
+        record is None
+        or record.enabled_at is None
+        or record.totp_secret_encrypted is None
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail="No active authenticator is enrolled.",
+        )
+
+    if record.locked_until and record.locked_until > now:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many attempts. Try again later.",
+        )
+
+    submitted_hash = hashlib.sha256(
+        grant.encode("ascii")
+    ).hexdigest()
+
+    valid_grant = (
+        record.recovery_grant_hash is not None
+        and record.recovery_grant_expires_at is not None
+        and record.recovery_grant_expires_at > now
+        and hmac.compare_digest(
+            record.recovery_grant_hash,
+            submitted_hash,
+        )
+    )
+
+    if not valid_grant:
+        raise HTTPException(
+            status_code=403,
+            detail="Recovery authorization expired or was already used.",
+        )
+
+    secret = generate_totp_secret()
+    expires_at = now + ENROLLMENT_LIFETIME
+
+    # Consume the grant before issuing replacement setup details.
+    record.recovery_grant_hash = None
+    record.recovery_grant_expires_at = None
+    record.pending_secret_encrypted = encrypt_totp_secret(secret)
+    record.pending_expires_at = expires_at
+    record.failed_attempts = 0
+    record.locked_until = None
+
+    provisioning_uri = get_totp_provisioning_uri(
+        secret,
+        admin.email,
+    )
+
+    qr_code_data_url = build_totp_qr_data_url(
+        provisioning_uri
+    )
+
+    db.commit()
+
+    response.delete_cookie(
+        key=RECOVERY_GRANT_COOKIE,
+        path=RECOVERY_GRANT_PATH,
+    )
+
+    return EnrollmentStartResponse(
+        provisioning_uri=provisioning_uri,
+        qr_code_data_url=qr_code_data_url,
+        expires_at=expires_at,
+    )
+
 @router.post(
     "/replace/start",
     response_model=EnrollmentStartResponse,
@@ -698,7 +974,17 @@ def confirm_authenticator_replacement(
     record.locked_until = None
     record.mfa_version += 1
 
+    admin.session_version += 1
     db.commit()
+    response.delete_cookie(
+        key="careerforge_session",
+        path="/api",
+    )
+
+    response.delete_cookie(
+        key="csrf_token",
+        path="/",
+    )
 
     return EnrollmentConfirmResponse(
         message="Authenticator replaced successfully.",

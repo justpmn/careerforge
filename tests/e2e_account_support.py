@@ -224,6 +224,46 @@ def expired_admin_mfa_challenge(email):
             algorithm=tokens.JWT_ALGORITHM,
         )
     )
+
+
+def expire_admin_recovery_grant(email: str) -> None:
+    import re
+    from datetime import datetime, timedelta, timezone
+    from sqlalchemy import create_engine, text
+
+    if not re.fullmatch(
+        r"cf-admin-mfa-e2e-[0-9a-f-]{36}@example\.com",
+        email,
+    ):
+        raise ValueError("Only disposable MFA test accounts are allowed.")
+
+    engine = create_engine(test_database_url())
+
+    try:
+        with engine.begin() as db:
+            result = db.execute(
+                text("""
+                    UPDATE admin_mfa_credentials AS mfa
+                    SET recovery_grant_expires_at = :expired_at
+                    FROM users AS u
+                    WHERE mfa.user_id = u.id
+                      AND lower(u.email) = :email
+                      AND u.role = 'admin'
+                      AND u.email_verified_at IS NOT NULL
+                      AND mfa.recovery_grant_hash IS NOT NULL
+                """),
+                {
+                    "email": email.lower(),
+                    "expired_at": datetime.now(timezone.utc)
+                        - timedelta(seconds=10),
+                },
+            )
+
+            if result.rowcount != 1:
+                raise RuntimeError("Active test recovery grant not found.")
+    finally:
+        engine.dispose()
+
 def serve():
     expected = make_url(test_database_url())
 
@@ -255,5 +295,7 @@ if __name__ == "__main__":
         promote_test_admin(sys.argv[2])
     elif command == "expired-mfa-challenge":
         expired_admin_mfa_challenge(sys.argv[2])
+    elif command == "expire-recovery-grant":
+        expire_admin_recovery_grant(sys.argv[2])
     else:
         raise SystemExit("Unknown command.")

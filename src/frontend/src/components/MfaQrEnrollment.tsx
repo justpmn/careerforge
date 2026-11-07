@@ -16,11 +16,10 @@ type EnrollmentResult = {
 };
 
 type Props = {
-  mode?: 'enroll' | 'replace';
+  mode?: 'enroll' | 'replace' | 'recover';
   onComplete?: () => void;
   oauthOnly?: boolean;
   oauthProvider?: 'google' | 'github' | 'both';
-
 };
 
 async function postMfa<T>(path: string, body?: object): Promise<T> {
@@ -71,6 +70,7 @@ export default function MfaQrEnrollment({
   const [completed, setCompleted] = useState(false);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const isReplacement = mode !== 'enroll';
 
   useEffect(() => {
     if (!open) return;
@@ -101,7 +101,6 @@ function beginEnrollment() {
   setRecoveryCodes([]);
 }
 
-
 async function prepareEnrollment() {
   if (busy) return;
 
@@ -114,14 +113,21 @@ async function prepareEnrollment() {
   setError('');
 
   try {
-    const result = await postMfa<EnrollmentStart>(
-    mode === 'replace' ? 'replace/start' : 'enroll/start',
-    mode === 'replace'
+    const path =
+      mode === 'recover'
+        ? 'replace/recovery/start'
+        : mode === 'replace'
+          ? 'replace/start'
+          : 'enroll/start';
+
+    const body =
+      mode === 'replace'
         ? { current_code: currentCode }
-        : oauthOnly
-        ? {}
-        : { password: password || null },
-    );
+        : mode === 'recover' || oauthOnly
+          ? {}
+          : { password: password || null };
+
+    const result = await postMfa<EnrollmentStart>(path, body);
 
     if (!result.provisioning_uri || !result.qr_code_data_url) {
       throw new Error('Authenticator setup information is unavailable.');
@@ -142,7 +148,6 @@ async function prepareEnrollment() {
 }
 
 
-
   async function confirmEnrollment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -153,7 +158,7 @@ async function prepareEnrollment() {
 
     try {
       const result = await postMfa<EnrollmentResult>(
-        mode === 'replace' ? 'replace/confirm' : 'enroll/confirm',
+        isReplacement ? 'replace/confirm' : 'enroll/confirm',
         { code },
         );
 
@@ -215,9 +220,11 @@ return (
       onClick={() => void beginEnrollment()}
       disabled={busy}
     >
-      {mode === 'replace'
-        ? 'Replace authenticator'
-        : 'Set up authenticator app'}
+      {mode === 'recover'
+        ? 'Replace lost authenticator'
+        : mode === 'replace'
+            ? 'Replace authenticator'
+            : 'Set up authenticator app'}
     </button>
 
     {open && (
@@ -238,23 +245,22 @@ return (
               disabled={busy}
               onClick={closeModal}
             >
-              ×
             </button>
           </div>
 
           {completed ? (
             <div className="cf-mfa-qr-body">
               <h2 id="cf-mfa-qr-title">
-                {mode === 'replace'
-                  ? 'Authenticator replaced.'
-                  : 'Authenticator connected.'}
-              </h2>
+                {isReplacement
+                    ? 'Authenticator replaced.'
+                    : 'Authenticator connected.'}
+                </h2>
 
-              <p>
-                {mode === 'replace'
-                  ? 'Your new authenticator is now registered with CareerForge. Your previous authenticator can no longer be used.'
-                  : 'Your authenticator app is now registered with CareerForge.'}
-              </p>
+                <p>
+                {isReplacement
+                    ? 'Your new authenticator is now registered with CareerForge. Your previous authenticator can no longer be used.'
+                    : 'Your authenticator app is now registered with CareerForge.'}
+                </p>
 
               {recoveryCodes.length > 0 && (
                 <section className="cf-mfa-recovery">
@@ -290,7 +296,7 @@ return (
               >
                 {recoveryCodes.length > 0
                   ? "I've saved my recovery codes"
-                  : mode === 'replace'
+                  : isReplacement
                     ? 'Finish replacement'
                     : 'Finish setup'}
               </button>
@@ -298,13 +304,13 @@ return (
           ) : (
             <div className="cf-mfa-qr-body">
               <h2 id="cf-mfa-qr-title">
-                {mode === 'replace'
+                {isReplacement
                   ? 'Replace your authenticator.'
                   : 'Connect your authenticator.'}
               </h2>
 
               <p>
-                {mode === 'replace'
+                {isReplacement
                   ? 'Connect a new authenticator app to replace your current one.'
                   : 'Connect an authenticator app to secure your CareerForge account.'}
               </p>
@@ -341,7 +347,16 @@ return (
                         authenticator. Your existing authenticator will
                         remain active until replacement is completed.
                       </p>
-                    </>
+                                        </>
+                  ) : mode === 'recover' ? (
+                    <p>
+                      Your recovery code has authorized a one-time
+                      authenticator replacement. Generate the QR code
+                      and connect your new authenticator to continue.
+
+                      Your recovery authorization expires after
+                      five minutes.
+                    </p>
                   ) : oauthOnly ? (
                     <p>
                         {oauthProvider === 'google'
@@ -384,7 +399,7 @@ return (
                   >
                     {busy
                       ? 'Preparing...'
-                      : mode === 'replace'
+                      : isReplacement
                         ? 'Generate replacement QR code'
                         : 'Generate setup QR code'}
                   </button>
@@ -435,7 +450,7 @@ return (
                     onSubmit={confirmEnrollment}
                   >
                     <label htmlFor="cf-enrollment-code">
-                      {mode === 'replace'
+                      {isReplacement
                         ? 'Enter the code from your new authenticator'
                         : 'Enter the six-digit code to finish setup'}
                     </label>
@@ -468,7 +483,7 @@ return (
                     >
                       {busy
                         ? 'Verifying...'
-                        : mode === 'replace'
+                        : isReplacement
                           ? 'Verify and replace'
                           : 'Verify and enable'}
                     </button>
@@ -490,7 +505,7 @@ return (
               className="cf-mfa-qr-cancel"
               onClick={closeModal}
             >
-              {mode === 'replace'
+              {isReplacement
                 ? 'Cancel replacement'
                 : 'Cancel setup'}
             </button>
