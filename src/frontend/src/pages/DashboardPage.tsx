@@ -40,6 +40,8 @@ const tourSteps = [
       'Start conversations to get career guidance and discuss your progress.',
   },
 ] as const;
+const tourDismissalKey = (userId: number | string) =>
+  `careerforge:tour-dismissed:${userId}`;
 
 export default function DashboardPage() {
   const { user, refresh } = useAuth();
@@ -86,8 +88,14 @@ export default function DashboardPage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (user && !user.onboarding_completed) {
+    useEffect(() => {
+    if (!user || user.onboarding_completed) return;
+
+    const dismissed = localStorage.getItem(
+      tourDismissalKey(user.id)
+    );
+
+    if (dismissed !== '1') {
       setTourStep(0);
     }
   }, [user?.id, user?.onboarding_completed]);
@@ -104,6 +112,18 @@ export default function DashboardPage() {
         block: 'center',
       });
   }, [tourStep]);
+
+  function skipTour() {
+  if (user) {
+    localStorage.setItem(
+      tourDismissalKey(user.id),
+      '1'
+    );
+  }
+
+  setTourError('');
+  setTourStep(null);
+}
 
   async function finishTour() {
     if (tourSaving) return;
@@ -289,7 +309,7 @@ export default function DashboardPage() {
             <div className="cf-home-tour-actions">
               <button
                 type="button"
-                onClick={finishTour}
+                onClick={skipTour}
                 disabled={tourSaving}
               >
                 Skip

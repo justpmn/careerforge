@@ -6,9 +6,10 @@ import { authApi } from '../lib/auth';
 import { onboardingApi } from '../lib/onboarding';
 import type { Career } from '../lib/onboarding';
 
+
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { refresh } = useAuth();
+  const {user, refresh } = useAuth();
 
   const [careers, setCareers] = useState<Career[]>([]);
   const [search, setSearch] = useState('');
@@ -19,6 +20,9 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const tourDismissalKey = (userId: number | string) =>
+  `careerforge:tour-dismissed:${userId}`;
+  
 
   useEffect(() => {
     let active = true;
@@ -86,6 +90,16 @@ export default function OnboardingPage() {
     }
   }
 
+  function skipSetup() {
+  if (user) {
+    localStorage.setItem(
+      tourDismissalKey(user.id),
+      '1'
+    );
+  }
+
+  navigate('/dashboard', { replace: true });
+}
   async function finishSetup() {
     if (!careerSaved || finishing) return;
 
@@ -224,6 +238,16 @@ export default function OnboardingPage() {
         >
           {saving ? 'Saving...' : 'Save career'}
         </button>
+        <button
+        type="button"
+        onClick={skipSetup}
+        disabled={finishing}
+        className="rounded-lg border border-current/20
+          px-5 py-3 text-sm font-medium
+          hover:border-amber-600/60"
+      >
+        Skip for now
+      </button>
 
         <button
           type="button"
