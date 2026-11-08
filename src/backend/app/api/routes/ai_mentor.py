@@ -326,3 +326,286 @@ def get_mentor_conversation_messages(
             status_code=404,
             detail="Conversation not found.",
         ) from exc
+
+
+@router.post(
+    "/jobs",
+    response_model=MentorJobAccepted,
+    status_code=202,
+)
+def queue_mentor_message(
+    request: PersistentAssessmentMentorRequest,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    message = request.message.strip()
+
+    if not message:
+        raise HTTPException(422, "Message cannot be empty.")
+
+    try:
+        user = db.scalar(
+            select(User)
+            .where(User.id == user_id)
+            .with_for_update()
+        )
+
+        if user is None:
+            raise HTTPException(404, "User not found.")
+
+        active_job = db.scalar(
+            select(MentorGenerationJob.id)
+            .where(
+                MentorGenerationJob.user_id == user_id,
+                MentorGenerationJob.status.in_(
+                    ["queued", "running"]
+                ),
+            )
+            .limit(1)
+        )
+
+        if active_job is not None:
+            raise HTTPException(
+                409,
+                "The AI Mentor is still generating a response.",
+            )
+
+        requested_career = resolve_explicit_career_change(
+            db=db,
+            message=message,
+        )
+
+        career_key = request.career_key
+        conversation_id = request.conversation_id
+        target_updated = False
+
+        if requested_career is not None:
+            target_updated = (
+                user.target_career_id != requested_career.id
+            )
+
+            user.target_career_id = requested_career.id
+            career_key = requested_career.career_key
+            conversation_id = None
+
+        elif not career_key:
+            if conversation_id is not None:
+                existing = get_owned_conversation(
+                    db=db,
+                    user_id=user_id,
+                    conversation_id=conversation_id,
+                )
+
+                selected = (
+                    db.get(Career, existing.career_id)
+                    if existing.career_id is not None
+                    else None
+                )
+            else:
+                selected = (
+                    db.get(Career, user.target_career_id)
+                    if user.target_career_id is not None
+                    else None
+                )
+
+            if selected is None:
+                raise HTTPException(
+                    422,
+                    "Choose a career before sending a message.",
+                )
+
+            career_key = selected.career_key
+
+        career = db.scalar(
+            select(Career).where(
+                Career.career_key == career_key
+            )
+        )
+
+        if career is None:
+            raise HTTPException(404, "Career not found.")
+
+        if conversation_id is not None:
+            conversation = get_owned_conversation(
+                db=db,
+                user_id=user_id,
+                conversation_id=conversation_id,
+            )
+
+            if conversation.career_id != career.id:
+                raise HTTPException(
+                    422,
+                    "Conversation does not match the selected career.",
+                )
+
+        else:
+            conversation = create_mentor_conversation(
+                db=db,
+                user_id=user_id,
+                career_id=career.id,
+                title=make_mentor_title(message),
+            )
+
+        user_message = save_mentor_message(
+            db=db,
+            user_id=user_id,
+            conversation_id=conversation.id,
+            role="user",
+            content=message,
+        )
+
+        job = MentorGenerationJob(
+            user_id=user_id,
+            conversation_id=conversation.id,
+            user_message_id=user_message.id,
+            career_key=career_key,
+            status="queued",
+        )
+
+        db.add(job)
+        db.flush()
+
+        response = MentorJobAccepted(
+            job_id=job.id,
+            conversation_id=conversation.id,
+            career_key=career_key,
+            target_updated=target_updated,
+        )
+
+        db.commit()
+        return response
+
+    except (ValueError, UnrecognizedCareerChange) as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+    except Exception:
+        db.rollback()
+        raise
+
+@router.get(
+    "/jobs",
+    response_model=list[MentorJobSummary],
+)
+def list_mentor_jobs(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    return db.scalars(
+        select(MentorGenerationJob)
+        .where(MentorGenerationJob.user_id == user_id)
+        .order_by(MentorGenerationJob.id.desc())
+        .limit(30)
+    ).all()
+
+
+@router.get(
+    "/jobs/{job_id}",
+    response_model=MentorJobSummary,
+)
+def get_mentor_job(
+    job_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    job = db.scalar(
+        select(MentorGenerationJob).where(
+            MentorGenerationJob.id == job_id,
+            MentorGenerationJob.user_id == user_id,
+        )
+    )
+
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Mentor job not found.",
+        )
+
+    return job
+
+
+@router.patch(
+    "/conversations/{conversation_id}",
+    response_model=MentorConversationSummary,
+)
+def rename_mentor_conversation(
+    conversation_id: int,
+    request: MentorConversationRenameRequest,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        conversation = get_owned_conversation(
+            db=db,
+            user_id=user_id,
+            conversation_id=conversation_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        ) from exc
+
+    title = " ".join(request.title.split())
+
+    if not title:
+        raise HTTPException(
+            status_code=422,
+            detail="Conversation title cannot be empty.",
+        )
+
+    conversation.title = title
+
+    db.commit()
+    db.refresh(conversation)
+
+    return conversation
+
+
+@router.delete(
+    "/conversations/{conversation_id}",
+    status_code=204,
+)
+def delete_mentor_conversation(
+    conversation_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    try:
+        conversation = get_owned_conversation(
+            db=db,
+            user_id=user_id,
+            conversation_id=conversation_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail="Conversation not found.",
+        ) from exc
+
+    active_job = db.scalar(
+        select(MentorGenerationJob.id)
+        .where(
+            MentorGenerationJob.conversation_id == conversation_id,
+            MentorGenerationJob.status.in_(
+                ["queued", "running"]
+            ),
+        )
+        .limit(1)
+        .with_for_update()
+    )
+
+    if active_job is not None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "Wait for the mentor to finish before "
+                "deleting this conversation."
+            ),
+        )
+
+    db.delete(conversation)
+    db.commit()

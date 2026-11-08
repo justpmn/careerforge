@@ -188,3 +188,15 @@ def list_owned_mentor_messages(
         for item in reversed(messages)
     ]
 
+
+def make_mentor_title(message: str, max_length: int = 60) -> str:
+    title = " ".join(message.split())
+
+    if not title:
+        return "New conversation"
+
+    if len(title) <= max_length:
+        return title
+
+    shortened = title[:max_length - 1].rsplit(" ", 1)[0]
+    return (shortened or title[:max_length - 1]).rstrip(".,:;!? ") + "…"

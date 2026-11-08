@@ -997,3 +997,60 @@ html[data-appearance="neon"]
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Neon — Mentor conversation actions */
+
+html[data-appearance="neon"] .cf-mentor-thread-more:hover,
+html[data-appearance="neon"] .cf-mentor-thread-more[aria-expanded="true"] {
+  background: rgba(0, 221, 235, .09);
+  color: var(--neon-cyan);
+}
+
+html[data-appearance="neon"] .cf-mentor-thread-menu,
+html[data-appearance="neon"] .cf-mentor-thread-edit,
+html[data-appearance="neon"] .cf-mentor-thread-confirm {
+  background: #101827;
+  border-color: #304054;
+}
+
+html[data-appearance="neon"] .cf-mentor-thread-menu button:hover {
+  background: rgba(0, 221, 235, .08);
+}
+
+html[data-appearance="neon"] .cf-mentor-thread-edit input {
+  background: #0c1320;
+  border-color: #304054;
+  color: #f1f5fb;
+}
+
+html[data-appearance="neon"] .cf-mentor-thread-actions button:first-child:not(.cf-mentor-danger) {
+  background: #087b88;
+  border-color: #087b88;
+  color: #fff;
+}
+
+html[data-appearance="neon"] .cf-mentor-thread-pending {
+  background: var(--neon-cyan);
+}
+
+/* Neon — Global notifications */
+
+html[data-appearance="neon"] .cf-global-notice {
+  background: #141c2a;
+  border-color: #304054;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .35);
+}
+
+html[data-appearance="neon"] .cf-global-notice-dot:not(.cf-global-notice-error) {
+  background: var(--neon-cyan);
+  box-shadow: 0 0 10px rgba(0, 221, 235, .3);
+}
+
+html[data-appearance="neon"] .cf-global-notice-body button {
+  color: var(--neon-cyan);
+}
+
+html[data-appearance="neon"] .cf-global-notice-body button:hover {
+  color: #7df5ff;
+}

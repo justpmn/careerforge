@@ -56,7 +56,13 @@ async function request<T>(
         ...(options.body
           ? { 'Content-Type': 'application/json' }
           : {}),
-        ...(options.method === 'POST' ? csrfHeader() : {}),
+        ...(
+          ['POST', 'PATCH', 'PUT', 'DELETE'].includes(
+            (options.method ?? 'GET').toUpperCase()
+          )
+            ? csrfHeader()
+            : {}
+        ),
         ...options.headers,
       },
     });
@@ -74,6 +80,10 @@ async function request<T>(
         ? body.detail
         : `Request failed (HTTP ${response.status}).`
     );
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return (await response.json()) as T;
@@ -106,5 +116,45 @@ export const mentorApi = {
         }),
         }
     );
+    },
+    queue(
+    message: string,
+    careerKey: string | null,
+    conversationId: number | null
+  ) {
+    return request<MentorJobAccepted>('/jobs', {
+      method: 'POST',
+      body: JSON.stringify({
+        message,
+        career_key: careerKey,
+        conversation_id: conversationId,
+      }),
+    });
+  },
+
+  jobs() {
+    return request<MentorJob[]>('/jobs');
+  },
+  renameConversation(conversationId: number, title: string) {
+  return request<MentorConversation>(
+    `/conversations/${conversationId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ title }),
     }
+  );
+},
+
+deleteConversation(conversationId: number) {
+  return request<void>(
+    `/conversations/${conversationId}`,
+    {
+      method: 'DELETE',
+    }
+  );
+},
+
+  job(jobId: number) {
+    return request<MentorJob>(`/jobs/${jobId}`);
+  },
 };

@@ -21,34 +21,49 @@ type CareerOption = {
 };
 
 export default function MentorPage() {
-  const { submit, sending } = useMentorJobs();
+  const { jobs, sending, submitting, submit } = useMentorJobs();
   const location = useLocation();
   const navigate = useNavigate();
-const requestedThread = useRef<number | null>(null);
+
+  const currentRoute = useRef(
+    location.pathname + location.search
+  );
+  const bottomRef = useRef<HTMLDivElement>(null);
+
   const [careers, setCareers] = useState<CareerOption[]>([]);
   const [careerKey, setCareerKey] = useState('');
   const [careerNotice, setCareerNotice] = useState('');
   const [conversations, setConversations] = useState<
     MentorConversation[]
   >([]);
-
-  const [conversationId, setConversationId] = useState<number | null>(
-    null
-  );
-
-  const [messages, setMessages] = useState<DisplayMentorMessage[]>([]);
+  const [messages, setMessages] = useState<MentorMessage[]>([]);
   const [draft, setDraft] = useState('');
-
   const [loading, setLoading] = useState(true);
   const [loadingThread, setLoadingThread] = useState(false);
   const [error, setError] = useState('');
+  const [menuId, setMenuId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingTitle, setEditingTitle] = useState('');
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [busyThreadId, setBusyThreadId] = useState<number | null>(null);
 
-    const bottomRef = useRef<HTMLDivElement>(null);
+  const rawThreadId = new URLSearchParams(
+    location.search
+  ).get('conversation');
 
-    
-    
+  const parsedThreadId = rawThreadId
+    ? Number(rawThreadId)
+    : null;
 
-  // Load the available careers and saved conversations.
+  const conversationId =
+    parsedThreadId !== null &&
+    Number.isSafeInteger(parsedThreadId) &&
+    parsedThreadId > 0
+      ? parsedThreadId
+      : null;
+
+  currentRoute.current = location.pathname + location.search;
+
   useEffect(() => {
     let active = true;
 
@@ -197,154 +212,216 @@ const requestedThread = useRef<number | null>(null);
       new Date(a.updated_at).getTime()
   );
 
-    function newConversation() {
-    if (sending || loadingThread) return;
-    requestedThread.current = null;
-    navigate('/mentor', { replace: true });
+  function newConversation() {
     setCareerNotice('');
-    setConversationId(null);
-    setMessages([]);
-    setDraft('');
     setError('');
+    setDraft('');
+    setMessages([]);
+    navigate('/mentor');
   }
 
   function changeCareer(value: string) {
-    if (sending || loadingThread) return;
-
-    requestedThread.current = null;
-    navigate('/mentor', { replace: true });
-    setCareerNotice('');
     setCareerKey(value);
-    setConversationId(null);
+    setCareerNotice('');
     setMessages([]);
     setDraft('');
     setError('');
+    navigate('/mentor');
   }
 
   function openConversation(thread: MentorConversation) {
-    if (sending || loadingThread) return;
-
     setCareerNotice('');
     setError('');
+    setDraft('');
 
     navigate(`/mentor?conversation=${thread.id}`);
   }
-  async function sendMessage(event: FormEvent<HTMLFormElement>) {
+
+  async function sendMessage(
+    event: FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
 
     const question = draft.trim();
 
     if (
-    !question ||
-    loading ||
-    loadingThread ||
-    sending
+      !question ||
+      loading ||
+      loadingThread ||
+      sending
     ) {
-    return;
+      return;
     }
 
+    const sourceRoute = currentRoute.current;
     const previousMessages = [...messages];
-    const activeConversationId = conversationId;
 
     setMessages([
       ...previousMessages,
       { role: 'user', content: question },
     ]);
 
-setDraft('');
-
-    
+    setDraft('');
     setError('');
 
     try {
-      
-              
       const result = await submit(
         question,
         careerKey || null,
-        activeConversationId
+        conversationId
       );
 
-      const responseSeconds = result.responseSeconds;
+      if (currentRoute.current === sourceRoute) {
+        if (result.target_updated) {
+          const career = careers.find(
+            (item) =>
+              item.career_key === result.career_key
+          );
 
-      const switchedConversation =
-        activeConversationId !== null &&
-        result.conversation_id !== activeConversationId;
+          setCareerNotice(
+            `Target career updated to ${
+              career?.name ?? result.career_key
+            }.`
+          );
+        }
 
-        setConversationId(result.conversation_id);
         setCareerKey(result.career_key);
 
-        // Prepare the newly generated message pair.
-        const newMessages: DisplayMentorMessage[] = [
-        {
-            role: 'user',
-            content: question,
-        },
-        {
-            role: 'assistant',
-            content: result.response,
-            responseSeconds,
-        },
-        ];
-
-        // Preserve history unless the backend changed conversations.
-        setMessages(
-        switchedConversation
-            ? newMessages
-            : [...previousMessages, ...newMessages]
-        );
-
-
-        if (result.target_updated) {
-        const career = careers.find(
-            (item) => item.career_key === result.career_key
-        );
-
-        setCareerNotice(
-            `Target career updated to ${career?.name ?? result.career_key}.`
-        );
+        if (conversationId !== result.conversation_id) {
+          navigate(
+            `/mentor?conversation=${result.conversation_id}`
+          );
+        } else {
+          void mentorApi.messages(result.conversation_id)
+            .then((history) => {
+              if (currentRoute.current === sourceRoute) {
+                setMessages(history);
+              }
+            })
+            .catch(() => {});
         }
+      }
 
-        try {
-        const updated = await mentorApi.conversations();
-        setConversations(updated);
-        } catch {
-        // The successful message remains visible.
-        }
-
+      void mentorApi.conversations()
+        .then(setConversations)
+        .catch(() => {});
     } catch (err) {
+      if (currentRoute.current !== sourceRoute) return;
+
       setMessages(previousMessages);
       setDraft(question);
 
       setError(
         err instanceof Error
           ? err.message
-          : 'The mentor could not respond.'
+          : 'Could not submit the message.'
       );
     }
   }
 
-
-function handleComposerKeyDown(
-  event: KeyboardEvent<HTMLTextAreaElement>
-) {
-  if (
-    event.key === 'Enter' &&
-    !event.shiftKey &&
-    !event.nativeEvent.isComposing
+  function handleComposerKeyDown(
+    event: KeyboardEvent<HTMLTextAreaElement>
   ) {
-    event.preventDefault();
-
     if (
-      !loading &&
-      !loadingThread &&
-      !sending &&
-      draft.trim()
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing
     ) {
-      event.currentTarget.form?.requestSubmit();
+      event.preventDefault();
+
+      if (
+        !loading &&
+        !loadingThread &&
+        !sending &&
+        draft.trim()
+      ) {
+        event.currentTarget.form?.requestSubmit();
+      }
     }
   }
+
+
+function startRename(thread: MentorConversation) {
+  setMenuId(null);
+  setDeletingId(null);
+  setEditingId(thread.id);
+  setEditingTitle(thread.title || '');
 }
+
+async function saveConversationTitle(id: number) {
+  const title = editingTitle.replace(/\s+/g, ' ').trim();
+
+  if (!title) {
+    setError('Conversation title cannot be empty.');
+    return;
+  }
+
+  setBusyThreadId(id);
+  setError('');
+
+  try {
+    const updated = await mentorApi.renameConversation(id, title);
+
+    setConversations((previous) =>
+      previous.map((thread) =>
+        thread.id === id ? updated : thread
+      )
+    );
+
+    setEditingId(null);
+    setEditingTitle('');
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : 'Could not rename conversation.'
+    );
+  } finally {
+    setBusyThreadId(null);
+  }
+}
+
+async function removeConversation(id: number) {
+  const pending = jobs.some(
+    (job) =>
+      job.conversation_id === id &&
+      (job.status === 'queued' || job.status === 'running')
+  );
+
+  if (pending) {
+    setError('Wait for the mentor to finish before deleting.');
+    return;
+  }
+
+  setBusyThreadId(id);
+  setError('');
+
+  try {
+    await mentorApi.deleteConversation(id);
+
+    setConversations((previous) =>
+      previous.filter((thread) => thread.id !== id)
+    );
+
+    setDeletingId(null);
+    setMenuId(null);
+
+    if (conversationId === id) {
+      setMessages([]);
+      setDraft('');
+      navigate('/mentor');
+    }
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : 'Could not delete conversation.'
+    );
+  } finally {
+    setBusyThreadId(null);
+  }
+}
+
 
   return (
     <section className="cf-mentor">
@@ -360,7 +437,6 @@ function handleComposerKeyDown(
           type="button"
           className="cf-mentor-new"
           onClick={newConversation}
-          disabled={sending || loadingThread}
         >
           + New conversation
         </button>
@@ -381,23 +457,174 @@ function handleComposerKeyDown(
               className="cf-mentor-thread-list"
               aria-label="Saved conversations"
             >
-              {sortedConversations.map((thread) => (
-                <button
-                  key={thread.id}
-                  type="button"
-                  disabled={sending || loadingThread}
-                  className={
-                    'cf-mentor-thread' +
-                    (conversationId === thread.id
-                      ? ' cf-mentor-thread-active'
-                      : '')
-                  }
-                  onClick={() => openConversation(thread)}
-                >
-                  {thread.title?.trim() ||
-                    `Conversation ${thread.id}`}
-                </button>
-              ))}
+              {sortedConversations.map((thread) => {
+                const pending = jobs.some(
+                  (job) =>
+                    job.conversation_id === thread.id &&
+                    (job.status === 'queued' ||
+                      job.status === 'running')
+                );
+
+                const busy = busyThreadId === thread.id;
+
+                return (
+                  <div
+                    className="cf-mentor-thread-item"
+                    key={thread.id}
+                  >
+                    <div className="cf-mentor-thread-row">
+                      <button
+                        type="button"
+                        className={
+                          'cf-mentor-thread' +
+                          (conversationId === thread.id
+                            ? ' cf-mentor-thread-active'
+                            : '')
+                        }
+                        title={
+                          thread.title ||
+                          `Conversation ${thread.id}`
+                        }
+                        onClick={() => {
+                          setMenuId(null);
+                          openConversation(thread);
+                        }}
+                      >
+                        {thread.title?.trim() ||
+                          `Conversation ${thread.id}`}
+
+                        {pending && (
+                          <span
+                            className="cf-mentor-thread-pending"
+                            title="Generating response"
+                            aria-label="Generating response"
+                          />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="cf-mentor-thread-more"
+                        aria-label={`Options for ${
+                          thread.title || 'conversation'
+                        }`}
+                        aria-expanded={menuId === thread.id}
+                        disabled={busy}
+                        onClick={() => {
+                          setMenuId(
+                            menuId === thread.id
+                              ? null
+                              : thread.id
+                          );
+                          setEditingId(null);
+                          setDeletingId(null);
+                        }}
+                      >
+                        ⋯
+                      </button>
+                    </div>
+
+                    {menuId === thread.id && (
+                      <div className="cf-mentor-thread-menu">
+                        <button
+                          type="button"
+                          onClick={() => startRename(thread)}
+                        >
+                          Rename
+                        </button>
+
+                        <button
+                          type="button"
+                          className="cf-mentor-danger"
+                          disabled={pending}
+                          title={
+                            pending
+                              ? 'Wait for the response to finish'
+                              : 'Delete conversation'
+                          }
+                          onClick={() => {
+                            setMenuId(null);
+                            setDeletingId(thread.id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+
+                    {editingId === thread.id && (
+                      <form
+                        className="cf-mentor-thread-edit"
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          void saveConversationTitle(thread.id);
+                        }}
+                      >
+                        <input
+                          autoFocus
+                          aria-label="Conversation title"
+                          maxLength={100}
+                          value={editingTitle}
+                          onChange={(event) =>
+                            setEditingTitle(event.target.value)
+                          }
+                          disabled={busy}
+                        />
+
+                        <div className="cf-mentor-thread-actions">
+                          <button
+                            type="submit"
+                            disabled={
+                              busy || !editingTitle.trim()
+                            }
+                          >
+                            Save
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => setEditingId(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {deletingId === thread.id && (
+                      <div className="cf-mentor-thread-confirm">
+                        <p>
+                          Delete this conversation and its messages?
+                        </p>
+
+                        <div className="cf-mentor-thread-actions">
+                          <button
+                            type="button"
+                            className="cf-mentor-danger"
+                            disabled={busy}
+                            onClick={() =>
+                              void removeConversation(thread.id)
+                            }
+                          >
+                            Delete
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              setDeletingId(null)
+                            }
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </nav>
           )}
         </aside>
@@ -417,17 +644,21 @@ function handleComposerKeyDown(
             </div>
 
             <div className="cf-mentor-career">
-              <label htmlFor="mentor-career">Career context</label>
+              <label htmlFor="mentor-career">
+                Career context
+              </label>
 
               <select
                 id="mentor-career"
                 value={careerKey}
-                disabled={loading || loadingThread || sending}
+                disabled={loading || submitting}
                 onChange={(event) =>
                   changeCareer(event.target.value)
                 }
               >
-                <option value="">Select a career</option>
+                <option value="">
+                  Select a career
+                </option>
 
                 {careers.map((career) => (
                   <option
@@ -440,8 +671,12 @@ function handleComposerKeyDown(
               </select>
             </div>
           </div>
-                    {careerNotice && (
-            <p className="cf-mentor-career-notice" role="status">
+
+          {careerNotice && (
+            <p
+              className="cf-mentor-career-notice"
+              role="status"
+            >
               {careerNotice}
             </p>
           )}
