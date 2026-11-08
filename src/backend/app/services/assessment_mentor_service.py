@@ -207,6 +207,17 @@ async def generate_persistent_assessment_mentor_response(
             user_id=user_id,
             conversation_id=conversation_id,
         )
+        if pre_saved_user_message_id is not None:
+            if (
+                not history
+                or history[-1]["role"] != "user"
+                or history[-1]["content"] != message
+            ):
+                raise ValueError(
+                    "Queued message history is inconsistent."
+                )
+
+            history = history[:-1]
 
     # Step 1: Generate competency assessment.
     assessment_started = perf_counter()
@@ -227,9 +238,13 @@ async def generate_persistent_assessment_mentor_response(
         history=history,
     )
 
-    context = build_mentor_context(
-        assessment,
+    context = build_grounded_mentor_context(
+        db=db,
+        user_id=user_id,
+        career_key=career_key,
+        assessment=assessment,
         include_resources=resource_question,
+        message=message,
     )
 
     context_seconds = perf_counter() - context_started
