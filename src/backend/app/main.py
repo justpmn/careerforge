@@ -75,7 +75,7 @@ app.add_middleware(
     secret_key=settings.oauth_state_secret_key,
     session_cookie="careerforge_oauth_state",
     same_site="lax",
-    https_only=False,  # Local HTTP only
+    https_only=settings.cookie_secure,
     max_age=600,
 )
 
