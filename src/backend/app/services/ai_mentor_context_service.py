@@ -12,7 +12,94 @@ ACTION_PRIORITY = {
     "no_immediate_action": 4,
 }
 
-def build_mentor_context(assessment: dict[str, Any]) -> dict:
+MAX_RESOURCE_LINKS = 10
+MAX_RESOURCES_PER_COMPETENCY = 3
+
+
+def build_learning_resources_context(
+    assessment: dict[str, Any],
+    competencies: list[dict],
+    total_competencies: int,
+) -> dict:
+    """
+    Build a resource-focused context using actual
+    learning resources returned by the assessment.
+
+    Never generate or guess resource URLs.
+    """
+    remaining_links = MAX_RESOURCE_LINKS
+    resource_competencies = []
+
+    for item in competencies:
+        raw_resources = item.get("learning_resources") or []
+
+        if not isinstance(raw_resources, list):
+            raw_resources = []
+
+        selected_resources = []
+
+        for resource in raw_resources:
+            if remaining_links <= 0:
+                break
+
+            if len(selected_resources) >= MAX_RESOURCES_PER_COMPETENCY:
+                break
+
+            if not isinstance(resource, dict):
+                continue
+
+            url = resource.get("url")
+            title = resource.get("title")
+
+            if (
+                not isinstance(url, str)
+                or not url.startswith(("https://", "http://"))
+                or not isinstance(title, str)
+                or not title.strip()
+            ):
+                continue
+
+            selected_resources.append({
+                "title": title,
+                "provider": resource.get("provider"),
+                "url": url,
+                "matched_skills": resource.get(
+                    "matched_skills", []
+                ),
+            })
+
+            remaining_links -= 1
+
+        resource_competencies.append({
+            "competency_key": item["competency_key"],
+            "competency": item["competency"],
+            "level": item["level"],
+            "available_resource_count": len(raw_resources),
+            "learning_resources": selected_resources,
+        })
+
+    return {
+        "source": "careerforge_competency_assessment",
+        "focus": "learning_resources",
+        "career": {
+            "key": assessment["career_key"],
+            "name": assessment["career_name"],
+        },
+        "competency_resources": resource_competencies,
+        "total_competencies": total_competencies,
+        "omitted_competencies": max(
+            0,
+            total_competencies - len(competencies),
+        ),
+        "resource_limit": MAX_RESOURCE_LINKS,
+    }
+
+
+def build_mentor_context(
+    assessment: dict[str, Any],
+    *,
+    include_resources: bool = False,
+) -> dict:
     """
     Prepare CareerForge competency assessment results for the LLM.
 
@@ -46,6 +133,12 @@ def build_mentor_context(assessment: dict[str, Any]) -> dict:
     selected_competencies = ordered_competencies[
         :MAX_COMPETENCIES
     ]
+    if include_resources:
+        return build_learning_resources_context(
+            assessment=assessment,
+            competencies=selected_competencies,
+            total_competencies=len(competencies),
+        )
 
     simplified_competencies = []
 

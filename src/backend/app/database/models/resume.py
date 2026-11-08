@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 from src.backend.app.database.base import Base
+from sqlalchemy.dialects.postgresql import JSONB
 
 class Resume(Base):
     __tablename__ = "resumes"
@@ -22,3 +23,7 @@ class Resume(Base):
         server_default=func.now(),
         nullable=False
     )
+    analysis_result: Mapped[dict | None] = mapped_column(
+    JSONB,
+    nullable=True,
+)

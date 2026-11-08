@@ -1,0 +1,122 @@
+
+.cf-neon-greeting {
+  margin: 10px 0 14px;
+  min-height: 1.3em;
+  color: #f1f5fb;
+  font-size: clamp(2rem, 3.2vw, 3.3rem);
+  font-weight: 760;
+  letter-spacing: -0.055em;
+  line-height: 1.3;
+}
+
+.cf-neon-name {
+  position: relative;
+  display: inline-block;
+  font-weight: 800;
+  background: linear-gradient(100deg, #ed986b 5%, #ff4e9e 52%, #00ddeb 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255, 78, 158, .16));
+}
+
+.cf-neon-name::before,
+.cf-neon-name::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  -webkit-text-fill-color: currentColor;
+}
+
+.cf-neon-name::before {
+  color: #00ddeb;
+  clip-path: inset(0 0 60% 0);
+  animation: cf-neon-glitch-top 14s steps(1, end) infinite;
+}
+
+.cf-neon-name::after {
+  color: #ff4e9e;
+  clip-path: inset(65% 0 0 0);
+  animation: cf-neon-glitch-bottom 14s steps(1, end) infinite;
+}
+
+@keyframes cf-neon-glitch-top {
+  0%, 93%, 96%, 100% {
+    opacity: 0;
+    transform: none;
+  }
+
+  93.5%, 94.4% {
+    opacity: .85;
+    transform: translate(-3px, -1px);
+  }
+
+  95% {
+    opacity: .65;
+    transform: translate(2px, 1px);
+  }
+}
+
+@keyframes cf-neon-glitch-bottom {
+  0%, 93%, 96%, 100% {
+    opacity: 0;
+    transform: none;
+  }
+
+  93.5%, 94.4% {
+    opacity: .85;
+    transform: translate(3px, 1px);
+  }
+
+  95% {
+    opacity: .7;
+    transform: translate(-2px, -1px);
+  }
+}
+
+.cf-neon-name:hover::before,
+.cf-neon-name:hover::after {
+  animation-duration: 1.5s;
+}
+
+.cf-neon-cursor {
+  color: #00ddeb;
+  font-weight: 450;
+  animation: cf-neon-blink 900ms steps(1) infinite;
+}
+
+@keyframes cf-neon-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-neon-name::before {
+  color: #00ddeb;
+  clip-path: inset(0 0 60% 0);
+}
+
+.cf-neon-name::after {
+  color: #ff4e9e;
+  clip-path: inset(65% 0 0 0);
+}
+
+.cf-neon-name.is-complete::before {
+  animation: cf-neon-glitch-top 14s steps(1, end) infinite;
+}
+
+.cf-neon-name.is-complete::after {
+  animation: cf-neon-glitch-bottom 14s steps(1, end) infinite;
+}
+
+.cf-neon-name.is-complete:hover::before,
+.cf-neon-name.is-complete:hover::after {
+  animation-duration: 1.5s;
+}}
+
+@media (max-width: 600px) {
+  .cf-neon-greeting {
+    font-size: clamp(1.75rem, 7vw, 2.3rem);
+  }
+}

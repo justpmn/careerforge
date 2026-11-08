@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "programming",
+      "title": "Programming",
+      "requires": [],
+      "skillAliases": [
+        "C#",
+        "Go",
+        "Java",
+        "JavaScript",
+        "PHP",
+        "Python",
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "software_design",
+      "title": "Software Design",
+      "requires": [
+        "programming"
+      ]
+    },
+    {
+      "id": "database",
+      "title": "Databases",
+      "requires": [
+        "programming"
+      ],
+      "skillAliases": [
+        "Microsoft SQL Server",
+        "MySQL",
+        "PostgreSQL",
+        "SQL",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging",
+      "requires": [
+        "programming"
+      ]
+    },
+    {
+      "id": "api",
+      "title": "API Development",
+      "requires": [
+        "programming",
+        "database"
+      ],
+      "skillAliases": [
+        "GraphQL",
+        "RESTful API"
+      ]
+    },
+    {
+      "id": "testing",
+      "title": "Automated Testing",
+      "requires": [
+        "software_design",
+        "debugging"
+      ]
+    },
+    {
+      "id": "containers",
+      "title": "Containers",
+      "requires": [
+        "api"
+      ],
+      "skillAliases": [
+        "Docker"
+      ]
+    },
+    {
+      "id": "ci_cd",
+      "title": "CI/CD",
+      "requires": [
+        "version_control",
+        "testing",
+        "containers"
+      ]
+    }
+  ]
+}

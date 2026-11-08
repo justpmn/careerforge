@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "game_languages",
+      "title": "Game Programming",
+      "requires": [],
+      "skillAliases": [
+        "C#",
+        "C++",
+        "Lua",
+        "Python",
+        "Rust"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "game_design",
+      "title": "Game Design",
+      "requires": []
+    },
+    {
+      "id": "game_engine",
+      "title": "Game Engines",
+      "requires": [
+        "game_languages"
+      ]
+    },
+    {
+      "id": "gameplay_programming",
+      "title": "Gameplay Systems",
+      "requires": [
+        "game_languages",
+        "game_engine"
+      ]
+    },
+    {
+      "id": "game_rendering",
+      "title": "Graphics and Rendering",
+      "requires": [
+        "game_engine"
+      ]
+    },
+    {
+      "id": "game_physics",
+      "title": "Physics and Collisions",
+      "requires": [
+        "gameplay_programming"
+      ]
+    },
+    {
+      "id": "game_testing",
+      "title": "Game Testing",
+      "requires": [
+        "game_design",
+        "gameplay_programming"
+      ]
+    },
+    {
+      "id": "game_optimization",
+      "title": "Game Optimization",
+      "requires": [
+        "game_rendering",
+        "game_physics"
+      ]
+    }
+  ]
+}

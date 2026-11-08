@@ -1,0 +1,103 @@
+
+.cf-verify-page {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 32px 0;
+  color: var(--text);
+}
+
+.cf-verify-card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cf-verify-card > section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cf-verify-card h1 {
+  margin: 0;
+  font-size: clamp(30px, 3vw, 38px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+}
+
+.cf-verify-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.cf-verify-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.cf-verify-card label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cf-verify-card input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  color: var(--text);
+  background: var(--field);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.cf-verify-card button,
+.cf-verify-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 46px;
+  padding: 12px 18px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #231b16;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cf-verify-card button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.cf-verify-back {
+  width: fit-content;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.cf-verify-card [role="alert"] {
+  color: #d66d64;
+}
+
+.cf-verify-card :is(a, button, input):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .cf-verify-page {
+    padding: 24px 0;
+  }
+}

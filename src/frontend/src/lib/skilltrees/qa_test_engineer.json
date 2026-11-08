@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "test_programming",
+      "title": "Test Programming",
+      "requires": [],
+      "skillAliases": [
+        "C#",
+        "Java",
+        "JavaScript",
+        "Python",
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "test_strategy",
+      "title": "Test Strategy",
+      "requires": []
+    },
+    {
+      "id": "debugging",
+      "title": "Debugging",
+      "requires": [
+        "test_programming"
+      ]
+    },
+    {
+      "id": "testing",
+      "title": "Automated Testing",
+      "requires": [
+        "test_strategy",
+        "test_programming"
+      ]
+    },
+    {
+      "id": "defect_management",
+      "title": "Defect Management",
+      "requires": [
+        "test_strategy",
+        "debugging"
+      ]
+    },
+    {
+      "id": "api_testing",
+      "title": "API Testing",
+      "requires": [
+        "testing"
+      ]
+    },
+    {
+      "id": "performance_testing",
+      "title": "Performance Testing",
+      "requires": [
+        "testing"
+      ]
+    },
+    {
+      "id": "ci_cd",
+      "title": "CI/CD",
+      "requires": [
+        "version_control",
+        "testing"
+      ]
+    }
+  ]
+}

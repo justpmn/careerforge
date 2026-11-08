@@ -14,7 +14,7 @@ export type Registration = Credentials & { name: string };
 
 const API_ROOT = '/api/auth';
 
-function csrfHeader(): Record<string, string> {
+export function csrfHeader(): Record<string, string> {
   const item = document.cookie.split('; ').find((part) => part.startsWith('csrf_token='));
   if (!item) return {};
   return { 'X-CSRF-Token': decodeURIComponent(item.slice('csrf_token='.length)) };
@@ -36,29 +36,100 @@ async function request(path: string, init?: RequestInit): Promise<Response> {
   }
 }
 
-async function messageFrom(response: Response): Promise<string> {
-  try {
-    const body: unknown = await response.json();
-    if (typeof body === 'object' && body !== null) {
-      const error = body as { detail?: unknown; message?: unknown };
-      if (typeof error.detail === 'string') return error.detail;
-      if (typeof error.message === 'string') return error.message;
-    }
-  } catch { /* Not every error response is JSON */ }
-  if (response.status === 404) return 'This authentication endpoint is not available yet. It needs to be connected to FastAPI.';
-  return `Authentication failed (HTTP ${response.status}). Please try again.`;
+export class AuthApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code?: string,
+  ) {
+    super(message);
+    this.name = 'AuthApiError';
+  }
 }
 
+async function errorFrom(response: Response): Promise<AuthApiError> {
+  let message = response.status === 404
+    ? 'This authentication endpoint is not available yet.'
+    : `Authentication failed (HTTP ${response.status}). Please try again.`;
+
+  let code: string | undefined;
+
+  try {
+    const body: unknown = await response.json();
+
+    if (body && typeof body === 'object') {
+      const data = body as { detail?: unknown; message?: unknown };
+
+      if (typeof data.detail === 'string') {
+        message = data.detail;
+      } else if (data.detail && typeof data.detail === 'object') {
+        const detail = data.detail as {
+          code?: unknown;
+          message?: unknown;
+        };
+
+        if (typeof detail.message === 'string') {
+          message = detail.message;
+        }
+
+        if (typeof detail.code === 'string') {
+          code = detail.code;
+        }
+      } else if (typeof data.message === 'string') {
+        message = data.message;
+      }
+    }
+  } catch {
+    // Preserve the fallback message for non-JSON responses.
+  }
+
+  return new AuthApiError(message, response.status, code);
+}
 async function post(path: string, body?: object): Promise<void> {
   const response = await request(path, {
     method: 'POST',
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-  if (!response.ok) throw new Error(await messageFrom(response));
+ if (!response.ok) throw await errorFrom(response);
 }
 
+async function messageFrom(response: Response): Promise<string> {
+  const body = await response.json().catch(() => null);
+
+  const detail = body?.detail;
+
+  if (typeof detail === 'string') {
+    return detail;
+  }
+
+  if (typeof detail?.message === 'string') {
+    return detail.message;
+  }
+
+  return `Authentication failed (HTTP ${response.status}).`;
+}
 export const authApi = {
-  login: (data: Credentials) => post('/login', data),
+  login: async (data: Credentials): Promise<void> => {
+    const response = await request('/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error(await messageFrom(response));
+  }
+
+  const result: {
+    mfa_required?: boolean;
+  } = await response.json();
+
+  if (result.mfa_required) {
+    throw Object.assign(
+      new Error('Complete administrator MFA verification.'),
+      { code: 'ADMIN_MFA_REQUIRED' }
+    );
+  }
+},
   register: (data: Registration) =>
   post('/register', {
     full_name: data.name,
@@ -67,25 +138,80 @@ export const authApi = {
   }),
   logout: () => post('/logout'),
   completeOnboarding: () => post('/onboarding/complete'),
+
+
   async me(): Promise<User | null> {
-    const response = await request('/me');
-    if (response.status === 401) return null;
-    if (!response.ok) throw new Error(await messageFrom(response));
-    const user: User = await response.json();
-    if (!user || typeof user.id !== 'string' || typeof user.onboarding_completed !== 'boolean') {
-      throw new Error('Invalid user response from the API. Check the /api/auth/me contract.');
+    const controller = new AbortController();
+
+    // Give the authentication request 10 seconds.
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 10000);
+
+    try {
+      const response = await request('/me', {
+        signal: controller.signal,
+      });
+
+      if (response.status === 401) {
+        const body = await response.json().catch(() => null) as {
+          detail?: {
+            code?: string;
+            message?: string;
+          } | string;
+        } | null;
+
+        const detail = body?.detail;
+        const code =
+          detail && typeof detail === 'object'
+            ? detail.code
+            : undefined;
+
+        if (
+          code === 'ADMIN_MFA_ENROLLMENT_REQUIRED' ||
+          code === 'ADMIN_MFA_REQUIRED'
+        ) {
+          const message =
+            detail && typeof detail === 'object'
+              ? detail.message ?? 'Administrator verification required.'
+              : 'Administrator verification required.';
+
+          throw Object.assign(new Error(message), { code });
+        }
+
+        return null;
+      }
+
+      if (!response.ok) {
+        throw await errorFrom(response);
+      }
+
+      const user: User = await response.json();
+
+      if (
+        !user ||
+        typeof user.id !== 'string' ||
+        typeof user.onboarding_completed !== 'boolean'
+      ) {
+        throw new Error(
+          'Invalid user response from the API.'
+        );
+      }
+
+      return user;
+    } finally {
+      clearTimeout(timeout);
     }
-    return user;
   },
 };
 
-export function postAuthRoute(user: User): string {
-  return user.onboarding_completed ? '/dashboard' : '/onboarding';
+export function postAuthRoute(_user: User): string {
+  return '/dashboard';
 }
+export function oauthStartPath(provider: 'google' | 'github'): string {
+  if (provider === 'google') {
+    return '/api/auth/oauth/google/start';
+  }
 
-export function oauthStartPath(provider: 'google' | 'github'): string | null {
-  const path = provider === 'google'
-    ? import.meta.env.VITE_GOOGLE_OAUTH_START_PATH
-    : import.meta.env.VITE_GITHUB_OAUTH_START_PATH;
-  return typeof path === 'string' && /^\/api\/[a-zA-Z0-9/_-]+$/.test(path) ? path : null;
+  return '/api/auth/oauth/github/start';
 }

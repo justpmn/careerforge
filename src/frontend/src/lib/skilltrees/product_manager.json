@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "product_management_tools",
+      "title": "Product Tools",
+      "requires": [],
+      "skillAliases": [
+        "Atlassian Confluence",
+        "Atlassian JIRA"
+      ]
+    },
+    {
+      "id": "product_analytics_tools",
+      "title": "Analytics Tools",
+      "requires": [],
+      "skillAliases": [
+        "Google Analytics",
+        "Microsoft Power BI",
+        "Tableau"
+      ]
+    },
+    {
+      "id": "product_discovery",
+      "title": "Product Discovery",
+      "requires": []
+    },
+    {
+      "id": "product_strategy",
+      "title": "Product Strategy",
+      "requires": [
+        "product_discovery"
+      ]
+    },
+    {
+      "id": "requirements_analysis",
+      "title": "Product Requirements",
+      "requires": [
+        "product_discovery"
+      ]
+    },
+    {
+      "id": "stakeholder_management",
+      "title": "Stakeholder Alignment",
+      "requires": [
+        "product_strategy"
+      ]
+    },
+    {
+      "id": "product_roadmap",
+      "title": "Product Roadmap",
+      "requires": [
+        "product_strategy",
+        "requirements_analysis"
+      ]
+    },
+    {
+      "id": "feature_prioritization",
+      "title": "Prioritization",
+      "requires": [
+        "product_roadmap"
+      ]
+    },
+    {
+      "id": "product_metrics",
+      "title": "Product Metrics",
+      "requires": [
+        "product_analytics_tools",
+        "product_strategy"
+      ]
+    },
+    {
+      "id": "product_experimentation",
+      "title": "Experimentation",
+      "requires": [
+        "feature_prioritization",
+        "product_metrics"
+      ]
+    },
+    {
+      "id": "product_launch",
+      "title": "Product Launch",
+      "requires": [
+        "feature_prioritization",
+        "stakeholder_management"
+      ]
+    }
+  ]
+}

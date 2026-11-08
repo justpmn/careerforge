@@ -189,41 +189,14 @@ def list_owned_mentor_messages(
     ]
 
 
-def list_owned_mentor_messages(
-    db: Session,
-    user_id: int,
-    conversation_id: int,
-    limit: int = 50,
-) -> list[dict]:
+def make_mentor_title(message: str, max_length: int = 60) -> str:
+    title = " ".join(message.split())
 
-    get_owned_conversation(
-        db=db,
-        user_id=user_id,
-        conversation_id=conversation_id,
-    )
+    if not title:
+        return "New conversation"
 
-    if not 1 <= limit <= 50:
-        raise ValueError("Invalid message limit.")
+    if len(title) <= max_length:
+        return title
 
-    messages = db.scalars(
-        select(MentorMessage)
-        .where(
-            MentorMessage.conversation_id == conversation_id
-        )
-        .order_by(MentorMessage.id.desc())
-        .limit(limit)
-    ).all()
-
-    return [
-        {
-            "id": item.id,
-            "role": (
-                "assistant"
-                if item.role == "mentor"
-                else "user"
-            ),
-            "content": item.content,
-            "created_at": item.created_at,
-        }
-        for item in reversed(messages)
-    ]
+    shortened = title[:max_length - 1].rsplit(" ", 1)[0]
+    return (shortened or title[:max_length - 1]).rstrip(".,:;!? ") + "…"

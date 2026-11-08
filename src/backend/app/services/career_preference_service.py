@@ -72,6 +72,31 @@ def set_career_preference(
 
     return record
 
+def remove_career_preference(
+    db: Session,
+    user_id: int,
+    career_key: str,
+) -> bool:
+    career = db.scalar(
+        select(Career).where(Career.career_key == career_key)
+    )
+
+    if career is None:
+        raise ValueError(f"Career '{career_key}' does not exist.")
+
+    record = db.scalar(
+        select(UserCareerPreference).where(
+            UserCareerPreference.user_id == user_id,
+            UserCareerPreference.career_id == career.id,
+        )
+    )
+
+    if record is None:
+        return False
+
+    db.delete(record)
+    db.commit()
+    return True
 
 def get_user_career_preferences(
     db: Session,

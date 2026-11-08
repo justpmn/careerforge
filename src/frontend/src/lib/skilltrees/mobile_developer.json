@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "mobile_languages",
+      "title": "Mobile Programming",
+      "requires": [],
+      "skillAliases": [
+        "Dart",
+        "Java",
+        "JavaScript",
+        "Kotlin",
+        "Swift",
+        "TypeScript"
+      ]
+    },
+    {
+      "id": "version_control",
+      "title": "Git",
+      "requires": [],
+      "skillAliases": [
+        "Git"
+      ]
+    },
+    {
+      "id": "mobile_tooling",
+      "title": "Mobile Dev Tools",
+      "requires": [
+        "mobile_languages"
+      ],
+      "skillAliases": [
+        "Android Studio",
+        "Xcode"
+      ]
+    },
+    {
+      "id": "mobile_app_development",
+      "title": "App Development",
+      "requires": [
+        "mobile_languages",
+        "mobile_tooling"
+      ]
+    },
+    {
+      "id": "mobile_ui",
+      "title": "Mobile UI",
+      "requires": [
+        "mobile_app_development"
+      ]
+    },
+    {
+      "id": "mobile_platform_integration",
+      "title": "Platform APIs",
+      "requires": [
+        "mobile_app_development"
+      ]
+    },
+    {
+      "id": "mobile_storage",
+      "title": "Mobile Storage",
+      "requires": [
+        "mobile_app_development"
+      ],
+      "skillAliases": [
+        "Firebase",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "mobile_api",
+      "title": "API Integration",
+      "requires": [
+        "mobile_app_development"
+      ],
+      "skillAliases": [
+        "GraphQL",
+        "RESTful API"
+      ]
+    },
+    {
+      "id": "mobile_testing",
+      "title": "Mobile Testing",
+      "requires": [
+        "mobile_ui",
+        "mobile_platform_integration",
+        "mobile_api"
+      ]
+    },
+    {
+      "id": "mobile_release",
+      "title": "App Distribution",
+      "requires": [
+        "mobile_testing",
+        "version_control"
+      ]
+    }
+  ]
+}

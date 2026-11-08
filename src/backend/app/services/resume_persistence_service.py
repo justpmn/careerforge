@@ -18,6 +18,9 @@ def save_resume_analysis(
     extracted_text: str,
     extracted_skills: list[str],
     recommendations: list[dict],
+    model_skills: list[str] | None = None,
+    ignored_skills: list[str] | None = None,
+    model_recommendations: list[dict] | None = None,
 ) -> Resume:
     """
     Save resume metadata, extracted user skills,
@@ -48,6 +51,13 @@ def save_resume_analysis(
         file_type=extension,
         storage_path="not_persisted",
         extracted_text=extracted_text,
+        analysis_result={
+            "extracted_skills": extracted_skills,
+            "model_skills": model_skills if model_skills is not None else [],
+            "ignored_skills": ignored_skills if ignored_skills is not None else [],
+            "recommendations": recommendations,
+            "model_recommendations": model_recommendations or [],
+        },
     )
 
     db.add(resume)
@@ -103,7 +113,6 @@ def save_resume_analysis(
         )
 
     db.commit()
-
     db.refresh(resume)
 
     return resume

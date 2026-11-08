@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "os_platforms",
+      "title": "Server Operating Systems",
+      "requires": [],
+      "skillAliases": [
+        "Linux",
+        "Microsoft Windows",
+        "Microsoft Windows Server",
+        "Red Hat Enterprise Linux"
+      ]
+    },
+    {
+      "id": "sys_scripting",
+      "title": "Admin Scripting",
+      "requires": [
+        "os_platforms"
+      ],
+      "skillAliases": [
+        "Ansible",
+        "Bash/Shell (all shells)",
+        "PowerShell",
+        "Python"
+      ]
+    },
+    {
+      "id": "directory_tooling",
+      "title": "Directory Tools",
+      "requires": [
+        "os_platforms"
+      ],
+      "skillAliases": [
+        "Microsoft Active Directory"
+      ]
+    },
+    {
+      "id": "cloud_platform",
+      "title": "Cloud Platforms",
+      "requires": [],
+      "skillAliases": [
+        "Amazon Web Services (AWS)",
+        "Google Cloud",
+        "Microsoft Azure"
+      ]
+    },
+    {
+      "id": "systems_administration",
+      "title": "Systems Administration",
+      "requires": [
+        "os_platforms"
+      ]
+    },
+    {
+      "id": "network_configuration",
+      "title": "Network Configuration",
+      "requires": [
+        "os_platforms"
+      ]
+    },
+    {
+      "id": "directory_management",
+      "title": "Directory Management",
+      "requires": [
+        "directory_tooling",
+        "systems_administration"
+      ]
+    },
+    {
+      "id": "network_troubleshooting",
+      "title": "Network Diagnostics",
+      "requires": [
+        "network_configuration"
+      ]
+    },
+    {
+      "id": "firewall_tooling",
+      "title": "Firewall Tools",
+      "requires": [
+        "network_configuration"
+      ],
+      "skillAliases": [
+        "Firewall software"
+      ]
+    },
+    {
+      "id": "access_permissions",
+      "title": "Access Permissions",
+      "requires": [
+        "directory_management"
+      ]
+    },
+    {
+      "id": "patch_management",
+      "title": "Patch Management",
+      "requires": [
+        "systems_administration"
+      ]
+    },
+    {
+      "id": "system_monitoring",
+      "title": "System Monitoring",
+      "requires": [
+        "systems_administration",
+        "network_troubleshooting"
+      ]
+    },
+    {
+      "id": "system_backup_recovery",
+      "title": "Backup and Recovery",
+      "requires": [
+        "systems_administration"
+      ]
+    }
+  ]
+}

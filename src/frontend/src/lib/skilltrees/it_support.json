@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "nodes": [
+    {
+      "id": "os_familiarity",
+      "title": "Operating Systems",
+      "requires": [],
+      "skillAliases": [
+        "Linux",
+        "Microsoft Windows",
+        "Microsoft Windows Server"
+      ]
+    },
+    {
+      "id": "customer_communication",
+      "title": "User Communication",
+      "requires": []
+    },
+    {
+      "id": "support_ticketing_tooling",
+      "title": "Service Desk Tools",
+      "requires": [],
+      "skillAliases": [
+        "ServiceNow"
+      ]
+    },
+    {
+      "id": "directory_tooling",
+      "title": "Directory Tools",
+      "requires": [
+        "os_familiarity"
+      ],
+      "skillAliases": [
+        "Microsoft Active Directory"
+      ]
+    },
+    {
+      "id": "hardware_support",
+      "title": "Hardware Support",
+      "requires": [
+        "os_familiarity"
+      ]
+    },
+    {
+      "id": "software_support",
+      "title": "Software Support",
+      "requires": [
+        "os_familiarity"
+      ]
+    },
+    {
+      "id": "connectivity_support",
+      "title": "Network Troubleshooting",
+      "requires": [
+        "os_familiarity"
+      ]
+    },
+    {
+      "id": "account_support",
+      "title": "Account Support",
+      "requires": [
+        "directory_tooling"
+      ]
+    },
+    {
+      "id": "debugging",
+      "title": "Troubleshooting",
+      "requires": [
+        "hardware_support",
+        "software_support",
+        "connectivity_support"
+      ]
+    },
+    {
+      "id": "end_user_support",
+      "title": "End-User Support",
+      "requires": [
+        "debugging",
+        "customer_communication"
+      ]
+    },
+    {
+      "id": "ticket_management",
+      "title": "Ticket Management",
+      "requires": [
+        "support_ticketing_tooling",
+        "end_user_support"
+      ]
+    },
+    {
+      "id": "knowledge_documentation",
+      "title": "Knowledge Articles",
+      "requires": [
+        "ticket_management"
+      ]
+    }
+  ]
+}

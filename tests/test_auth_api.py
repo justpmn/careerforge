@@ -1,13 +1,12 @@
 
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
-
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from sqlalchemy import select
+from datetime import datetime, timezone
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
-
 from src.backend.app.api.routes.auth import router as auth_router
 from src.backend.app.api.routes.ai_mentor import router as mentor_router
 from src.backend.app.core.config import settings
@@ -75,6 +74,14 @@ def register_account(client, email=None):
 
     return response
 
+def verify_registered_user(connection, registration):
+    user_id = registration.json()["id"]
+
+    connection.execute(
+        update(User)
+        .where(User.id == user_id)
+        .values(email_verified_at=datetime.now(timezone.utc))
+    )
 
 def test_registration_creates_secure_user(api_context):
     client, connection = api_context
@@ -131,12 +138,13 @@ def test_registration_rejects_admin_role(api_context):
 
 
 def test_login_returns_valid_jwt(api_context):
-    client, _ = api_context
+    client, connection = api_context
 
     email = unique_email()
     registration = register_account(client, email)
 
     assert registration.status_code == 201
+    verify_registered_user(connection, registration)
 
     login = client.post(
         "/api/auth/login",
@@ -186,11 +194,26 @@ def test_login_rejects_invalid_credentials(api_context):
 
 
 def test_authenticated_mentor_access(api_context):
-    client, _ = api_context
+    client, connection = api_context
 
     registration = register_account(client)
 
     assert registration.status_code == 201
+    verify_registered_user(connection, registration)
+    
+    endpoint = "/api/ai-mentor/chat/assessment/persistent"
+    
+    payload = {
+            "message": "Which competencies should I assess?",
+            "career_key": "data_scientist",
+        }
+    
+    unauthorized = client.post(
+            endpoint,
+            json=payload,
+        )
+    
+    assert unauthorized.status_code == 401
 
     email = registration.json()["email"]
     user_id = registration.json()["id"]
@@ -207,19 +230,7 @@ def test_authenticated_mentor_access(api_context):
 
     token = login.json()["access_token"]
 
-    endpoint = "/api/ai-mentor/chat/assessment/persistent"
-
-    payload = {
-        "message": "Which competencies should I assess?",
-        "career_key": "data_scientist",
-    }
-
-    unauthorized = client.post(
-        endpoint,
-        json=payload,
-    )
-
-    assert unauthorized.status_code == 401
+    
 
     with patch(
         "src.backend.app.api.routes.ai_mentor.generate_persistent_assessment_mentor_response",

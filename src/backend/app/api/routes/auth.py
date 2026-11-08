@@ -1,13 +1,18 @@
 import hmac
 import secrets
+import logging
+from src.backend.app.database.models.email_verification_token import EmailVerificationToken
+from src.backend.app.services.email_verification_tokens import generate_verification_token
+from src.backend.app.services.email_service import (EmailDeliveryError,send_verification_email)
 from typing import Annotated
+from src.backend.app.database.models.admin_mfa import AdminMfaCredential
 from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from src.backend.app.core.security import hash_password, verify_password
-from src.backend.app.core.tokens import create_access_token, decode_access_token
+from src.backend.app.core.tokens import create_access_token, decode_access_token, create_admin_mfa_challenge_token
 from src.backend.app.database.models.user import User
 from src.backend.app.database.session import get_db
 from src.backend.app.core.config import settings
@@ -18,6 +23,7 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+logger = logging.getLogger(__name__)
 
 
 class RegisterRequest(BaseModel):
@@ -44,6 +50,7 @@ class RegisterResponse(BaseModel):
     id: int
     full_name: str
     email: EmailStr
+    verification_email_sent: bool
 
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -53,9 +60,9 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    access_token: str
+    access_token: str | None = None
     token_type: str = "bearer"
-
+    mfa_required: bool = False
 class CurrentUserResponse(BaseModel):
     id: str
     name: str
@@ -67,6 +74,7 @@ class CurrentUserResponse(BaseModel):
     response_model=RegisterResponse,
     status_code=status.HTTP_201_CREATED,
 )
+
 def register_user(
     request: RegisterRequest,
     db: Session = Depends(get_db),
@@ -86,15 +94,28 @@ def register_user(
             detail="Email already registered.",
         )
 
+    token, token_hash, expires_at = generate_verification_token()
+
     user = User(
         full_name=request.full_name,
         email=normalized_email,
         password_hash=hash_password(request.password),
         role="user",
+        email_verified_at=None,
     )
 
     try:
         db.add(user)
+        db.flush()
+
+        db.add(
+            EmailVerificationToken(
+                user_id=user.id,
+                token_hash=token_hash,
+                expires_at=expires_at,
+            )
+        )
+
         db.commit()
         db.refresh(user)
 
@@ -119,12 +140,23 @@ def register_user(
         db.rollback()
         raise
 
+    email_sent = False
+
+    try:
+        send_verification_email(user.email, token)
+        email_sent = True
+    except EmailDeliveryError:
+        logger.exception(
+            "Verification email delivery failed for user %s.",
+            user.id,
+        )
+
     return RegisterResponse(
         id=user.id,
         full_name=user.full_name,
         email=user.email,
+        verification_email_sent=email_sent,
     )
-
 
 @router.post(
     "/login",
@@ -143,17 +175,77 @@ def login_user(
         )
     )
 
-    if user is None or not verify_password(
-        request.password,
-        user.password_hash,
+    if (
+        user is None
+        or user.password_hash is None
+        or not verify_password(
+            request.password,
+            user.password_hash,
+        )
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "Please verify your email before signing in.",
+            },
+        )
+    if user.suspended_at is not None:
+            raise HTTPException(
+            status_code=403,
+            detail="This account has been suspended.",
+        )
 
-    access_token = create_access_token(user_id=user.id)
+    if user.role == "admin":
+        mfa = db.get(AdminMfaCredential, user.id)
+
+        if (
+            mfa is not None
+            and mfa.enabled_at is not None
+            and mfa.totp_secret_encrypted is not None
+        ):
+            challenge_token = create_admin_mfa_challenge_token(
+                user.id
+            )
+
+            response.headers["Cache-Control"] = "no-store"
+            response.delete_cookie(
+                key="careerforge_session",
+                path="/api",
+            )
+
+            response.set_cookie(
+                key="careerforge_admin_mfa_challenge",
+                value=challenge_token,
+                httponly=True,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/api/auth/admin-mfa/challenge",
+                max_age=300,
+            )
+
+            response.set_cookie(
+                key="csrf_token",
+                value=create_csrf_token(challenge_token),
+                httponly=False,
+                secure=settings.cookie_secure,
+                samesite="lax",
+                path="/",
+                max_age=300,
+            )
+
+            return LoginResponse(mfa_required=True)
+
+    access_token = create_access_token(
+        user_id=user.id,
+        session_version=user.session_version,
+    )
 
     max_age = settings.jwt_access_token_expire_minutes * 60
 
@@ -161,7 +253,7 @@ def login_user(
         key="careerforge_session",
         value=access_token,
         httponly=True,
-        secure=False,  # Local development only
+        secure=settings.cookie_secure,
         samesite="lax",
         path="/api",
         max_age=max_age,
@@ -172,7 +264,7 @@ def login_user(
         key="csrf_token",
         value=create_csrf_token(access_token),
         httponly=False,
-        secure=False,  # Local development only
+        secure=settings.cookie_secure,
         samesite="lax",
         path="/",
         max_age=max_age,
@@ -223,14 +315,14 @@ def complete_onboarding(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not found.",
         )
-
+    if user.target_career_id is None:
+        raise HTTPException(
+        status_code=400,
+        detail="Select a target career before completing setup.",
+        )
     user.onboarding_completed = True
     db.commit()
 
-@router.post(
-    "/logout",
-    status_code=status.HTTP_204_NO_CONTENT,
-)
 
 @router.post(
     "/logout",

@@ -1,82 +1,217 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
+
+import {
+  BrowserRouter, Navigate, Outlet, Route, Routes,
+} from 'react-router-dom';
+
 import AuthLayout from './components/AuthLayout';
 import AppShell from './components/AppShell';
+import WorkspaceLayout from './components/layout';
+
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { MentorJobsProvider } from './context/mentorjobscontext';
+import { AppearanceProvider, useAppearance } from './context/appearancecontext';
+
 import { postAuthRoute } from './lib/auth';
+
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
-import OnboardingPage from './pages/OnboardingPage';
 import SignupPage from './pages/SignupPage';
+import SkillsAssessmentPage from './pages/skillassessment';
+import CvPage from './pages/cvpage';
+import MentorPage from './pages/mentorpage';
+import RoadmapPage from './pages/roadmappage';
+import ProfilePage from './pages/profilepage';
+import SettingsPage from './pages/settingpage';
+import AdminPage from './pages/adminpage';
+import VerifyEmailPage from './pages/verifyemailpage';
+import AdminMfaPage from './pages/adminmfapage';
+import AdminResourcesPage from './pages/adminresourcespage';
+import HomePage from './pages/homepage';
+import './neon.css';
+import './responsive.css';
+import ConfirmAccountDeletionPage from './pages/ConfirmAccountDeletionPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
-type Theme = 'light' | 'dark';
-
-function StartingPage() {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="loading-screen">Loading…</div>;
-  return <Navigate to={user ? postAuthRoute(user) : '/login'} replace />;
+function LoadingScreen() {
+  return <div className="loading-screen">Loading...</div>;
 }
 
 function GuestOnly() {
   const { user, loading } = useAuth();
-  if (loading) return <div className="loading-screen">Loading…</div>;
-  return user ? <Navigate to={postAuthRoute(user)} replace /> : <Outlet />;
+
+  if (loading) return <LoadingScreen />;
+
+  return user
+    ? <Navigate to={postAuthRoute(user)} replace />
+    : <Outlet />;
 }
 
 function Protected() {
   const { user, loading } = useAuth();
-  if (loading) return <div className="loading-screen">Loading…</div>;
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+
+  if (loading) return <LoadingScreen />;
+
+  return user
+    ? <Outlet />
+    : <Navigate to="/login" replace />;
 }
 
-function OnboardingGuard() {
-  const { user } = useAuth();
-  return user?.onboarding_completed ? <Navigate to="/dashboard" replace /> : <Outlet />;
-}
+function AppRoutes() {
+  const { theme, toggleTheme } = useAppearance();
+  const layoutProps = { theme, toggleTheme };
 
-function DashboardGuard() {
-  const { user } = useAuth();
-  return user?.onboarding_completed ? <Outlet /> : <Navigate to="/onboarding" replace />;
+ return (
+  <BrowserRouter>
+    <MentorJobsProvider>
+      <Routes>
+
+            {/* Public homepage */}
+            <Route
+              index
+              element={<HomePage {...layoutProps} />}
+            />
+
+            {/* Public authentication */}
+            <Route element={<GuestOnly />}>
+              <Route element={<AuthLayout {...layoutProps} />}>
+                <Route
+                  path="login"
+                  element={<LoginPage />}
+                />
+
+                <Route
+                  path="signup"
+                  element={<SignupPage />}
+                />
+              </Route>
+              <Route
+                path="verify-email"
+                element={<VerifyEmailPage />}
+              />
+            </Route>
+            <Route element={<AuthLayout {...layoutProps} />}>
+            <Route
+              path="delete-account"
+              element={<ConfirmAccountDeletionPage />}
+            />
+          </Route>
+          <Route element={<AuthLayout {...layoutProps} />}>
+          <Route
+            path="forgot-password"
+            element={<ForgotPasswordPage />}
+          />
+          <Route
+            path="reset-password"
+            element={<ResetPasswordPage />}
+          />
+        </Route>
+
+            {/* Administrator MFA */}
+            <Route
+              path="auth/mfa"
+              element={<AdminMfaPage />}
+            />
+
+            {/* OAuth callback */}
+            <Route
+              path="auth/callback"
+              element={<AuthLayout {...layoutProps} />}
+            >
+              <Route
+                index
+                element={<AuthCallbackPage />}
+              />
+            </Route>
+
+            {/* Authenticated application */}
+            <Route element={<Protected />}>
+
+              {/* Administrator workspace */}
+              <Route
+                path="admin"
+                element={
+                  <AppShell {...layoutProps}>
+                    <AdminPage />
+                  </AppShell>
+                }
+              />
+
+              <Route
+                path="admin/resources"
+                element={<AdminResourcesPage />}
+              />
+
+              {/* Standard workspace */}
+              <Route
+                element={
+                  <AppShell {...layoutProps}>
+                    <WorkspaceLayout />
+                  </AppShell>
+                }
+              >
+                <Route
+                  path="dashboard"
+                  element={<DashboardPage />}
+                />
+
+                <Route
+                  path="profile"
+                  element={<ProfilePage />}
+                />
+
+                <Route
+                  path="cv"
+                  element={<CvPage />}
+                />
+
+                <Route
+                  path="skills-assessment"
+                  element={<SkillsAssessmentPage />}
+                />
+
+                <Route
+                  path="roadmap"
+                  element={<RoadmapPage />}
+                />
+
+                <Route
+                  path="mentor"
+                  element={<MentorPage />}
+                />
+
+                <Route
+                  path="settings"
+                  element={<SettingsPage />}
+                />
+
+                <Route
+                  path="onboarding"
+                  element={
+                    <Navigate to="/dashboard" replace />
+                  }
+                />
+              </Route>
+            </Route>
+
+            {/* Unknown routes */}
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+            </Routes>
+    </MentorJobsProvider>
+  </BrowserRouter>
+);
 }
 
 export default function App() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('careerforge-theme');
-    return saved === 'light' || saved === 'dark' ? saved : 'light';
-  });
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('careerforge-theme', theme);
-  }, [theme]);
-  const toggleTheme = () => setTheme((current) => current === 'light' ? 'dark' : 'light');
-  const props = { theme, toggleTheme };
-
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<StartingPage />} />
-          <Route element={<GuestOnly />}>
-            <Route element={<AuthLayout {...props} />}>
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
-            </Route>
-          </Route>
-          <Route path="auth/callback" element={<AuthLayout {...props} />}>
-            <Route index element={<AuthCallbackPage />} />
-          </Route>
-          <Route element={<Protected />}>
-            <Route element={<OnboardingGuard />}>
-              <Route path="onboarding" element={<AppShell {...props}><OnboardingPage /></AppShell>} />
-            </Route>
-            <Route element={<DashboardGuard />}>
-              <Route path="dashboard" element={<AppShell {...props}><DashboardPage /></AppShell>} />
-            </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <AppearanceProvider>
+        <AppRoutes />
+      </AppearanceProvider>
     </AuthProvider>
   );
 }

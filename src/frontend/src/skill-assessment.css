@@ -1,0 +1,224 @@
+
+.cf-assessment-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.cf-assessment-metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.cf-assessment-metrics strong {
+  color: var(--text);
+  font-size: 26px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.cf-assessment-metrics span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cf-assessment-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 20px 0;
+}
+
+.cf-assessment-skill {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cf-assessment-hint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 16px 0;
+}
+
+.cf-assessment-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cf-assessment-link:hover {
+  background: color-mix(
+    in srgb,
+    var(--accent) 8%,
+    transparent
+  );
+}
+
+.cf-assessment-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 14px;
+}
+
+.cf-assessment-filters button {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cf-assessment-filters button.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(
+    in srgb,
+    var(--accent) 8%,
+    transparent
+  );
+}
+
+.cf-assessment-gap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cf-assessment-gap-row {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+}
+
+.cf-assessment-gap-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cf-assessment-gap-heading strong {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cf-assessment-gap-heading > span {
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.cf-assessment-gap-row p {
+  margin: 10px 0 6px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.cf-assessment-gap-row small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cf-assessment-gap-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.cf-assessment-gap-tags span {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+@media (max-width: 600px) {
+  .cf-assessment-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cf-assessment-gap-heading {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.cf-career-collapse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cf-career-collapse-header h2 {
+  margin: 12px 0 0;
+}
+
+.cf-career-current {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 0;
+  color: var(--text-primary, #eeeae5);
+  font-weight: 600;
+}
+
+.cf-career-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cf-interactive-highlight, #d18a64);
+  flex-shrink: 0;
+}
+
+.cf-career-toggle {
+  padding: 10px 16px;
+  border: 1px solid var(--line, #494949);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cf-career-toggle:hover {
+  border-color: var(--cf-interactive-highlight, #d18a64);
+  color: var(--cf-interactive-highlight, #d18a64);
+}
+
+.cf-career-toggle:focus-visible {
+  outline: 2px solid var(--cf-interactive-highlight, #d18a64);
+  outline-offset: 3px;
+}
