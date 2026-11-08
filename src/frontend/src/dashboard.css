@@ -1,6 +1,4 @@
-
 /* CareerForge dashboard */
-
 .cf-home {
   width: 100%;
   max-width: 1100px;
@@ -279,4 +277,13 @@ html[data-appearance="neon"] .cf-home-tour.cf-tour-popover {
   background: #141c2a;
   color: #f1f5fb;
   border-color: #34485b;
+}
+/* Cozy Light — dashboard greeting */
+
+html[data-appearance="cozy"][data-theme="light"] .cf-home-welcome {
+  color: #292521;
+}
+
+html[data-appearance="cozy"][data-theme="light"] .cf-home-name {
+  color: #bd704e;
 }
