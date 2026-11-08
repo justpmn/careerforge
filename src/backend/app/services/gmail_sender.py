@@ -33,35 +33,38 @@ def send_email(
     message["Auto-Submitted"] = "auto-generated"
     message.set_content(body)
 
+    
     if html_body:
         message.add_alternative(html_body, subtype="html")
+
         if logo_path:
             path = Path(logo_path)
-        if not path.is_absolute():
-            path = Path(__file__).resolve().parents[4] / path
 
-        if not path.is_file():
-            raise GmailDeliveryError("Email logo file not found.")
+            if not path.is_absolute():
+                path = Path(__file__).resolve().parents[4] / path
 
-        subtype = {
-            ".png": "png",
-            ".jpg": "jpeg",
-            ".jpeg": "jpeg",
-        }.get(path.suffix.lower())
+            if not path.is_file():
+                raise GmailDeliveryError("Email logo file not found.")
 
-        if subtype is None:
-            raise GmailDeliveryError("Email logo must be PNG or JPEG.")
+            subtype = {
+                ".png": "png",
+                ".jpg": "jpeg",
+                ".jpeg": "jpeg",
+            }.get(path.suffix.lower())
 
-        if path.stat().st_size > 500_000:
-            raise GmailDeliveryError("Email logo exceeds 500 KB.")
+            if subtype is None:
+                raise GmailDeliveryError("Email logo must be PNG or JPEG.")
 
-        message.get_payload()[-1].add_related(
-            path.read_bytes(),
-            maintype="image",
-            subtype=subtype,
-            cid="<careerforge-logo>",
-            disposition="inline",
-        )
+            if path.stat().st_size > 500_000:
+                raise GmailDeliveryError("Email logo exceeds 500 KB.")
+
+            message.get_payload()[-1].add_related(
+                path.read_bytes(),
+                maintype="image",
+                subtype=subtype,
+                cid="<careerforge-logo>",
+                disposition="inline",
+            )
 
     try:
         with smtplib.SMTP_SSL(
