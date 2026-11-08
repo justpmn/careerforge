@@ -139,3 +139,62 @@ def get_latest_resume_analysis(
         filename=resume.file_name,
         **resume.analysis_result,
     )
+
+@router.post("/resumes/latest/recommendations")
+def refresh_resume_recommendations(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    resume = db.scalar(
+        select(Resume)
+        .where(
+            Resume.user_id == user_id,
+            Resume.analysis_result.is_not(None),
+        )
+        .order_by(Resume.id.desc())
+        .limit(1)
+    )
+
+    if resume is None:
+        raise HTTPException(404, "No saved CV analysis found.")
+
+    analysis = dict(resume.analysis_result or {})
+    model_recommendations = analysis.get("model_recommendations")
+
+    if not model_recommendations:
+        if not resume.extracted_text:
+            raise HTTPException(
+                422,
+                "The saved CV cannot be reanalyzed.",
+            )
+
+        service = get_recommendation_service()
+        career_count = len(service.recommender.model.classes_)
+
+        result = service.recommend_from_text(
+            text=resume.extracted_text,
+            top_k=career_count,
+        )
+
+        model_recommendations = result["recommendations"]
+
+        analysis["model_recommendations"] = model_recommendations
+        resume.analysis_result = analysis
+        db.commit()
+
+    return personalize_recommendations(
+        db=db,
+        user_id=user_id,
+        recommendations=model_recommendations,
+        top_k=len(model_recommendations),
+    )
+
+@router.get("/core-skill-coverage")
+def read_core_skill_coverage(
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    return get_user_core_skill_coverage(
+        db=db,
+        user_id=user_id,
+    )

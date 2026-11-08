@@ -10,7 +10,8 @@ ACTION_PRIORITY = {
     "review_submitted_evidence": 1,
     "review_resume_evidence": 2,
     "assess_competency": 3,
-    "confirm_skill_experience": 4,
+    "confirm_self_reported_skill": 4,
+    "confirm_skill_experience": 5,
 }
 
 ACTION_DESCRIPTIONS = {
@@ -25,6 +26,10 @@ ACTION_DESCRIPTIONS = {
     "assess_competency": (
         "Assess the user's existing experience before "
         "determining whether further learning is needed."
+    ),
+     "confirm_self_reported_skill": (
+        "Confirm the user's self-reported experience "
+        "before treating it as competency evidence."
     ),
     "confirm_skill_experience": (
         "Confirm whether the user has experience with "
