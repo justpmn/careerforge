@@ -7,10 +7,12 @@ from src.backend.app.services.llm_service import (LLMServiceError, generate_ment
 from src.backend.app.database.models.user import User
 from src.backend.app.database.models.career import Career
 from src.backend.app.services.career_intent_service import (UnrecognizedCareerChange, resolve_explicit_career_change)
-from src.backend.app.services.mentor_conversation_service import (list_owned_mentor_conversations, list_owned_mentor_messages)
+from src.backend.app.services.mentor_conversation_service import (list_owned_mentor_conversations, list_owned_mentor_messages,create_mentor_conversation,get_owned_conversation, save_mentor_message, make_mentor_title)
 from src.backend.app.services.assessment_mentor_service import (generate_assessment_mentor_response, generate_persistent_assessment_mentor_response,)
 from typing import Literal, Annotated
 from pydantic import BaseModel, Field, StringConstraints, ConfigDict
+from sqlalchemy import select
+from src.backend.app.database.models.mentor_job import MentorGenerationJob
 
 router = APIRouter()
 
@@ -61,7 +63,23 @@ class PersistentAssessmentMentorResponse(BaseModel):
     response: str
     career_key: str
     target_updated: bool = False
+class MentorJobAccepted(BaseModel):
+    job_id: int
+    conversation_id: int
+    career_key: str
+    target_updated: bool = False
 
+
+class MentorJobSummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    conversation_id: int
+    status: Literal["queued", "running", "completed", "failed"]
+    response_seconds: float | None
+    error: str | None
+    created_at: datetime
+    updated_at: datetime
 
 class MentorConversationSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -78,7 +96,8 @@ class MentorConversationMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str
     created_at: datetime
-
+class MentorConversationRenameRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=100)
 
 @router.post(
     "/chat",

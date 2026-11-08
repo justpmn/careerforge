@@ -8,7 +8,8 @@ from src.backend.app.database.models.career import Career
 from src.backend.app.services.competency_gap_service import (analyze_competency_gaps)
 from src.backend.app.services.ai_mentor_context_service import (build_mentor_context)
 from src.backend.app.services.llm_service import (generate_mentor_response)
-from src.backend.app.services.mentor_conversation_service import (create_mentor_conversation, get_owned_conversation, get_recent_mentor_history, save_mentor_message,)
+from src.backend.app.services.mentor_conversation_service import (create_mentor_conversation, get_owned_conversation, get_recent_mentor_history, save_mentor_message, make_mentor_title)
+from src.backend.app.services.careerforge_account_context_service import (build_account_mentor_context)
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -71,6 +72,73 @@ def should_include_learning_resources(
         for previous in recent_user_messages
     )
 
+def build_grounded_mentor_context(
+    db: Session,
+    user_id: int,
+    career_key: str,
+    assessment: dict,
+    include_resources: bool,
+    message: str,
+) -> dict:
+    account_context = build_account_mentor_context(
+        db=db,
+        user_id=user_id,
+        career_key=career_key,
+        include_resources=include_resources,
+    )
+
+    if is_cv_ranking_question(message):
+        return {
+            "focus": "saved_cv_recommendations",
+            "recommendations": account_context["recommendations"],
+            "career_preferences": account_context["career_preferences"],
+            "instructions": (
+                "Answer the user's question about saved CV "
+                "recommendations directly. Name the ranked careers "
+                "and compare their Random Forest scores with "
+                "documented skill coverage. These metrics measure "
+                "different things and neither verifies career "
+                "readiness. Do not substitute a competency "
+                "assessment. If rankings are unavailable, say so."
+            ),
+        }
+
+    assessment_context = build_mentor_context(
+        assessment,
+        include_resources=False,
+    )
+
+    competencies = assessment_context.get("competencies", [])
+
+    assessment_context["competencies"] = competencies[:6]
+    assessment_context["omitted_competencies"] = max(
+        0,
+        len(assessment.get("competencies", [])) - 6,
+    )
+
+    return {
+        "focus": (
+            "learning_resources"
+            if include_resources
+            else "career_guidance"
+        ),
+        "assessment": assessment_context,
+        "account": account_context,
+    }
+
+def is_cv_ranking_question(message: str) -> bool:
+    terms = (
+        "random forest",
+        "rf score",
+        "model score",
+        "documented coverage",
+        "skill coverage",
+        "cv analysis",
+        "career recommendation",
+        "recommended careers",
+        "career ranking",
+    )
+    return any(term in message.lower() for term in terms)
 
 async def generate_assessment_mentor_response(
     db: Session,
@@ -84,9 +152,13 @@ async def generate_assessment_mentor_response(
         career_key=career_key,
     )
 
-    context = build_mentor_context(
-        assessment,
+    context = build_grounded_mentor_context(
+        db=db,
+        user_id=user_id,
+        career_key=career_key,
+        assessment=assessment,
         include_resources=is_learning_resource_question(message),
+        message=message,
     )
 
     response = await generate_mentor_response(
@@ -103,6 +175,7 @@ async def generate_persistent_assessment_mentor_response(
     career_key: str,
     message: str,
     conversation_id: int | None = None,
+    pre_saved_user_message_id: int | None = None,
 ) -> dict:
 
     career_id = db.scalar(
@@ -187,19 +260,20 @@ async def generate_persistent_assessment_mentor_response(
             db=db,
             user_id=user_id,
             career_id=career_id,
-            title=f"{assessment['career_name']} Assessment",
+            title=make_mentor_title(message),
         )
 
         conversation_id = conversation.id
 
     # Step 5: Persist both messages.
-    save_mentor_message(
-        db=db,
-        user_id=user_id,
-        conversation_id=conversation_id,
-        role="user",
-        content=message,
-    )
+    if pre_saved_user_message_id is None:
+        save_mentor_message(
+            db=db,
+            user_id=user_id,
+            conversation_id=conversation_id,
+            role="user",
+            content=message,
+        )
 
     save_mentor_message(
         db=db,

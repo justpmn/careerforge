@@ -19,6 +19,7 @@ from src.backend.app.database.models.user_learning_progress import UserLearningP
 from src.backend.app.database.models.oauth_identity import OAuthIdentity
 from src.backend.app.database.models.password_reset_token import PasswordResetToken
 from src.backend.app.database.models.account_deletion_token import AccountDeletionToken
+from src.backend.app.database.models.mentor_job import MentorGenerationJob
 
 
 __all__ = [

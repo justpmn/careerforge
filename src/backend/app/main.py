@@ -3,10 +3,29 @@ from src.backend.app.api.router import api_router
 from starlette.middleware.sessions import SessionMiddleware
 from src.backend.app.core.config import settings
 from src.backend.app.core.admin_logging import record_system_event
+import asyncio
+from contextlib import asynccontextmanager, suppress
+from src.backend.app.services.mentor_job_service import (mentor_job_worker,recover_interrupted_mentor_jobs)
 
+
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    recover_interrupted_mentor_jobs()
+    worker = asyncio.create_task(mentor_job_worker())
+
+    try:
+        yield
+    finally:
+        worker.cancel()
+
+        with suppress(asyncio.CancelledError):
+            await worker
 app = FastAPI(
     title=settings.app_name,
-    version=settings.app_version
+    version=settings.app_version,
+    lifespan=lifespan,
 )
 
 @app.middleware("http")
