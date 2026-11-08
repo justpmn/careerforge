@@ -7,6 +7,7 @@ import { getCompetencyAssessments } from '../lib/competencyassessments';
 import { getLearningProgress } from '../lib/learningprogress';
 import type { RecordedSkill } from '../lib/roadmap';
 import AdminAccessLink from '../components/adminaccesslink';
+import CareerPreferencesPanel from '../components/careerpreferencespanel';
 import '../profile.css';
 
 
@@ -417,6 +418,8 @@ export default function ProfilePage() {
             self-reporting, not verified mastery.
           </p>
         </article>
+        {/* Career preferences */}
+        <CareerPreferencesPanel />
 
         {/* CV */}
         <article className="cf-dashboard-card cf-profile-wide">
