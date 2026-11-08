@@ -20,6 +20,7 @@ def save_resume_analysis(
     recommendations: list[dict],
     model_skills: list[str] | None = None,
     ignored_skills: list[str] | None = None,
+    model_recommendations: list[dict] | None = None,
 ) -> Resume:
     """
     Save resume metadata, extracted user skills,
@@ -55,6 +56,7 @@ def save_resume_analysis(
             "model_skills": model_skills if model_skills is not None else [],
             "ignored_skills": ignored_skills if ignored_skills is not None else [],
             "recommendations": recommendations,
+            "model_recommendations": model_recommendations or [],
         },
     )
 

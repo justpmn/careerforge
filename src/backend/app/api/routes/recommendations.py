@@ -4,10 +4,12 @@ from src.backend.app.schemas.recommendation import (RecommendationRequest,Recomm
 from sqlalchemy.orm import Session
 from src.backend.app.database.session import (get_db)
 from src.backend.app.services.resume_persistence_service import (save_resume_analysis)
-from src.backend.app.services.recommendation_service import (analyze_career_text, analyze_personalized_career_text)
+from src.backend.app.services.recommendation_service import (analyze_career_text, analyze_personalized_career_text, get_recommendation_service)
 from sqlalchemy import select
 from src.backend.app.api.auth import get_current_user_id
 from src.backend.app.database.models.resume import Resume
+from src.backend.app.services.career_preference_service import personalize_recommendations
+from src.backend.app.services.core_skill_coverage_service import (get_user_core_skill_coverage)
 
 router = APIRouter(
     prefix="/recommendations",
@@ -91,6 +93,7 @@ async def upload_resume(
             model_skills=result["model_skills"],
             ignored_skills=result["ignored_skills"],
             recommendations=result["recommendations"],
+            model_recommendations=result["model_recommendations"],
         )
 
         return result

@@ -43,7 +43,7 @@ export async function uploadResume(
   const form = new FormData();
   form.append('file', file);
   form.append('user_id', String(parsedUserId));
-  form.append('top_k', '3');
+  form.append('top_k', '5');
 
   let response: Response;
 
@@ -105,4 +105,29 @@ export async function getLatestResumeAnalysis():
   }
 
   return (await response.json()) as SavedResumeAnalysis | null;
+}
+
+export async function refreshResumeRecommendations():
+  Promise<CareerRecommendation[]> {
+
+  const response = await fetch(
+    '/api/recommendations/resumes/latest/recommendations',
+    {
+      method: 'POST',
+      credentials: 'include',
+      headers: csrfHeader(),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => null);
+
+    throw new Error(
+      typeof error?.detail === 'string'
+        ? error.detail
+        : `Could not refresh recommendations (HTTP ${response.status}).`
+    );
+  }
+
+  return (await response.json()) as CareerRecommendation[];
 }

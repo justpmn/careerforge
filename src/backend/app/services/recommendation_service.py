@@ -83,6 +83,9 @@ def analyze_personalized_career_text(
             text=text,
             top_k=career_count,
         )
+        result["model_recommendations"] = [
+            dict(item) for item in result["recommendations"]
+        ]
 
         personalized = personalize_recommendations(
             db=db,
