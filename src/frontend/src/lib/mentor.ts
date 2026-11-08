@@ -23,6 +23,23 @@ export type MentorChatResponse = {
   target_updated: boolean;
 };
 
+export type MentorJobAccepted = {
+  job_id: number;
+  conversation_id: number;
+  career_key: string;
+  target_updated: boolean;
+};
+
+export type MentorJob = {
+  id: number;
+  conversation_id: number;
+  status: 'queued' | 'running' | 'completed' | 'failed';
+  response_seconds: number | null;
+  error: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 const API = '/api/ai-mentor';
 
 async function request<T>(

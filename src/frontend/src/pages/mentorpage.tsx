@@ -1,21 +1,18 @@
+
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { onboardingApi } from '../lib/onboarding';
 import { mentorApi } from '../lib/mentor';
 import type {
   MentorConversation,
   MentorMessage,
 } from '../lib/mentor';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { useMentorJobs } from '../context/mentorjobscontext';
 
 import '../mentor.css';
-import { useMentorJobs } from '../context/mentorjobscontext';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-type DisplayMentorMessage = MentorMessage & {
-  responseSeconds?: number;
-};
 
 type CareerOption = {
   id: number;
@@ -82,7 +79,7 @@ const requestedThread = useRef<number | null>(null);
         historyResult.status === 'rejected'
       ) {
         setError(
-          'Some mentor information could not be loaded. Try refreshing.'
+          'Some mentor information could not be loaded.'
         );
       }
 
@@ -96,77 +93,100 @@ const requestedThread = useRef<number | null>(null);
     };
   }, []);
 
-  
-useEffect(() => {
-  if (loading) return;
+  useEffect(() => {
+    let active = true;
 
-  const rawId = new URLSearchParams(
-    location.search
-  ).get('conversation');
+    setError('');
 
-  if (!rawId) return;
+    if (!conversationId) {
+      setMessages([]);
+      setLoadingThread(false);
+      return;
+    }
 
-  const id = Number(rawId);
+    setLoadingThread(true);
 
-  if (!Number.isSafeInteger(id) || id <= 0) return;
-  if (requestedThread.current === id) return;
+    mentorApi.messages(conversationId)
+      .then((history) => {
+        if (active) setMessages(history);
+      })
+      .catch((err) => {
+        if (!active) return;
 
-  const thread = conversations.find(
-    (item) => item.id === id
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Could not load conversation.'
+        );
+      })
+      .finally(() => {
+        if (active) setLoadingThread(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const thread = conversations.find(
+      (item) => item.id === conversationId
+    );
+
+    const career = careers.find(
+      (item) => item.id === thread?.career_id
+    );
+
+    if (career) setCareerKey(career.career_key);
+  }, [conversationId, conversations, careers]);
+
+  const latestJob = jobs.find(
+    (job) => job.conversation_id === conversationId
   );
 
-  const career = careers.find(
-    (item) => item.id === thread?.career_id
-  );
+  const thinkingHere =
+    latestJob?.status === 'queued' ||
+    latestJob?.status === 'running';
 
-  if (!thread || !career) {
-    setError('Conversation could not be found.');
-    return;
-  }
+  const failedHere = latestJob?.status === 'failed';
 
-  let active = true;
+  useEffect(() => {
+    if (
+      !conversationId ||
+      !latestJob ||
+      latestJob.status !== 'completed'
+    ) {
+      return;
+    }
 
-  requestedThread.current = id;
-  setLoadingThread(true);
-  setCareerNotice('');
-  setError('');
+    let active = true;
 
-  mentorApi.messages(id)
-    .then((history) => {
-      if (!active) return;
+    mentorApi.messages(conversationId)
+      .then((history) => {
+        if (active) setMessages(history);
+      })
+      .catch(() => {
+        // Saved history can be loaded again.
+      });
 
-      setConversationId(id);
-      setCareerKey(career.career_key);
-      setMessages(history);
-      setDraft('');
-    })
-    .catch((err) => {
-      if (!active) return;
-
-      requestedThread.current = null;
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Could not load conversation.'
-      );
-    })
-    .finally(() => {
-      if (active) setLoadingThread(false);
-    });
-
-  return () => {
-    active = false;
-  };
-}, [loading, location.search, conversations, careers]);
-
+    return () => {
+      active = false;
+    };
+  }, [
+    conversationId,
+    latestJob?.id,
+    latestJob?.status,
+  ]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
     });
-  }, [messages, sending]);
-  
+  }, [messages, thinkingHere, submitting]);
+
   const selectedCareer = careers.find(
     (career) => career.career_key === careerKey
   );
@@ -454,51 +474,74 @@ function handleComposerKeyDown(
                       : 'cf-mentor-assistant')
                   }
                 >
+                  <span className="cf-mentor-role">
+                    {message.role === 'user'
+                      ? 'You'
+                      : 'CareerForge'}
+                  </span>
 
-                    <span className="cf-mentor-role">
-                    {message.role === 'user' ? 'You' : 'CareerForge'}
-                    </span>
-
-                    {message.role === 'assistant' ? (
+                  {message.role === 'assistant' ? (
                     <div className="cf-mentor-markdown">
-                        <ReactMarkdown
+                      <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         skipHtml
-                        >
+                      >
                         {message.content}
-                        </ReactMarkdown>
+                      </ReactMarkdown>
                     </div>
-                    ) : (
+                  ) : (
                     <p>{message.content}</p>
-                    )}
-
-                    {message.role === 'assistant' &&
-                    message.responseSeconds !== undefined && (
-                        <span className="cf-mentor-duration">
-                        Responded in {message.responseSeconds.toFixed(1)}s
-                        </span>
-                    )}
-
+                  )}
                 </div>
               ))
             )}
 
-            {sending && (
-                <div className="cf-mentor-thinking" role="status">
-                    <span className="cf-thinking-dot" aria-hidden="true" />
-                    <span>
-                    thinking… 
-                    </span>
-                </div>
-                )}
+            {(thinkingHere ||
+              (submitting && !conversationId)) && (
+              <div
+                className="cf-mentor-thinking"
+                role="status"
+              >
+                <span
+                  className="cf-thinking-dot"
+                  aria-hidden="true"
+                />
+
+                <span>
+                  {submitting && !conversationId
+                    ? 'Saving your message...'
+                    : 'Thinking...'}
+                </span>
+              </div>
+            )}
+
+            {failedHere && (
+              <p
+                className="cf-mentor-error"
+                role="alert"
+              >
+                {latestJob?.error ||
+                  'The mentor could not respond.'}
+              </p>
+            )}
 
             <div ref={bottomRef} />
           </div>
 
           <div className="cf-mentor-composer">
             {error && (
-              <p className="cf-mentor-error" role="alert">
+              <p
+                className="cf-mentor-error"
+                role="alert"
+              >
                 {error}
+              </p>
+            )}
+
+            {sending && !thinkingHere && !submitting && (
+              <p className="cf-mentor-muted">
+                Your mentor is replying in another
+                conversation.
               </p>
             )}
 
@@ -510,37 +553,39 @@ function handleComposerKeyDown(
                 Your message
               </label>
 
-              
-                <textarea
+              <textarea
                 id="mentor-input"
                 rows={3}
                 value={draft}
                 maxLength={2000}
-                onChange={(event) => setDraft(event.target.value)}
+                onChange={(event) =>
+                  setDraft(event.target.value)
+                }
                 onKeyDown={handleComposerKeyDown}
                 placeholder="Ask anything about your career..."
-                disabled={loading || loadingThread || sending}
-                />
-
+                disabled={loading || loadingThread}
+              />
 
               <div className="cf-mentor-composer-bottom">
                 <span>
                   Enter to send · Shift+Enter for a new line
                 </span>
 
-
                 <button
-                type="submit"
-                disabled={
+                  type="submit"
+                  disabled={
                     !draft.trim() ||
                     loading ||
                     loadingThread ||
                     sending
-                }
+                  }
                 >
-                {sending ? 'Sending...' : 'Send'}
+                  {submitting
+                    ? 'Saving...'
+                    : thinkingHere
+                      ? 'Thinking...'
+                      : 'Send'}
                 </button>
-
               </div>
             </form>
           </div>
