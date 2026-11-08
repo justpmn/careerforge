@@ -1,18 +1,35 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import {uploadResume, getLatestResumeAnalysis,} from '../lib/resume';
-import type { ResumeAnalysis } from '../lib/resume';
+import {uploadResume, getLatestResumeAnalysis, refreshResumeRecommendations} from '../lib/resume';
+import type { ResumeAnalysis, CareerRecommendation } from '../lib/resume';
 import CvUploadModal from '../components/cvuploadmodal';
+import { useCareerPreferences } from '../hooks/useCareerPreferences';
+import {getCoreSkillCoverage,type CoreCoverageResults,} from '../lib/corecoverage';
 
 function careerName(key: string): string {
   return key
     .replace(/[_-]/g, ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
+type SortMode =
+  | 'personalized'
+  | 'model_desc'
+  | 'model_asc'
+  | 'coverage_desc'
+  | 'coverage_asc';
 
 export default function CvPage() {
   const { user } = useAuth();
+  const {
+    loading: preferencesLoading,
+    savingKey,
+    error: preferencesError,
+    preferenceFor,
+    choose,
+  } = useCareerPreferences(
+  user?.id != null ? Number(user.id) : undefined
+);
 
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
   const [analyzedFilename, setAnalyzedFilename] = useState('');

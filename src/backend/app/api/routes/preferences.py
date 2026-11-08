@@ -7,7 +7,7 @@ from src.backend.app.database.session import get_db
 
 from src.backend.app.services.career_preference_service import (
     get_user_career_preferences,
-    set_career_preference,
+    set_career_preference, remove_career_preference,
 )
 
 
@@ -68,3 +68,29 @@ def read_career_preferences(
         db=db,
         user_id=authenticated_user_id,
     )
+
+@router.delete("/careers/{career_key}")
+def delete_career_preference(
+    career_key: str,
+    user_id: int,
+    authenticated_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    if user_id != authenticated_user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot modify another user's preferences.",
+        )
+
+    try:
+        removed = remove_career_preference(
+            db=db,
+            user_id=authenticated_user_id,
+            career_key=career_key,
+        )
+        return {"career_key": career_key, "removed": removed}
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error),
+        ) from error
