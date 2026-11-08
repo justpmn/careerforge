@@ -38,6 +38,68 @@ export default function CvPage() {
   const [uploading, setUploading] = useState(false);
   const [cvUploadOpen, setCvUploadOpen] = useState(false);
   const [savedError, setSavedError] = useState('');
+  const [recommendations, setRecommendations] =
+    useState<CareerRecommendation[]>([]);
+
+  const [recommendationsLoading, setRecommendationsLoading] =
+    useState(false);
+
+  const [processingKey, setProcessingKey] =
+    useState<string | null>(null);
+
+  const [exitingKey, setExitingKey] =
+    useState<string | null>(null);
+
+  const [recommendationError, setRecommendationError] =
+    useState('');
+  const [skippedKeys, setSkippedKeys] = useState<string[]>([]);
+
+const rankingsDialogRef = useRef<HTMLDialogElement>(null);
+
+const [coreCoverage, setCoreCoverage] =
+  useState<CoreCoverageResults>({});
+
+const [coverageLoading, setCoverageLoading] =
+  useState(false);
+
+const [sortMode, setSortMode] =
+  useState<SortMode>('personalized');
+
+const sortedRecommendations = [...recommendations].sort((a, b) => {
+  const originalOrder = a.rank - b.rank;
+
+  if (sortMode === 'personalized') {
+    return originalOrder;
+  }
+
+  if (sortMode === 'model_desc') {
+    return b.score - a.score || originalOrder;
+  }
+
+  if (sortMode === 'model_asc') {
+    return a.score - b.score || originalOrder;
+  }
+
+  const aCoverage = coreCoverage[a.career_key]?.overall_percentage;
+  const bCoverage = coreCoverage[b.career_key]?.overall_percentage;
+
+  if (aCoverage == null && bCoverage == null) {
+    return originalOrder;
+  }
+
+  if (aCoverage == null) return 1;
+  if (bCoverage == null) return -1;
+
+  if (sortMode === 'coverage_desc') {
+    return bCoverage - aCoverage || originalOrder;
+  }
+
+  return aCoverage - bCoverage || originalOrder;
+});
+
+const visibleRecommendations = sortedRecommendations
+  .filter((item) => !skippedKeys.includes(item.career_key))
+  .slice(0, 3);
 
   // Load the latest saved CV analysis.
   useEffect(() => {
@@ -50,11 +112,33 @@ export default function CvPage() {
         if (!active) return;
 
         if (saved) {
-          const { filename, ...result } = saved;
+        const { filename, ...result } = saved;
 
-          setAnalysis(result);
-          setAnalyzedFilename(filename);
+        setAnalysis(result);
+        setAnalyzedFilename(filename);
+        setRecommendationsLoading(true);
+
+        try {
+          const updated = await refreshResumeRecommendations();
+
+          if (!active) return;
+
+          setRecommendations(updated);
+          setRecommendationError('');
+          setSkippedKeys([]);
+        } catch (err) {
+          if (!active) return;
+
+          setRecommendations(result.recommendations);
+          setRecommendationError(
+            err instanceof Error
+              ? err.message
+              : 'Could not refresh recommendations.'
+          );
+        } finally {
+          if (active) setRecommendationsLoading(false);
         }
+      }
       } catch (err) {
         if (!active) return;
 
@@ -75,216 +159,525 @@ export default function CvPage() {
     };
   }, []);
 
-  async function handleCvAnalysis(selectedFile: File): Promise<void> {
-    if (!user?.id) {
-      throw new Error('Please sign in to analyze your CV.');
-    }
-
-    setUploading(true);
-
-    try {
-      const result = await uploadResume(
-        selectedFile,
-        String(user.id)
-      );
-
-      setAnalysis(result);
-      setAnalyzedFilename(selectedFile.name);
-      setSavedError('');
-    } finally {
-      setUploading(false);
-    }
+useEffect(() => {
+  if (!analysis || !user?.id) {
+    setCoreCoverage({});
+    return;
   }
 
+  let active = true;
+
+  setCoverageLoading(true);
+
+  getCoreSkillCoverage()
+    .then((result) => {
+      if (active) setCoreCoverage(result);
+    })
+    .catch(() => {
+      if (active) setCoreCoverage({});
+    })
+    .finally(() => {
+      if (active) setCoverageLoading(false);
+    });
+
+  return () => {
+    active = false;
+  };
+}, [analysis, user?.id]);
+
+  async function handleCvAnalysis(selectedFile: File): Promise<void> {
+  if (!user?.id) {
+    throw new Error('Please sign in to analyze your CV.');
+  }
+
+  setUploading(true);
+  setRecommendationError('');
+
+  try {
+    const result = await uploadResume(
+      selectedFile,
+      String(user.id)
+    );
+
+    setAnalysis(result);
+    setRecommendations(result.recommendations);
+    setAnalyzedFilename(selectedFile.name);
+    setSkippedKeys([]);
+    setSavedError('');
+
+    try {
+      const updated = await refreshResumeRecommendations();
+      setRecommendations(updated);
+    } catch {
+      setRecommendationError(
+        'Showing initial recommendations. The full ranking could not be loaded.'
+      );
+    }
+  } finally {
+    setUploading(false);
+  }
+}
+
+  async function handleAvoid(careerKey: string): Promise<void> {
+  if (processingKey !== null || savingKey !== null) return;
+
+  setProcessingKey(careerKey);
+  setRecommendationError('');
+
+  try {
+    const saved = await choose(careerKey, 'avoid');
+
+    if (!saved) return;
+
+    const updated = await refreshResumeRecommendations();
+
+    setExitingKey(careerKey);
+
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, 260);
+    });
+
+    setRecommendations(updated);
+  } catch (err) {
+    setRecommendationError(
+      err instanceof Error
+        ? err.message
+        : 'Could not update recommendations.'
+    );
+  } finally {
+    setExitingKey(null);
+    setProcessingKey(null);
+  }
+}
+function handleSkip(careerKey: string): void {
+  if (processingKey !== null || savingKey !== null) return;
+
+  setProcessingKey(careerKey);
+  setExitingKey(careerKey);
+
+  window.setTimeout(() => {
+    setSkippedKeys((previous) =>
+      previous.includes(careerKey)
+        ? previous
+        : [...previous, careerKey]
+    );
+
+    setExitingKey(null);
+    setProcessingKey(null);
+  }, 260);
+}
+
+async function handlePrefer(careerKey: string): Promise<void> {
+  if (processingKey !== null || savingKey !== null) return;
+
+  setProcessingKey(careerKey);
+  setRecommendationError('');
+
+  try {
+    const saved = await choose(careerKey, 'preferred');
+    if (!saved) return;
+
+    const updated = await refreshResumeRecommendations();
+    setRecommendations(updated);
+  } catch (err) {
+    setRecommendationError(
+      err instanceof Error
+        ? err.message
+        : 'Could not refresh career rankings.'
+    );
+  } finally {
+    setProcessingKey(null);
+  }
+}
   return (
-    <section className="cf-cv">
-      <header className="cf-cv-header">
-        <h1>Your experience, understood.</h1>
+  <section className="cf-cv">
+    <header className="cf-cv-header">
+      <h1>Your experience, understood.</h1>
+
+      <p>
+        Upload your CV to identify your technical skills
+        and discover relevant career paths.
+      </p>
+    </header>
+
+    {loadingSaved && (
+      <p className="cf-cv-muted" role="status">
+        Loading your saved CV analysis...
+      </p>
+    )}
+
+    {savedError && (
+      <p className="cf-cv-error" role="alert">
+        {savedError}
+      </p>
+    )}
+
+    {/* Upload section */}
+
+    <article className="cf-cv-upload-compact">
+      <div>
+        <h2>Upload CV</h2>
 
         <p>
-          Upload your CV to identify your technical skills
-          and discover relevant career paths.
+          Add or update your CV to refresh your technical
+          skills and career recommendations.
         </p>
-      </header>
 
-      {/* Saved analysis loading state */}
+        <small>PDF or DOCX · Maximum 5 MB</small>
+      </div>
 
-      {loadingSaved && (
-        <p className="cf-cv-muted" role="status">
-          Loading your saved CV analysis...
-        </p>
-      )}
+      <button
+        type="button"
+        className="cf-cv-primary cf-cv-upload-action"
+        disabled={uploading || loadingSaved}
+        onClick={() => setCvUploadOpen(true)}
+      >
+        + Upload CV
+      </button>
+    </article>
 
-      {savedError && (
-        <p className="cf-cv-error" role="alert">
-          {savedError}
-        </p>
-      )}
+    <CvUploadModal
+      open={cvUploadOpen}
+      onClose={() => setCvUploadOpen(false)}
+      onAnalyze={handleCvAnalysis}
+    />
 
-      {/* Upload section */}
+    {/* CV analysis results */}
 
-      <article className="cf-cv-upload-compact">
-        <div>
-          <h2>Upload CV</h2>
+    {analysis && (
+      <div className="cf-cv-results" aria-live="polite">
+        <div className="cf-cv-results-heading">
+          <div>
+            <span className="cf-cv-eyebrow cf-neon-cv-label">
+              CV ANALYSIS
+            </span>
 
-          <p>
-            Add or update your CV to refresh your technical
-            skills and career recommendations.
+            <h2>Your CV analysis</h2>
+
+            <p>{analyzedFilename}</p>
+          </div>
+        </div>
+
+        {/* Extracted skills */}
+
+        <article className="cf-cv-panel">
+          <div className="cf-cv-panel-heading">
+            <h3>Extracted skills</h3>
+
+            <span>
+              {analysis.extracted_skills.length} identified
+            </span>
+          </div>
+
+          {analysis.extracted_skills.length > 0 ? (
+            <div className="cf-cv-skills">
+              {analysis.extracted_skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="cf-cv-skill"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="cf-cv-muted">
+              No technical skills were identified.
+            </p>
+          )}
+
+          <p className="cf-cv-note">
+            Skills are identified from your document.
+            This does not independently verify proficiency.
           </p>
+        </article>
 
-          <small>PDF or DOCX · Maximum 5 MB</small>
+        {/* Random Forest career recommendations */}
+
+        <article className="cf-cv-panel">
+          <div className="cf-cv-panel-heading">
+          <h3>Career recommendations</h3>
+
+          <div className="cf-pref-heading-actions">
+            <label htmlFor="cf-career-sort" className="cf-sort-label">
+              Sort by
+            </label>
+
+            <select
+              id="cf-career-sort"
+              className="cf-career-sort"
+              value={sortMode}
+              onChange={(event) =>
+                setSortMode(event.target.value as SortMode)
+              }
+              disabled={recommendationsLoading}
+            >
+              <option value="personalized">Personalized ranking</option>
+              <option value="model_desc">Model score: High to Low</option>
+              <option value="model_asc">Model score: Low to High</option>
+              <option value="coverage_desc">Coverage: High to Low</option>
+              <option value="coverage_asc">Coverage: Low to High</option>
+            </select>
+
+            <button
+              type="button"
+              className="cf-pref-text-link"
+              disabled={recommendationsLoading || recommendations.length === 0}
+              onClick={() => rankingsDialogRef.current?.showModal()}
+            >
+              View all rankings
+            </button>
+          </div>
+        </div>
+
+          {recommendationsLoading ? (
+            <p className="cf-cv-muted" role="status">
+              Loading personalized recommendations...
+            </p>
+          ) : visibleRecommendations.length > 0 ? (
+            <div className="cf-cv-match-grid">
+              {visibleRecommendations.map((recommendation, index) => {
+                  const careerKey = recommendation.career_key;
+                  const coverage = coreCoverage[careerKey];
+                  const preference = preferenceFor(careerKey);
+                  const exiting = exitingKey === careerKey;
+
+                  const disabled =
+                    preferencesLoading ||
+                    savingKey !== null ||
+                    processingKey !== null;
+
+                  return (
+                    <div
+                      key={careerKey}
+                      className={
+                        'cf-cv-match-card' +
+                        (exiting
+                          ? ' cf-cv-match-card--exiting'
+                          : '')
+                      }
+                    >
+                      <div className="cf-cv-match-top">
+                        <span className="cf-cv-rank">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+
+                        <div className="cf-pref-card-tools">
+                          {preference === 'preferred' && (
+                            <span className="cf-cv-match-state">
+                              Preferred
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            className="cf-pref-text-link"
+                            disabled={disabled}
+                            onClick={() => handleSkip(careerKey)}
+                          >
+                            Skip
+                          </button>
+                        </div>
+                      </div>
+
+                      <strong className="cf-cv-match-title">
+                        {careerName(careerKey)}
+                      </strong>
+
+                      <div className="cf-cv-score-display">
+                        <div className="cf-cv-score-heading">
+                          <span>Documented skill coverage</span>
+
+                          <strong>
+                            {coverageLoading
+                              ? '...'
+                              : coverage?.overall_percentage != null
+                                ? `${coverage.overall_percentage.toFixed(1)}%`
+                                : 'Not assessed'}
+                          </strong>
+                        </div>
+
+                        <div className="cf-cv-score-track" aria-hidden="true">
+                          <span
+                            style={{
+                              width: `${coverage?.overall_percentage ?? 0}%`,
+                            }}
+                          />
+                        </div>
+
+                        <small className="cf-cv-coverage-detail">
+                          {coverageLoading
+                            ? 'Calculating coverage...'
+                            : coverage?.overall_percentage != null
+                              ? `${coverage.matched_core}/${coverage.total_core} core and ${coverage.matched_supporting}/${coverage.total_supporting} supporting groups documented`
+                              : 'Coverage unavailable'}
+                        </small>
+
+                        <div className="cf-cv-model-secondary">
+                          <span>Random Forest score</span>
+                          <span>
+                            {(recommendation.score * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="cf-pref-actions">
+                        <button
+                          type="button"
+                          className="cf-pref-btn"
+                          aria-pressed={preference === 'preferred'}
+                          disabled={disabled}
+                          onClick={() => void handlePrefer(careerKey)}
+                        >
+                          Prefer
+                        </button>
+
+                        <button
+                          type="button"
+                          className="cf-pref-btn"
+                          disabled={disabled}
+                          onClick={() =>
+                            void handleAvoid(careerKey)
+                          }
+                        >
+                          Avoid
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          ) : (
+            <p className="cf-cv-muted">
+              No eligible career recommendations are available.
+              You can review avoided careers in My Profile.
+            </p>
+          )}
+
+          {recommendationError && (
+            <p className="cf-cv-error" role="alert">
+              {recommendationError}
+            </p>
+          )}
+
+          {preferencesError && (
+            <p className="cf-cv-error" role="alert">
+              {preferencesError}
+            </p>
+          )}
+
+          <p className="cf-cv-note">
+            Coverage measures documented skill evidence against reviewed career requirements. Unassessed competencies are not credited. It does not verify proficiency or determine career suitability.
+          </p>
+        </article>
+
+        {/* Model vocabulary coverage */}
+
+        <article className="cf-cv-panel">
+          <div className="cf-cv-panel-heading">
+            <h3>Model skill coverage</h3>
+          </div>
+
+          <div className="cf-cv-coverage">
+            <div>
+              <strong>
+                {analysis.model_skills.length}
+              </strong>
+
+              <span>
+                Skills used by the classifier
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                {analysis.ignored_skills.length}
+              </strong>
+
+              <span>
+                Extracted skills outside its vocabulary
+              </span>
+            </div>
+          </div>
+
+          {analysis.ignored_skills.length > 0 && (
+            <p className="cf-cv-note">
+              Not used by the classifier:{' '}
+              {analysis.ignored_skills.join(', ')}.
+              These may still be relevant to your career.
+            </p>
+          )}
+        </article>
+      </div>
+    )}
+    <dialog
+      ref={rankingsDialogRef}
+      className="cf-cv-panel cf-pref-dialog"
+    >
+      <div className="cf-pref-dialog-header">
+        <div>
+          <h2>All career recommendations</h2>
+          <p className="cf-cv-muted">
+            Personalized ranking based on your Random Forest
+            predictions and saved career preferences.
+          </p>
         </div>
 
         <button
           type="button"
-          className="cf-cv-primary cf-cv-upload-action"
-          disabled={uploading || loadingSaved}
-          onClick={() => setCvUploadOpen(true)}
+          className="cf-pref-text-link"
+          onClick={() => rankingsDialogRef.current?.close()}
         >
-          + Upload CV
+          Close
         </button>
-      </article>
+      </div>
 
-      {/* CV upload modal */}
+      <div className="cf-pref-ranking-list">
+        {sortedRecommendations.map((item, index) => {
+          const coverage = coreCoverage[item.career_key];
 
-      <CvUploadModal
-        open={cvUploadOpen}
-        onClose={() => setCvUploadOpen(false)}
-        onAnalyze={handleCvAnalysis}
-      />
-
-      {/* Saved or newly generated analysis */}
-
-      {analysis && (
-        <div className="cf-cv-results" aria-live="polite">
-          <div className="cf-cv-results-heading">
-            <div>
-              <span className="cf-cv-eyebrow cf-neon-cv-label">
-                CV ANALYSIS
+          return (
+            <div
+              className="cf-pref-ranking-item"
+              key={item.career_key}
+            >
+              <span className="cf-cv-rank">
+                {String(index + 1).padStart(2, '0')}
               </span>
 
-              <h2>Your CV analysis</h2>
+              <div className="cf-pref-ranking-name">
+                <strong>{careerName(item.career_key)}</strong>
 
-              <p>{analyzedFilename}</p>
-            </div>
-          </div>
+                {preferenceFor(item.career_key) === 'preferred' && (
+                  <small>Preferred</small>
+                )}
 
-          {/* Extracted skills */}
-
-          <article className="cf-cv-panel">
-            <div className="cf-cv-panel-heading">
-              <h3>Extracted skills</h3>
-
-              <span>
-                {analysis.extracted_skills.length} identified
-              </span>
-            </div>
-
-            {analysis.extracted_skills.length > 0 ? (
-              <div className="cf-cv-skills">
-                {analysis.extracted_skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="cf-cv-skill"
-                  >
-                    {skill}
-                  </span>
-                ))}
+                {skippedKeys.includes(item.career_key) && (
+                  <small>Skipped this session</small>
+                )}
               </div>
-            ) : (
-              <p className="cf-cv-muted">
-                No technical skills were identified.
-              </p>
-            )}
 
-            <p className="cf-cv-note">
-              Skills are identified from your document.
-              This does not independently verify proficiency.
-            </p>
-          </article>
-
-          {/* Random Forest recommendations */}
-
-          <article className="cf-cv-panel">
-            <div className="cf-cv-panel-heading">
-              <h3>Career recommendations</h3>
-              <span>Random Forest</span>
-            </div>
-
-            {analysis.recommendations.length > 0 ? (
-              <div className="cf-cv-recommendations">
-                {[...analysis.recommendations]
-                  .sort((a, b) => a.rank - b.rank)
-                  .map((recommendation) => (
-                    <div
-                      className="cf-cv-recommendation"
-                      key={recommendation.career_key}
-                    >
-                      <span className="cf-cv-rank cf-cv-recommendation-rank">
-                        {String(recommendation.rank).padStart(2, '0')}
-                      </span>
-
-                      <strong>
-                        {careerName(recommendation.career_key)}
-                      </strong>
-
-                      <span className="cf-cv-score">
-                        RF score: {recommendation.score.toFixed(3)}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            ) : (
-              <p className="cf-cv-muted">
-                No career recommendations were returned.
-              </p>
-            )}
-
-            <p className="cf-cv-note">
-              Model scores are ranking signals, not verified
-              measures of career readiness.
-            </p>
-          </article>
-
-          {/* Model vocabulary coverage */}
-
-          <article className="cf-cv-panel">
-            <div className="cf-cv-panel-heading">
-              <h3>Model skill coverage</h3>
-            </div>
-
-            <div className="cf-cv-coverage">
-              <div>
+              <div className="cf-pref-ranking-metrics">
                 <strong>
-                  {analysis.model_skills.length}
+                  {coverage?.overall_percentage != null
+                    ? `${coverage.overall_percentage.toFixed(1)}% coverage`
+                    : 'Coverage unavailable'}
                 </strong>
 
                 <span>
-                  Skills used by the classifier
-                </span>
-              </div>
-
-              <div>
-                <strong>
-                  {analysis.ignored_skills.length}
-                </strong>
-
-                <span>
-                  Extracted skills outside its vocabulary
+                  RF: {(item.score * 100).toFixed(1)}%
                 </span>
               </div>
             </div>
+          );
+        })}
+      </div>
 
-            {analysis.ignored_skills.length > 0 && (
-              <p className="cf-cv-note">
-                Not used by the classifier:{' '}
-                {analysis.ignored_skills.join(', ')}.
-                These may still be relevant to your career.
-              </p>
-            )}
-          </article>
-        </div>
-      )}
-    </section>
-  );
+      <p className="cf-cv-note">
+        Rankings reflect your preferences; RF scores remain
+        unchanged. Avoided careers are managed in My Profile.
+      </p>
+    </dialog>
+  </section>
+);
 }
