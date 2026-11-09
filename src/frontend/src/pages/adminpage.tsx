@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  FiActivity,
-  FiBookOpen,
-  FiGrid,
-  FiRefreshCw,
-  FiShield,
-  FiUsers,
-} from 'react-icons/fi';
+import {FiActivity, FiBookOpen, FiGrid, FiRefreshCw, FiShield, FiUsers,} from 'react-icons/fi';
 import { onboardingApi } from '../lib/onboarding';
 import type { Career } from '../lib/onboarding';
 import {
@@ -32,6 +25,9 @@ import AdminTotpModal from '../components/AdminTotpModal';
 import { csrfHeader } from '../lib/auth';
 import '../admin.css';
 import MfaQrEnrollment from '../components/MfaQrEnrollment';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../context/AuthContext';
+import { queryKeys } from '../lib/queryclient';
 
 type Tab = 'overview' | 'users' | 'careers' | 'logs';
 type Access = 'checking' | 'authorized' | 'denied' | 'error';
@@ -139,53 +135,120 @@ export default function AdminPage() {
   const [admin, setAdmin] = useState<AdminIdentity | null>(null);
   const [accessError, setAccessError] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('overview');
-
-  const [overview, setOverview] =
-    useState<AdminOverview | null>(null);
-
-  const [users, setUsers] =
-    useState<AdminUsersPage | null>(null);
-
-  const [careers, setCareers] = useState<Career[]>([]);
-
-  const [logs, setLogs] =
-    useState<AdminLogsPage | null>(null);
-
-  const [systemHealth, setSystemHealth] =
-    useState<AdminSystemHealth | null>(null);
-
-  const [healthLoading, setHealthLoading] = useState(false);
-  const [healthError, setHealthError] = useState('');
+  const { user } = useAuth();
+  const userId = user?.id ?? '';
+  const cache = useQueryClient();
 
   const [usersPage, setUsersPage] = useState(1);
   const [logsPage, setLogsPage] = useState(1);
-
   const [severity, setSeverity] = useState('');
   const [category, setCategory] = useState('');
-
   const [careerSearch, setCareerSearch] = useState('');
   const [userSearch, setUserSearch] = useState('');
+  const [selectedCareerKey, setSelectedCareerKey] = useState('');
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [refreshCount, setRefreshCount] = useState(0);
-
-  const [selectedCareerKey, setSelectedCareerKey] =
-    useState('');
-
-  const [careerDetails, setCareerDetails] =
-    useState<AdminCareerDetails | null>(null);
-
-  const [careerDetailLoading, setCareerDetailLoading] =
-    useState(false);
-
-  const [careerDetailError, setCareerDetailError] =
-    useState('');
   const [pendingUserAction, setPendingUserAction] =
-  useState<UserAction | null>(null);
+    useState<UserAction | null>(null);
   const [userActionBusy, setUserActionBusy] = useState(false);
   const [userActionError, setUserActionError] = useState('');
   const [userActionNotice, setUserActionNotice] = useState('');
+
+  const authorized = access === 'authorized' && Boolean(userId);
+
+
+  const overviewQuery = useQuery({
+    queryKey: queryKeys.adminOverview(userId),
+    queryFn: getAdminOverview,
+    enabled: authorized && activeTab === 'overview',
+    staleTime: 30_000,
+  });
+
+  const usersQuery = useQuery({
+    queryKey: queryKeys.adminUsers(userId, usersPage),
+    queryFn: () => getAdminUsers(usersPage),
+    enabled: authorized && activeTab === 'users',
+    staleTime: 30_000,
+  });
+
+  const careersQuery = useQuery({
+    queryKey: queryKeys.careers,
+    queryFn: onboardingApi.careers,
+    enabled: authorized && activeTab === 'careers',
+    staleTime: 30 * 60 * 1000,
+  });
+
+  const logsQuery = useQuery({
+    queryKey: queryKeys.adminLogs(
+      userId, logsPage, severity, category
+    ),
+    queryFn: () => getAdminLogs(logsPage, severity, category),
+    enabled: authorized && activeTab === 'logs',
+    staleTime: 15_000,
+  });
+
+  const healthQuery = useQuery({
+    queryKey: queryKeys.adminHealth(userId),
+    queryFn: getAdminSystemHealth,
+    enabled: authorized && activeTab === 'overview',
+    staleTime: 15_000,
+    retry: 0,
+  });
+
+  const careerDetailsQuery = useQuery({
+    queryKey: queryKeys.adminCareer(userId, selectedCareerKey),
+    queryFn: () => getAdminCareerResources(selectedCareerKey),
+    enabled:
+      authorized &&
+      activeTab === 'careers' &&
+      Boolean(selectedCareerKey),
+    staleTime: 60_000,
+  });
+
+  const overview: AdminOverview | null = overviewQuery.data ?? null;
+  const users: AdminUsersPage | null = usersQuery.data ?? null;
+  const careers: Career[] = careersQuery.data ?? [];
+  const logs: AdminLogsPage | null = logsQuery.data ?? null;
+  const systemHealth: AdminSystemHealth | null =
+    healthQuery.data ?? null;
+  const careerDetails: AdminCareerDetails | null =
+    careerDetailsQuery.data ?? null;
+
+  const activeQuery =
+    activeTab === 'overview' ? overviewQuery :
+    activeTab === 'users' ? usersQuery :
+    activeTab === 'careers' ? careersQuery :
+    logsQuery;
+
+  const loading = authorized && activeQuery.isPending;
+  const error = activeQuery.isError
+    ? activeQuery.error.message
+    : '';
+
+  const healthLoading = healthQuery.isPending;
+  const healthError = healthQuery.isError
+    ? healthQuery.error.message
+    : '';
+
+  const careerDetailLoading =
+    Boolean(selectedCareerKey) && careerDetailsQuery.isPending;
+
+  const careerDetailError = careerDetailsQuery.isError
+    ? careerDetailsQuery.error.message
+    : '';
+
+  function refreshAdmin() {
+    if (!userId) return;
+
+    void cache.invalidateQueries({
+      queryKey: queryKeys.admin(userId),
+    });
+
+    if (activeTab === 'careers') {
+      void cache.invalidateQueries({
+        queryKey: queryKeys.careers,
+      });
+    }
+  }
 
   // 1. Verify administrator authorization.
 
@@ -266,7 +329,9 @@ async function confirmUserAction(code: string) {
           ? 'Account suspended successfully.'
           : 'Account reactivated successfully.'
     );
-    setRefreshCount((count) => count + 1);
+    void cache.invalidateQueries({
+      queryKey: queryKeys.admin(userId),
+    });
   } catch (err) {
     setUserActionError(
       err instanceof Error ? err.message : 'Could not update account.'
@@ -278,7 +343,12 @@ async function confirmUserAction(code: string) {
 
 
   useEffect(() => {
+    if (!userId) return;
+
     let active = true;
+
+    setAccess('checking');
+    setAccessError('');
 
     void getAdminIdentity()
       .then((identity) => {
@@ -290,14 +360,19 @@ async function confirmUserAction(code: string) {
       .catch((cause: unknown) => {
         if (!active) return;
 
+        setAdmin(null);
+
         if (
           cause instanceof AdminApiError &&
           (cause.status === 401 || cause.status === 403)
         ) {
+          cache.removeQueries({
+            queryKey: queryKeys.admin(userId),
+          });
+
           setAccess('denied');
         } else {
           setAccess('error');
-
           setAccessError(
             cause instanceof Error
               ? cause.message
@@ -309,178 +384,8 @@ async function confirmUserAction(code: string) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [cache, userId]);
 
-  // 2. Load active tab data independently.
-
-  useEffect(() => {
-    if (access !== 'authorized') return;
-
-    let active = true;
-
-    setLoading(true);
-    setError('');
-
-    async function loadTab() {
-      try {
-        if (activeTab === 'overview') {
-          const data = await getAdminOverview();
-
-          if (active) {
-            setOverview(data);
-          }
-        } else if (activeTab === 'users') {
-          const data = await getAdminUsers(usersPage);
-
-          if (active) {
-            setUsers(data);
-          }
-        } else if (activeTab === 'careers') {
-          const data = await onboardingApi.careers();
-
-          if (active) {
-            setCareers(data);
-          }
-        } else if (activeTab === 'logs') {
-          const data = await getAdminLogs(
-            logsPage,
-            severity,
-            category
-          );
-
-          if (active) {
-            setLogs(data);
-          }
-        }
-      } catch (cause: unknown) {
-        if (!active) return;
-
-        if (
-          cause instanceof AdminApiError &&
-          (cause.status === 401 || cause.status === 403)
-        ) {
-          setAccess('denied');
-          return;
-        }
-
-        setError(
-          cause instanceof Error
-            ? cause.message
-            : 'Could not load administration data.'
-        );
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    void loadTab();
-
-    return () => {
-      active = false;
-    };
-  }, [
-    access,
-    activeTab,
-    usersPage,
-    logsPage,
-    severity,
-    category,
-    refreshCount,
-  ]);
-
-  // 3. Load system health separately from overview.
-  //    This does not block rendering.
-
-  useEffect(() => {
-    if (
-      access !== 'authorized' ||
-      activeTab !== 'overview'
-    ) {
-      return;
-    }
-
-    let active = true;
-
-    setHealthLoading(true);
-    setHealthError('');
-
-    void getAdminSystemHealth()
-      .then((result) => {
-        if (active) {
-          setSystemHealth(result);
-        }
-      })
-      .catch((cause: unknown) => {
-        if (!active) return;
-
-        setSystemHealth(null);
-
-        setHealthError(
-          cause instanceof Error
-            ? cause.message
-            : 'Could not retrieve system health.'
-        );
-      })
-      .finally(() => {
-        if (active) {
-          setHealthLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [access, activeTab, refreshCount]);
-
-  // 4. Load selected career resources.
-
-  useEffect(() => {
-    if (
-      access !== 'authorized' ||
-      activeTab !== 'careers' ||
-      !selectedCareerKey
-    ) {
-      return;
-    }
-
-    let active = true;
-
-    setCareerDetails(null);
-    setCareerDetailError('');
-    setCareerDetailLoading(true);
-
-    void getAdminCareerResources(selectedCareerKey)
-      .then((result) => {
-        if (active) {
-          setCareerDetails(result);
-        }
-      })
-      .catch((cause: unknown) => {
-        if (!active) return;
-
-        setCareerDetailError(
-          cause instanceof Error
-            ? cause.message
-            : 'Could not load career resources.'
-        );
-      })
-      .finally(() => {
-        if (active) {
-          setCareerDetailLoading(false);
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [
-    access,
-    activeTab,
-    selectedCareerKey,
-    refreshCount,
-  ]);
 
   // Conditional returns follow all React hooks.
 
@@ -563,9 +468,7 @@ async function confirmUserAction(code: string) {
         <div className="cf-admin-header-actions">
           <button
             type="button"
-            onClick={() =>
-              setRefreshCount((count) => count + 1)
-            }
+            onClick={refreshAdmin}
             disabled={loading}
           >
             <FiRefreshCw />

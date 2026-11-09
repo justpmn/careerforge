@@ -262,7 +262,7 @@ async def generate_persistent_assessment_mentor_response(
 
     logger.info(
         "CareerForge Mentor | assessment=%.2fs | "
-        "context=%.2fs | ollama=%.2fs | resources=%s",
+        "context=%.2fs | llm=%.2fs | resources=%s",
         assessment_seconds,
         context_seconds,
         llm_seconds,

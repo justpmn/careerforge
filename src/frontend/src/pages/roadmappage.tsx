@@ -3,18 +3,27 @@ import { Background, BackgroundVariant, Controls, ReactFlow } from '@xyflow/reac
 import type { Edge, Node } from '@xyflow/react';
 import dagre from '@dagrejs/dagre';
 import '@xyflow/react/dist/style.css';
-import '../roadmap.css';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+import CompetencyAssessmentPanel from '../components/competencyassessmentpanel';
+import SkillMapNode from '../components/skillmapnode';
+import CompetencyEvidencePanel from '../components/competencyevidencepanel';
+
 import { useAuth } from '../context/AuthContext';
+
 import { onboardingApi } from '../lib/onboarding';
 import { getCareerRoadmap, getRecordedSkills } from '../lib/roadmap';
 import { buildSkillTree } from '../lib/skilltreetemplates';
 import type { CareerRoadmap, RecordedSkill } from '../lib/roadmap';
 import type { SkillTreeItem } from '../lib/skilltreetemplates';
-import SkillMapNode from '../components/skillmapnode';
-import CompetencyEvidencePanel from '../components/competencyevidencepanel';
+import { queryKeys } from '../lib/queryclient';
+import type { LearningSkill } from '../lib/learningprogress';
 import {getLearningProgress,updateLearningProgress} from '../lib/learningprogress';
+
 import '../roadmapprogress.css';
-import CompetencyAssessmentPanel from '../components/competencyassessmentpanel';
+import '../roadmap.css';
+
+
 
 const NODE_WIDTH = 126;
 const NODE_HEIGHT = 112;
@@ -252,85 +261,95 @@ type FoundationResource = {
 };
 
 export default function RoadmapPage() {
+  
   const { user } = useAuth();
   const userId = user?.id;
-  const [roadmap, setRoadmap] = useState<CareerRoadmap | null>(null);
+  const cache = useQueryClient();
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [needsCareer, setNeedsCareer] = useState(false);
-  const [recordedSkills, setRecordedSkills] = useState<RecordedSkill[]>([]);
-  const [learnedByKey, setLearnedByKey] = useState<Record<string, boolean>>({});
   const [savingLearned, setSavingLearned] = useState(false);
   const [learningError, setLearningError] = useState('');
-    
+
   const [selectedResources, setSelectedResources] =
-  useState<FoundationResource[]>([]);
+    useState<FoundationResource[]>([]);
+  const [selectedResourcesLoading, setSelectedResourcesLoading] =
+    useState(false);
+  const [selectedResourcesError, setSelectedResourcesError] =
+    useState('');
 
-const [selectedResourcesLoading, setSelectedResourcesLoading] =
-  useState(false);
+  const selectedCareerQuery = useQuery({
+    queryKey: queryKeys.selectedCareer(userId ?? ''),
+    queryFn: onboardingApi.selectedCareer,
+    enabled: Boolean(userId),
+    staleTime: 5 * 60 * 1000,
+  });
 
-const [selectedResourcesError, setSelectedResourcesError] =
-  useState('');
+  const careerKey = selectedCareerQuery.data?.career_key ?? '';
 
+  const roadmapQuery = useQuery({
+    queryKey: queryKeys.roadmap(userId ?? '', careerKey),
+    queryFn: () => getCareerRoadmap(userId!, careerKey),
+    enabled: Boolean(userId && careerKey),
+  });
+
+  const skillsQuery = useQuery({
+    queryKey: queryKeys.recordedSkills(userId ?? ''),
+    queryFn: getRecordedSkills,
+    enabled: Boolean(userId && careerKey),
+  });
+
+  const progressQuery = useQuery({
+    queryKey: queryKeys.learningProgress(userId ?? '', careerKey),
+    queryFn: () => getLearningProgress(careerKey),
+    enabled: Boolean(userId && careerKey),
+  });
+
+  const roadmap: CareerRoadmap | null = roadmapQuery.data ?? null;
+
+  const recordedSkills = useMemo<RecordedSkill[]>(
+    () => skillsQuery.data ?? [],
+    [skillsQuery.data]
+  );
+
+  const learnedByKey = useMemo(
+    () => Object.fromEntries(
+      (progressQuery.data ?? []).map((item) => [
+        item.skill_key,
+        item.learned,
+      ])
+    ),
+    [progressQuery.data]
+  );
+
+  const needsCareer =
+    selectedCareerQuery.isSuccess && !careerKey;
+
+  const loading =
+    Boolean(userId) && (
+      selectedCareerQuery.isPending ||
+      (Boolean(careerKey) && (
+        roadmapQuery.isPending ||
+        skillsQuery.isPending ||
+        progressQuery.isPending
+      ))
+    );
+
+  const failedQuery = [
+    selectedCareerQuery,
+    roadmapQuery,
+    skillsQuery,
+    progressQuery,
+  ].find((query) => query.isError && query.data === undefined);
+
+  const error = failedQuery?.error instanceof Error
+    ? failedQuery.error.message
+    : failedQuery
+      ? 'Could not load your learning roadmap.'
+      : '';
 
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
-    let active = true;
-
-    async function initialize() {
-      setLoading(true);
-      setError('');
-      setNeedsCareer(false);
-
-      try {
-        const career = await onboardingApi.selectedCareer();
-
-        if (!active) return;
-
-        if (!career.career_key) {
-          setNeedsCareer(true);
-          return;
-        }
-
-        const [result, skills, progress] = await Promise.all([
-          getCareerRoadmap(userId!, career.career_key),
-          getRecordedSkills(),
-          getLearningProgress(career.career_key),
-        ]);
-
-        if (!active) return;
-
-        setRoadmap(result);
-        setRecordedSkills(skills);
-        setLearnedByKey(Object.fromEntries(
-          progress.map((item) => [item.skill_key, item.learned])
-        ));
-        setLearningError('');
-        setSelectedId(null);
-      } catch (err) {
-        if (!active) return;
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Could not load your skill tree.'
-        );
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    void initialize();
-
-    return () => {
-      active = false;
-    };
-  }, [userId]);
+    setSelectedId(null);
+  }, [careerKey]);
 
 
 
@@ -520,7 +539,7 @@ const resources =
       : step?.suggested_resources ?? [];
 
   async function toggleLearned() {
-    if (!roadmap || !selectedSkillKey || savingLearned) return;
+    if (!userId || !roadmap || !selectedSkillKey || savingLearned) return;
 
     setSavingLearned(true);
     setLearningError('');
@@ -530,10 +549,17 @@ const resources =
         selectedSkillKey,
         !isLearned
       );
-      setLearnedByKey((previous) => ({
-        ...previous,
-        [saved.skill_key]: saved.learned,
-      }));
+      
+      cache.setQueryData<LearningSkill[]>(
+        queryKeys.learningProgress(userId, roadmap.career_key),
+        (previous = []) => [
+          ...previous.filter(
+            (item) => item.skill_key !== saved.skill_key
+          ),
+          saved,
+        ]
+      );
+
     } catch (cause) {
       setLearningError(
         cause instanceof Error ? cause.message : 'Could not save learning progress.'
@@ -735,7 +761,10 @@ const resources =
                       roadmap.career_key
                     );
 
-                    setRoadmap(refreshedRoadmap);
+                    cache.setQueryData(
+                      queryKeys.roadmap(userId, roadmap.career_key),
+                      refreshedRoadmap
+                    );
                   }}
                 />
               )}

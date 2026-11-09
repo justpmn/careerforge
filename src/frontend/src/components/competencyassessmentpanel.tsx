@@ -1,16 +1,10 @@
-
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-
-import {
-  getCompetencyAssessments,
-  saveCompetencyAssessment,
-} from '../lib/competencyassessments';
-
-import type {
-  CompetencyAssessment,
-  ProficiencyLevel,
-} from '../lib/competencyassessments';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../context/AuthContext';
+import {getCompetencyAssessments, saveCompetencyAssessment} from '../lib/competencyassessments';
+import type {CompetencyAssessment, ProficiencyLevel} from '../lib/competencyassessments';
+import { queryKeys } from '../lib/queryclient';
 
 import '../competency-assessment.css';
 
@@ -56,6 +50,8 @@ export default function CompetencyAssessmentPanel({
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { user } = useAuth();
+  const cache = useQueryClient();
 
   useEffect(() => {
     let active = true;
@@ -116,6 +112,19 @@ export default function CompetencyAssessmentPanel({
           notes: notes.trim() || null,
         }
       );
+      
+      if (user?.id) {
+        cache.setQueryData<CompetencyAssessment[]>(
+          queryKeys.competencyAssessments(user.id, careerKey),
+          (previous = []) => [
+            ...previous.filter(
+              (item) => item.competency_key !== saved.competency_key
+            ),
+            saved,
+          ]
+        );
+      }
+
 
       setAssessment(saved);
       setLevel(saved.proficiency_level);

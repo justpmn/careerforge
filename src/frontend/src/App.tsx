@@ -1,18 +1,14 @@
 
-import {
-  BrowserRouter, Navigate, Outlet, Route, Routes,
-} from 'react-router-dom';
-
+import {BrowserRouter, Navigate, Outlet, Route, Routes} from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import AuthLayout from './components/AuthLayout';
 import AppShell from './components/AppShell';
 import WorkspaceLayout from './components/layout';
-
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { MentorJobsProvider } from './context/mentorjobscontext';
 import { AppearanceProvider, useAppearance } from './context/appearancecontext';
-
 import { postAuthRoute } from './lib/auth';
-
+import { queryClient } from './lib/queryclient';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
@@ -206,12 +202,15 @@ function AppRoutes() {
 );
 }
 
+
 export default function App() {
   return (
-    <AuthProvider>
-      <AppearanceProvider>
-        <AppRoutes />
-      </AppearanceProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AppearanceProvider>
+          <AppRoutes />
+        </AppearanceProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
