@@ -245,9 +245,6 @@ def build_mentor_messages(
     return messages
 
 
-
-@monitor_mentor_inference
-
 @monitor_mentor_inference
 async def generate_mentor_response(
     message: str,
