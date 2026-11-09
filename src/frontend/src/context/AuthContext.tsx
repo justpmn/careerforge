@@ -1,15 +1,8 @@
-
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import type { ReactNode } from 'react';
 import { authApi } from '../lib/auth';
-import type { Credentials, Registration, User } from '../lib/auth';
+import { queryClient } from '../lib/queryclient';
+import type { Credentials, Registration, User} from '../lib/auth';
 
 type AuthContextType = {
   user: User | null;
@@ -56,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Log in and retrieve the authenticated user
   const login = async (data: Credentials): Promise<User> => {
     await authApi.login(data);
+    queryClient.clear();
 
     const next = await refresh();
 
@@ -64,7 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         'Login succeeded, but no session was established.'
       );
     }
-
     return next;
   };
 
@@ -76,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Log out and clear the authenticated user
   const logout = async (): Promise<void> => {
     await authApi.logout();
+    queryClient.clear();
     setUser(null);
   };
 

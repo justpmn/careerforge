@@ -1,11 +1,15 @@
 
 import { useEffect, useState, useRef } from 'react';
-import { useAuth } from '../context/AuthContext';
-import {uploadResume, getLatestResumeAnalysis, refreshResumeRecommendations} from '../lib/resume';
-import type { ResumeAnalysis, CareerRecommendation } from '../lib/resume';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import CvUploadModal from '../components/cvuploadmodal';
+import { useAuth } from '../context/AuthContext';
 import { useCareerPreferences } from '../hooks/useCareerPreferences';
 import {getCoreSkillCoverage,type CoreCoverageResults,} from '../lib/corecoverage';
+import {uploadResume, getLatestResumeAnalysis, refreshResumeRecommendations} from '../lib/resume';
+import type { ResumeAnalysis, CareerRecommendation, SavedResumeAnalysis } from '../lib/resume';
+import { queryKeys } from '../lib/queryclient';
+
+
 
 function careerName(key: string): string {
   return key
@@ -21,6 +25,7 @@ type SortMode =
 
 export default function CvPage() {
   const { user } = useAuth();
+  const cache = useQueryClient();
   const {
     loading: preferencesLoading,
     savingKey,
@@ -31,19 +36,52 @@ export default function CvPage() {
   user?.id != null ? Number(user.id) : undefined
 );
 
-  const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
-  const [analyzedFilename, setAnalyzedFilename] = useState('');
+  const userId = user?.id ?? '';
 
-  const [loadingSaved, setLoadingSaved] = useState(true);
+  const savedCvQuery = useQuery({
+    queryKey: queryKeys.savedCv(userId),
+    queryFn: getLatestResumeAnalysis,
+    enabled: Boolean(userId),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const analysis = savedCvQuery.data ?? null;
+  const analyzedFilename = analysis?.filename ?? '';
+  const loadingSaved = savedCvQuery.isPending;
+
+  const savedError = savedCvQuery.isError
+    ? savedCvQuery.error.message
+    : '';
+
+  const recommendationsQuery = useQuery({
+    queryKey: queryKeys.cvRecommendations(userId),
+    queryFn: refreshResumeRecommendations,
+    enabled: Boolean(userId && analysis),
+    staleTime: 5 * 60 * 1000,
+    retry: 0,
+  });
+
+  const recommendations =
+    recommendationsQuery.data ?? analysis?.recommendations ?? [];
+
+  const recommendationsLoading =
+    Boolean(analysis) && recommendationsQuery.isPending;
+
+  const coverageQuery = useQuery({
+    queryKey: queryKeys.coreCoverage(userId),
+    queryFn: getCoreSkillCoverage,
+    enabled: Boolean(userId && analysis),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const coreCoverage: CoreCoverageResults = coverageQuery.data ?? {};
+  const coverageLoading = Boolean(analysis) && coverageQuery.isPending;
+
+  
   const [uploading, setUploading] = useState(false);
   const [cvUploadOpen, setCvUploadOpen] = useState(false);
-  const [savedError, setSavedError] = useState('');
-  const [recommendations, setRecommendations] =
-    useState<CareerRecommendation[]>([]);
-
-  const [recommendationsLoading, setRecommendationsLoading] =
-    useState(false);
-
+  
+  
   const [processingKey, setProcessingKey] =
     useState<string | null>(null);
 
@@ -56,17 +94,12 @@ export default function CvPage() {
 
 const rankingsDialogRef = useRef<HTMLDialogElement>(null);
 
-const [coreCoverage, setCoreCoverage] =
-  useState<CoreCoverageResults>({});
-
-const [coverageLoading, setCoverageLoading] =
-  useState(false);
-
 const [sortMode, setSortMode] =
-  useState<SortMode>('personalized');
+  useState<SortMode>('coverage_desc');
 
 const sortedRecommendations = [...recommendations].sort((a, b) => {
   const originalOrder = a.rank - b.rank;
+const cache = useQueryClient();
 
   if (sortMode === 'personalized') {
     return originalOrder;
@@ -102,121 +135,64 @@ const visibleRecommendations = sortedRecommendations
   .slice(0, 3);
 
   // Load the latest saved CV analysis.
-  useEffect(() => {
-    let active = true;
 
-    async function loadSavedAnalysis() {
-      try {
-        const saved = await getLatestResumeAnalysis();
 
-        if (!active) return;
-
-        if (saved) {
-        const { filename, ...result } = saved;
-
-        setAnalysis(result);
-        setAnalyzedFilename(filename);
-        setRecommendationsLoading(true);
-
-        try {
-          const updated = await refreshResumeRecommendations();
-
-          if (!active) return;
-
-          setRecommendations(updated);
-          setRecommendationError('');
-          setSkippedKeys([]);
-        } catch (err) {
-          if (!active) return;
-
-          setRecommendations(result.recommendations);
-          setRecommendationError(
-            err instanceof Error
-              ? err.message
-              : 'Could not refresh recommendations.'
-          );
-        } finally {
-          if (active) setRecommendationsLoading(false);
-        }
-      }
-      } catch (err) {
-        if (!active) return;
-
-        setSavedError(
-          err instanceof Error
-            ? err.message
-            : 'Could not load your saved CV analysis.'
-        );
-      } finally {
-        if (active) setLoadingSaved(false);
-      }
-    }
-
-    void loadSavedAnalysis();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-useEffect(() => {
-  if (!analysis || !user?.id) {
-    setCoreCoverage({});
-    return;
-  }
-
-  let active = true;
-
-  setCoverageLoading(true);
-
-  getCoreSkillCoverage()
-    .then((result) => {
-      if (active) setCoreCoverage(result);
-    })
-    .catch(() => {
-      if (active) setCoreCoverage({});
-    })
-    .finally(() => {
-      if (active) setCoverageLoading(false);
-    });
-
-  return () => {
-    active = false;
-  };
-}, [analysis, user?.id]);
 
   async function handleCvAnalysis(selectedFile: File): Promise<void> {
-  if (!user?.id) {
-    throw new Error('Please sign in to analyze your CV.');
-  }
+    if (!user?.id) {
+      throw new Error('Please sign in to analyze your CV.');
+    }
 
-  setUploading(true);
-  setRecommendationError('');
-
-  try {
-    const result = await uploadResume(
-      selectedFile,
-      String(user.id)
-    );
-
-    setAnalysis(result);
-    setRecommendations(result.recommendations);
-    setAnalyzedFilename(selectedFile.name);
-    setSkippedKeys([]);
-    setSavedError('');
+    setUploading(true);
+    setRecommendationError('');
 
     try {
-      const updated = await refreshResumeRecommendations();
-      setRecommendations(updated);
-    } catch {
-      setRecommendationError(
-        'Showing initial recommendations. The full ranking could not be loaded.'
+      const result = await uploadResume(selectedFile, user.id);
+
+      const saved: SavedResumeAnalysis = {
+        ...result,
+        filename: selectedFile.name,
+      };
+
+      cache.setQueryData(queryKeys.savedCv(user.id), saved);
+      cache.setQueryData(
+        queryKeys.cvRecommendations(user.id),
+        result.recommendations
       );
+
+      setSkippedKeys([]);
+
+      await cache.invalidateQueries({
+        queryKey: queryKeys.coreCoverage(user.id),
+      });
+
+      await cache.invalidateQueries({
+        queryKey: queryKeys.recordedSkills(user.id),
+        refetchType: 'none',
+      });
+
+      await cache.invalidateQueries({
+        queryKey: queryKeys.roadmaps(user.id),
+        refetchType: 'none',
+      });
+
+      try {
+        const updated = await refreshResumeRecommendations();
+
+        cache.setQueryData(
+          queryKeys.cvRecommendations(user.id),
+          updated
+        );
+      } catch {
+        setRecommendationError(
+          'Showing initial recommendations. The full ranking could not be loaded.'
+        );
+      }
+    } finally {
+      setUploading(false);
     }
-  } finally {
-    setUploading(false);
   }
-}
+
 
   async function handleAvoid(careerKey: string): Promise<void> {
   if (processingKey !== null || savingKey !== null) return;
@@ -237,7 +213,10 @@ useEffect(() => {
       window.setTimeout(resolve, 260);
     });
 
-    setRecommendations(updated);
+    cache.setQueryData(
+      queryKeys.cvRecommendations(userId),
+      updated
+    );
   } catch (err) {
     setRecommendationError(
       err instanceof Error
@@ -278,7 +257,10 @@ async function handlePrefer(careerKey: string): Promise<void> {
     if (!saved) return;
 
     const updated = await refreshResumeRecommendations();
-    setRecommendations(updated);
+    cache.setQueryData(
+      queryKeys.cvRecommendations(userId),
+      updated
+    );
   } catch (err) {
     setRecommendationError(
       err instanceof Error

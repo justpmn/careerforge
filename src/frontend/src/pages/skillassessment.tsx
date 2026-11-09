@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
+import ManualSkillManager from '../components/manualskillmanager';
 import { useAuth } from '../context/AuthContext';
 import { onboardingApi } from '../lib/onboarding';
 import type { Career } from '../lib/onboarding';
@@ -9,8 +11,9 @@ import {getCompetencyAssessments} from '../lib/competencyassessments';
 import type {CompetencyAssessment} from '../lib/competencyassessments';
 import {getLearningProgress} from '../lib/learningprogress';
 import type {LearningSkill} from '../lib/learningprogress';
-import ManualSkillManager from '../components/manualskillmanager';
+import { queryKeys } from '../lib/queryclient';
 import '../skill-assessment.css';
+
 
 
 type StepInfo = {
@@ -91,116 +94,100 @@ function recordedSkillName(input: RecordedSkill): string | null {
 }
 
 export default function SkillsAssessmentPage() {
+  
   const { user } = useAuth();
   const userId = user?.id;
+  const cache = useQueryClient();
 
-  const [careers, setCareers] = useState<Career[]>([]);
-  const [selectedCareer, setSelectedCareer] = useState('');
-  const [savedCareer, setSavedCareer] = useState('');
+  const cachedCareer = cache.getQueryData<{ career_key: string | null }>(
+    queryKeys.selectedCareer(userId ?? '')
+  )?.career_key ?? '';
+
+  const [selectedCareer, setSelectedCareer] = useState(cachedCareer);
   const [search, setSearch] = useState('');
-
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState('');
-  const [roadmap, setRoadmap] = useState<CareerRoadmap | null>(null);
-  const [recordedSkills, setRecordedSkills] =
-    useState<RecordedSkill[]>([]);
-  const [assessments, setAssessments] =
-    useState<CompetencyAssessment[]>([]);
-  const [progress, setProgress] = useState<LearningSkill[]>([]);
-
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [profileError, setProfileError] = useState('');
   const [gapFilter, setGapFilter] = useState<GapFilter>('attention');
-  const [careerExpanded, setCareerExpanded] = useState(true);
+  const [careerExpanded, setCareerExpanded] = useState(!cachedCareer);
+
+  const careersQuery = useQuery({
+    queryKey: queryKeys.careers,
+    queryFn: onboardingApi.careers,
+    staleTime: 30 * 60 * 1000,
+  });
+
+  const selectedCareerQuery = useQuery({
+    queryKey: queryKeys.selectedCareer(userId ?? ''),
+    queryFn: onboardingApi.selectedCareer,
+    enabled: Boolean(userId),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const careers: Career[] = careersQuery.data ?? [];
+  const savedCareer = selectedCareerQuery.data?.career_key ?? '';
+
   useEffect(() => {
-    let active = true;
+    if (!selectedCareerQuery.isSuccess) return;
 
-    Promise.all([
-      onboardingApi.careers(),
-      onboardingApi.selectedCareer(),
-    ])
-      .then(([available, selection]) => {
-        if (!active) return;
+    setSelectedCareer(savedCareer);
+    setCareerExpanded(!savedCareer);
+  }, [savedCareer, selectedCareerQuery.isSuccess]);
 
-        setCareers(available);
-        setSelectedCareer(selection.career_key ?? '');
-        setSavedCareer(selection.career_key ?? '');
-        setCareerExpanded(!selection.career_key);
-      })
-      .catch((err: unknown) => {
-        if (!active) return;
+  const roadmapQuery = useQuery({
+    queryKey: queryKeys.roadmap(userId ?? '', savedCareer),
+    queryFn: () => getCareerRoadmap(userId!, savedCareer),
+    enabled: Boolean(userId && savedCareer),
+  });
 
-        setError(
-          err instanceof Error
-            ? err.message
-            : 'Could not load careers.'
-        );
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+  const skillsQuery = useQuery({
+    queryKey: queryKeys.recordedSkills(userId ?? ''),
+    queryFn: getRecordedSkills,
+    enabled: Boolean(userId && savedCareer),
+  });
 
-    return () => {
-      active = false;
-    };
-  }, []);
+  const assessmentsQuery = useQuery({
+    queryKey: queryKeys.competencyAssessments(
+      userId ?? '',
+      savedCareer
+    ),
+    queryFn: () => getCompetencyAssessments(savedCareer),
+    enabled: Boolean(userId && savedCareer),
+  });
 
+  const progressQuery = useQuery({
+    queryKey: queryKeys.learningProgress(userId ?? '', savedCareer),
+    queryFn: () => getLearningProgress(savedCareer),
+    enabled: Boolean(userId && savedCareer),
+  });
 
-  // 2. Load actual user data whenever the saved career changes.
-  useEffect(() => {
-    let active = true;
+  const roadmap: CareerRoadmap | null = roadmapQuery.data ?? null;
 
-    setRoadmap(null);
-    setRecordedSkills([]);
-    setAssessments([]);
-    setProgress([]);
-    setProfileError('');
-    setGapFilter('attention');
+  const recordedSkills: RecordedSkill[] = skillsQuery.data ?? [];
+  const assessments: CompetencyAssessment[] =
+    assessmentsQuery.data ?? [];
+  const progress: LearningSkill[] = progressQuery.data ?? [];
 
-    if (!savedCareer || userId == null) {
-      setProfileLoading(false);
-      return;
-    }
+  const loading =
+    careersQuery.isPending || selectedCareerQuery.isPending;
 
-    setProfileLoading(true);
+  const profileLoading = Boolean(savedCareer) && (
+    roadmapQuery.isPending ||
+    skillsQuery.isPending ||
+    assessmentsQuery.isPending ||
+    progressQuery.isPending
+  );
 
-    async function loadProfile() {
-      try {
-        const [careerRoadmap, skills, ratings, learning] =
-          await Promise.all([
-            getCareerRoadmap(userId!, savedCareer),
-            getRecordedSkills(),
-            getCompetencyAssessments(savedCareer),
-            getLearningProgress(savedCareer),
-          ]);
+  const failedProfile = [
+    roadmapQuery,
+    skillsQuery,
+    assessmentsQuery,
+    progressQuery,
+  ].find((query) => query.isError && query.data === undefined);
 
-        if (!active) return;
-
-        setRoadmap(careerRoadmap);
-        setRecordedSkills(skills);
-        setAssessments(ratings);
-        setProgress(learning);
-      } catch (cause) {
-        if (!active) return;
-
-        setProfileError(
-          cause instanceof Error
-            ? cause.message
-            : 'Could not load your assessment information.'
-        );
-      } finally {
-        if (active) setProfileLoading(false);
-      }
-    }
-
-    void loadProfile();
-
-    return () => {
-      active = false;
-    };
-  }, [userId, savedCareer]);
+  const profileError = failedProfile?.error instanceof Error
+    ? failedProfile.error.message
+    : '';
 
 
   const filteredCareers = careers.filter((career) => {
@@ -306,19 +293,23 @@ export default function SkillsAssessmentPage() {
   });
 
 
+
   async function saveCareer() {
-    if (!selectedCareer || saving) return;
+    if (!userId || !selectedCareer || saving) return;
 
     setSaving(true);
     setError(null);
     setMessage('');
 
     try {
-      const result = await onboardingApi.saveCareer(
-        selectedCareer
+      const result = await onboardingApi.saveCareer(selectedCareer);
+
+      cache.setQueryData(
+        queryKeys.selectedCareer(userId),
+        result
       );
 
-      setSavedCareer(result.career_key ?? '');
+      setSelectedCareer(result.career_key ?? '');
       setCareerExpanded(!result.career_key);
       setMessage('Your target career has been saved.');
     } catch (err) {
@@ -331,17 +322,27 @@ export default function SkillsAssessmentPage() {
       setSaving(false);
     }
   }
-async function refreshSkillProfile() {
-  if (userId == null || !savedCareer) return;
 
-  const [skills, updatedRoadmap] = await Promise.all([
-    getRecordedSkills(),
-    getCareerRoadmap(userId, savedCareer),
-  ]);
 
-  setRecordedSkills(skills);
-  setRoadmap(updatedRoadmap);
-}
+  async function refreshSkillProfile() {
+    if (!userId || !savedCareer) return;
+
+    await Promise.all([
+      cache.invalidateQueries({
+        queryKey: queryKeys.recordedSkills(userId),
+      }),
+
+      cache.invalidateQueries({
+        queryKey: queryKeys.roadmap(userId, savedCareer),
+      }),
+
+      cache.invalidateQueries({
+        queryKey: queryKeys.coreCoverage(userId),
+        refetchType: 'none',
+      }),
+    ]);
+  }
+
 
   return (
     <section className="cf-dashboard">

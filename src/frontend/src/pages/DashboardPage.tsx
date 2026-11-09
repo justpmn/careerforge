@@ -1,12 +1,15 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useQuery } from '@tanstack/react-query';
+import NeonGreeting from '../components/neongreeting';
+import { useAppearance } from '../context/appearancecontext';
+import { queryKeys } from '../lib/queryclient';
 import { useAuth } from '../context/AuthContext';
 import { authApi } from '../lib/auth';
 import { onboardingApi } from '../lib/onboarding';
-import { useAppearance } from '../context/appearancecontext';
-import NeonGreeting from '../components/neongreeting';
+
+
 
 const tourSteps = [
   {
@@ -46,9 +49,35 @@ const tourDismissalKey = (userId: number | string) =>
 export default function DashboardPage() {
   const { user, refresh } = useAuth();
 
-  const [targetRole, setTargetRole] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [roleError, setRoleError] = useState(false);
+  
+  const careersQuery = useQuery({
+    queryKey: queryKeys.careers,
+    queryFn: onboardingApi.careers,
+    staleTime: 30 * 60 * 1000,
+    enabled: Boolean(user?.id),
+  });
+
+  const selectedCareerQuery = useQuery({
+    queryKey: queryKeys.selectedCareer(user?.id ?? ''),
+    queryFn: onboardingApi.selectedCareer,
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(user?.id),
+  });
+
+  const selectedKey =
+    selectedCareerQuery.data?.career_key ?? null;
+
+  const targetRole = selectedKey
+    ? careersQuery.data?.find(
+        (career) => career.career_key === selectedKey
+      )?.name ?? selectedKey
+    : null;
+
+  const loading =
+    careersQuery.isPending || selectedCareerQuery.isPending;
+
+  const roleError =
+    careersQuery.isError || selectedCareerQuery.isError;
 
   const [tourStep, setTourStep] = useState<number | null>(null);
   const [tourSaving, setTourSaving] = useState(false);
@@ -58,35 +87,8 @@ export default function DashboardPage() {
   const firstName =
     rawName.charAt(0).toUpperCase() + rawName.slice(1);
 
-  useEffect(() => {
-    let active = true;
 
-    Promise.all([
-      onboardingApi.selectedCareer(),
-      onboardingApi.careers(),
-    ])
-      .then(([selection, careers]) => {
-        if (!active) return;
 
-        const match = careers.find(
-          (career) => career.career_key === selection.career_key
-        );
-
-        setTargetRole(
-          match?.name ?? selection.career_key ?? null
-        );
-      })
-      .catch(() => {
-        if (active) setRoleError(true);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
     useEffect(() => {
     if (!user || user.onboarding_completed) return;
