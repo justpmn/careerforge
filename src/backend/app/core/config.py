@@ -41,5 +41,13 @@ class Settings(BaseSettings):
     mfa_encryption_key: str | None = None
     mfa_issuer: str = "CareerForge"
 
+    llm_provider: str = "ollama"
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "qwen3.5:4b"
+
+    cloudflare_account_id: str = ""
+    cloudflare_ai_api_token: str = ""
+    cloudflare_model: str = "@cf/google/gemma-4-26b-a4b-it"
+
 
 settings = Settings()

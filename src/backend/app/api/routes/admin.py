@@ -15,7 +15,7 @@ from src.backend.app.database.models.user_skill import UserSkill
 from src.backend.app.database.models.user_competency_assessment import ( UserCompetencyAssessment)
 from src.backend.app.database.session import get_db
 from src.backend.app.core.admin_logging import LOG_DIR, LOG_FILE
-from src.backend.app.services.llm_health_service import (check_ollama_health)
+from src.backend.app.services.llm_health_service import (check_llm_health)
 from src.backend.app.services.recommendation_health_service import ( check_recommendation_model_health)
 from src.backend.app.database.models.competency_resource_link import (CompetencyResourceLink)
 from src.backend.app.database.models.learning_resource import (LearningResource)
@@ -372,7 +372,7 @@ def get_admin_system_health(
     )
 
     # 5. AI mentor
-    checks["ai_mentor"] = check_ollama_health()
+    checks["ai_mentor"] = check_llm_health()
 
     measured = [
         check
