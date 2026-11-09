@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import type { CSSProperties, TransitionEvent } from 'react';
 import { Link } from 'react-router-dom';
@@ -258,15 +257,8 @@ export default function HomePage({ theme, toggleTheme }: Props) {
           <div className="cf-landing-preview">
             <div className="cf-landing-preview-top">
               <div>
-                <span className="cf-landing-preview-label">
-                  EXAMPLE PATHWAY
-                </span>
                 <h2>Software Engineer</h2>
               </div>
-
-              <span className="cf-landing-preview-code">
-                PATH / 01
-              </span>
             </div>
 
             <div className="cf-landing-path">
@@ -307,10 +299,6 @@ export default function HomePage({ theme, toggleTheme }: Props) {
               <span>Learn skills. Build evidence. Track progress.</span>
               <span aria-hidden="true">↗</span>
             </div>
-
-            <p className="cf-landing-preview-disclaimer">
-              Illustrative pathway, not a personal assessment.
-            </p>
           </div>
         </section>
 
