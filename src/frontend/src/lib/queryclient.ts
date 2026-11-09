@@ -43,4 +43,42 @@ export const queryKeys = {
 
   competencyAssessments: (userId: string, careerKey: string) =>
     ['user', userId, 'competency-assessments', careerKey] as const,
+
+  admin: (userId: string) =>
+    ['admin', userId] as const,
+
+  adminOverview: (userId: string) =>
+    ['admin', userId, 'overview'] as const,
+
+  adminUsers: (userId: string, page: number) =>
+    ['admin', userId, 'users', page] as const,
+
+  adminLogs: (
+    userId: string,
+    page: number,
+    severity: string,
+    category: string
+  ) => ['admin', userId, 'logs', page, severity, category] as const,
+
+  adminHealth: (userId: string) =>
+    ['admin', userId, 'health'] as const,
+
+  adminCareer: (userId: string, careerKey: string) =>
+    ['admin', userId, 'career', careerKey] as const,
+
+  adminResources: (userId: string) =>
+    ['admin', userId, 'resources'] as const,
+
+  adminResourceList: (
+    userId: string,
+    search: string,
+    page: number,
+    archived: boolean
+  ) => ['admin', userId, 'resources', 'list', search, page, archived] as const,
+
+  adminResourceOptions: (userId: string) =>
+    ['admin', userId, 'resources', 'options'] as const,
+  adminResourceSkills: (userId: string, search: string) =>
+  ['admin', userId, 'resources', 'skills', search] as const,
+
 };

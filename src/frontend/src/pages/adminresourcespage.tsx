@@ -2,8 +2,11 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { csrfHeader } from '../lib/auth';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTotpModal from '../components/AdminTotpModal';
+import { useAuth } from '../context/AuthContext';
+import { csrfHeader } from '../lib/auth';
+import { queryKeys } from '../lib/queryclient';
 import '../adminresourcepage.css';
 
 type Assignment = {
@@ -109,17 +112,62 @@ async function api<T>(
 }
 
 export default function AdminResourcesPage() {
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [careers, setCareers] = useState<CareerOption[]>([]);
-  const [total, setTotal] = useState(0);
+
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [includeArchived, setIncludeArchived] = useState(false);
-  const [reload, setReload] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [listError, setListError] = useState('');
-  const [optionsError, setOptionsError] = useState('');
 
+
+  const { user } = useAuth();
+  const userId = user?.id ?? '';
+  const cache = useQueryClient();
+
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 250);
+
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  const optionsQuery = useQuery({
+    queryKey: queryKeys.adminResourceOptions(userId),
+    queryFn: () =>
+      api<{ careers: CareerOption[] }>('/api/admin/resources/options'),
+    enabled: Boolean(userId),
+    staleTime: 30 * 60 * 1000,
+    retry: 0,
+  });
+
+  const resourceQuery = useQuery({
+    queryKey: queryKeys.adminResourceList(
+      userId, debouncedSearch, page, includeArchived
+    ),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        q: debouncedSearch,
+        page: String(page),
+        page_size: '20',
+        include_archived: String(includeArchived),
+      });
+
+      return api<ResourceList>(`/api/admin/resources?${params}`);
+    },
+    enabled: Boolean(userId),
+    staleTime: 30_000,
+    retry: 0,
+  });
+
+  const careers: CareerOption[] = optionsQuery.data?.careers ?? [];
+  const resources: Resource[] = resourceQuery.data?.resources ?? [];
+  const total = resourceQuery.data?.total ?? 0;
+  const loading = resourceQuery.isPending;
+
+  const listError = resourceQuery.isError
+    ? resourceQuery.error.message
+    : '';
   const [showCreate, setShowCreate] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [draft, setDraft] = useState<ResourceDraft>(emptyDraft);
@@ -128,9 +176,7 @@ export default function AdminResourcesPage() {
   ]);
   const [mappingMode, setMappingMode] = useState<MappingMode>('global');
   const [skillSearch, setSkillSearch] = useState('');
-  const [skillOptions, setSkillOptions] = useState<SkillOption[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<SkillOption[]>([]);
-  const [skillError, setSkillError] = useState('');
   const [totpOpen, setTotpOpen] = useState(false);
   const [totpError, setTotpError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -142,98 +188,41 @@ export default function AdminResourcesPage() {
   const [resourceActionError, setResourceActionError] = useState('');
 
 
-  useEffect(() => {
-    let active = true;
 
-    api<{ careers: CareerOption[] }>('/api/admin/resources/options')
-      .then((result) => {
-        if (active) setCareers(result.careers);
-      })
-      .catch((err: unknown) => {
-        if (active) {
-          setOptionsError(
-            err instanceof Error
-              ? err.message
-              : 'Could not load career options.'
-          );
-        }
-      });
 
-    return () => {
-      active = false;
-    };
-  }, []);
 
-  useEffect(() => {
-    let active = true;
+const [debouncedSkillSearch, setDebouncedSkillSearch] = useState('');
 
-    const timer = setTimeout(() => {
-      setLoading(true);
-      setListError('');
-
-      const params = new URLSearchParams({
-        q: search.trim(),
-        page: String(page),
-        page_size: '20',
-        include_archived: String(includeArchived),
-      });
-
-      api<ResourceList>(`/api/admin/resources?${params}`)
-        .then((result) => {
-          if (!active) return;
-
-          setResources(result.resources);
-          setTotal(result.total);
-        })
-        .catch((err: unknown) => {
-          if (!active) return;
-
-          setListError(
-            err instanceof Error
-              ? err.message
-              : 'Unable to load resources.'
-          );
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-    }, 250);
-
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [search, page, includeArchived, reload]);
 useEffect(() => {
-  if (mappingMode === 'career') return;
-
-  let active = true;
-
-  const timer = setTimeout(() => {
-    setSkillError('');
-
-    api<{ skills: SkillOption[] }>(
-      `/api/admin/resources/skills?q=${encodeURIComponent(skillSearch)}&limit=30`
-    )
-      .then((result) => {
-        if (active) setSkillOptions(result.skills);
-      })
-      .catch((error: unknown) => {
-        if (active) {
-          setSkillError(
-            error instanceof Error
-              ? error.message
-              : 'Unable to search skills.'
-          );
-        }
-      });
+  const timer = window.setTimeout(() => {
+    setDebouncedSkillSearch(skillSearch.trim());
   }, 250);
 
-  return () => {
-    active = false;
-    clearTimeout(timer);
-  };
-}, [mappingMode, skillSearch]);
+  return () => window.clearTimeout(timer);
+}, [skillSearch]);
+
+const skillsQuery = useQuery({
+  queryKey: queryKeys.adminResourceSkills(
+    userId,
+    debouncedSkillSearch
+  ),
+  queryFn: () =>
+    api<{ skills: SkillOption[] }>(
+      '/api/admin/resources/skills' +
+      `?q=${encodeURIComponent(debouncedSkillSearch)}&limit=30`
+    ),
+  enabled: Boolean(
+    userId && showCreate && mappingMode !== 'career'
+  ),
+  staleTime: 10 * 60 * 1000,
+});
+
+const skillOptions: SkillOption[] = skillsQuery.data?.skills ?? [];
+
+const skillError = skillsQuery.isError
+  ? skillsQuery.error.message
+  : '';
+
 
 function updateAssignment(index: number, value: Assignment) {
     setAssignments((current) =>
@@ -393,7 +382,9 @@ async function confirmCreateResource(code: string) {
     setSearch('');
     setPage(1);
     setIncludeArchived(false);
-    setReload((value) => value + 1);
+    void cache.invalidateQueries({
+      queryKey: queryKeys.admin(userId),
+    });
   } catch (err) {
     setTotpError(
       err instanceof Error
@@ -450,7 +441,9 @@ async function confirmResourceAction(code: string) {
       setPage((value) => value - 1);
     }
 
-    setReload((value) => value + 1);
+    void cache.invalidateQueries({
+      queryKey: queryKeys.admin(userId),
+    });
   } catch (err) {
     setResourceActionError(
       err instanceof Error
@@ -818,6 +811,11 @@ async function confirmResourceAction(code: string) {
           <h2 id="catalog-heading">Resource catalog</h2>
           <span>{total} RESOURCES</span>
         </div>
+        {optionsQuery.isError && (
+          <p className="cf-resources-error" role="alert">
+            {optionsQuery.error.message}
+          </p>
+        )}
 
         <div className="cf-resources-toolbar">
           <input
