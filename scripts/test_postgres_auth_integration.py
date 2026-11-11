@@ -106,7 +106,19 @@ class TestPostgresAuthIntegration(unittest.TestCase):
             response.text,
         )
 
-        return response.json()
+        user = response.json()
+
+        result = self.connection.execute(
+            text("""
+                UPDATE users
+                SET email_verified_at = CURRENT_TIMESTAMP
+                WHERE id = :id AND email = :email
+            """),
+            {"id": user["id"], "email": user["email"]},
+        )
+
+        self.assertEqual(result.rowcount, 1)
+        return user
 
     def login(self, email, client=None):
         client = client or self.client

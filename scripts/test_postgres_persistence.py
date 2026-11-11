@@ -214,6 +214,18 @@ class TestPostgresPersistence(unittest.TestCase):
             201,
             registration.text,
         )
+        with SessionLocal() as db:
+            result = db.execute(
+                text("""
+                    UPDATE users
+                    SET email_verified_at = CURRENT_TIMESTAMP
+                    WHERE id = :id AND email = :email
+                """),
+                {"id": registration.json()["id"], "email": email},
+            )
+
+            self.assertEqual(result.rowcount, 1)
+            db.commit()
 
         login = self.client.post(
             "/api/auth/login",

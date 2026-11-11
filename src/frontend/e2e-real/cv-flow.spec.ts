@@ -118,7 +118,7 @@ test.describe('CareerForge real CV analysis', () => {
     ).toBeVisible();
 
     await expect(
-      page.locator('.cf-cv-recommendation')
+      page.locator('.cf-cv-match-card')
     ).toHaveCount(3);
 
     // 6. Confirm that PostgreSQL stored the analysis.
@@ -138,7 +138,7 @@ test.describe('CareerForge real CV analysis', () => {
       'Python'
     );
 
-    expect(saved.recommendations).toHaveLength(3);
+    expect(saved.recommendations).toHaveLength(5);
 
     // 7. Reload and verify saved analysis restoration.
     await page.reload();
@@ -156,7 +156,7 @@ test.describe('CareerForge real CV analysis', () => {
     ).toBeVisible();
 
     await expect(
-      page.locator('.cf-cv-recommendation')
+      page.locator('.cf-cv-match-card')
     ).toHaveCount(3);
 
     console.log('DOCX EXTRACTION: PASS');
@@ -200,7 +200,7 @@ test.describe('CareerForge real CV analysis', () => {
     ).toBeVisible();
 
     await expect(
-      page.locator('.cf-cv-recommendation')
+      page.locator('.cf-cv-match-card')
     ).toHaveCount(3);
 
     // 2. Attempt to upload a file larger than 5 MB.
