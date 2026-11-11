@@ -5,8 +5,8 @@ The CareerForge backend is a Python-based REST API built with FastAPI. It provid
 
 The backend integrates a Random Forest career recommendation model, PostgreSQL for persistent storage, and configurable language model providers for conversational career guidance.
 
-**Production API:** https://api.careerforgeapp.me  
-**API Documentation (local):** http://127.0.0.1:8000/docs  
+**Production API:** https://api.careerforgeapp.me
+**API Documentation (local):** http://127.0.0.1:8000/docs
 **Main Project:** [CareerForge](../../README.md)
 
 ## 1. Technology Stack

@@ -7,8 +7,8 @@ CareerForge helps users explore technology careers, understand how their existin
 
 The platform combines machine learning, structured career and skill data, and conversational AI to provide practical, context-aware career guidance.
 
-**Live Application:** https://careerforgeapp.me  
-**Repository:** https://github.com/justpmn/careerforge  
+**Live Application:** https://careerforgeapp.me
+**Repository:** https://github.com/justpmn/careerforge
 **Status:** Deployed — Active Development
 
 ## Overview
