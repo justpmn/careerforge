@@ -1,297 +1,218 @@
+
 # CareerForge
 
-CareerForge is an AI-powered career mentorship and recommendation system designed to help users identify suitable career paths based on their skills, experience, and resume information.
+**An AI-powered career recommendation and mentorship platform for technology professionals.**
 
-The system uses resume analysis, career and skill data, machine learning, and a structured backend to generate personalized career recommendations and identify skill gaps between a user's current profile and potential career paths.
+CareerForge helps users explore technology careers, understand how their existing skills relate to career requirements, identify competency gaps, and follow personalized learning pathways.
 
-## Project Overview
+The platform combines machine learning, structured career and skill data, and conversational AI to provide practical, context-aware career guidance.
 
-Choosing a suitable career path can be difficult, especially when users are unsure how their existing skills and experience relate to different professions.
+**Live Application:** https://careerforgeapp.me  
+**Repository:** https://github.com/justpmn/careerforge  
+**Status:** Deployed — Active Development
 
-CareerForge aims to address this problem by providing a centralized platform that can:
+## Overview
 
-- Analyze user resumes.
-- Identify relevant skills.
-- Recommend suitable career paths.
-- Identify skill gaps.
-- Provide learning resources for missing skills.
-- Support career guidance through an AI mentorship component.
-- Store recommendation and mentorship history for future reference.
+Choosing a career path in technology can be challenging, particularly when individuals are uncertain about how their current skills, qualifications, and experience align with different roles.
 
-## System Architecture
+CareerForge addresses this problem by bringing career discovery, skill assessment, learning recommendations, and AI-assisted mentorship into a single platform.
 
-CareerForge follows a modular architecture consisting of several major components:
+Rather than relying solely on generic career descriptions, the system uses information from a user's CV, recorded skills, career preferences, and competency assessments to generate personalized guidance.
 
-1. **Frontend**  
-   Provides the user interface through which users interact with the system.
+CareerForge currently focuses on technology-related careers.
 
-2. **Backend API**  
-   Handles application logic, user requests, database communication, resume processing, and recommendation services.
+## Key Features
 
-3. **Database**  
-   Stores users, careers, skills, resumes, recommendations, skill gaps, learning resources, and mentorship information.
+### Career Recommendations
+- Analyze uploaded CVs to identify technical skills.
+- Generate ranked career recommendations using a Random Forest classifier.
+- Support 22 technology career categories.
+- Incorporate user career preferences into recommendations.
+- Present model scores alongside documented skill coverage.
 
-4. **Resume Processing**  
-   Extracts and processes information from uploaded resumes for use in career analysis.
+### Competency and Skill Assessment
+- Compare recorded skills against career competency requirements.
+- Distinguish evidenced, self-reported, and unassessed competencies.
+- Identify areas requiring additional learning or evidence.
+- Support competency evidence submissions and review.
 
-5. **Career Recommendation Model**  
-   Uses machine learning to estimate suitable career categories based on processed resume information.
+### Personalized Learning Roadmaps
+- Generate learning pathways based on the selected career.
+- Recommend learning resources mapped to relevant skills and competencies.
+- Track user-reported learning progress.
+- Visualize learning pathways through an interactive skill tree.
 
-6. **AI Mentor**  
-   Provides conversational career guidance and allows users to ask follow-up questions about their career recommendations.
+### AI Career Mentor
+- Provide conversational guidance based on the user's career profile.
+- Discuss career recommendations, competency gaps, and learning resources.
+- Maintain conversation history across sessions.
+- Support contextual follow-up questions.
+- Use background generation jobs so users can continue navigating while responses are generated.
+
+The AI Mentor supports two inference providers:
+
+- **Cloudflare Workers AI:** Google Gemma 4 for cloud-hosted inference.
+- **Ollama:** Qwen3.5 for local development and experimentation.
+
+### User Accounts and Personalization
+- Email and password authentication.
+- Google and GitHub OAuth sign-in.
+- Email verification and password recovery.
+- Career preferences and account settings.
+- Configurable appearance themes.
+
+### Administration and Monitoring
+- Administrative dashboard and system health monitoring.
+- Learning resource management and skill mapping.
+- User administration and access controls.
+- Multi-factor authentication for administrative access.
+- Operational logging and AI inference monitoring.
+
+## How CareerForge Works
+
+CareerForge combines several processes to produce personalized career guidance.
+
+```mermaid
+flowchart TD
+    A[User Registration and Profile] --> B[CV Upload and Skill Extraction]
+    B --> C[Random Forest Career Recommendations]
+    C --> D[Career Selection and Preferences]
+    D --> E[Competency Gap Assessment]
+    E --> F[Personalized Learning Roadmap]
+    F --> G[Learning Resources and Progress]
+    E --> H[AI Career Mentor]
+    G --> H
+    H --> I[Contextual Career Guidance]
+```
+
+Users can revisit their assessments, update their learning progress, and continue AI Mentor conversations as their career interests develop.
 
 ## Technology Stack
 
-### Backend
+| Component | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Styling | Tailwind CSS, CSS |
+| Routing | React Router |
+| Client-side caching | TanStack Query |
+| Learning visualizations | React Flow |
+| Backend | Python, FastAPI, Pydantic |
+| Database | PostgreSQL |
+| ORM and migrations | SQLAlchemy, Alembic |
+| Machine learning | Scikit-learn, Pandas, NumPy, Joblib |
+| Local AI inference | Ollama, Qwen3.5 |
+| Cloud AI inference | Cloudflare Workers AI, Google Gemma 4 |
+| Authentication | JWT, OAuth 2.0, MFA |
+| Testing | Pytest, Playwright |
+| Version control | Git, GitHub |
 
-- Python
-- FastAPI
-- Pydantic
-- SQLAlchemy
-- Alembic
+## System Architecture
 
-### Database
+CareerForge follows a modular client-server architecture.
 
-- PostgreSQL
+```mermaid
+flowchart TD
+    User[Web Browser] --> Frontend[React Frontend]
 
-### Machine Learning and Data Processing
+    Frontend -->|HTTPS API Requests| Backend[FastAPI Backend]
 
-- Scikit-learn
-- Pandas
-- NumPy
-- Joblib
+    Backend --> Auth[Authentication and User Services]
+    Backend --> Career[Career and Competency Services]
+    Backend --> Mentor[AI Mentor Service]
 
-### Development Tools
+    Auth --> DB[(PostgreSQL)]
+    Career --> DB
+    Mentor --> DB
 
-- Git
-- GitHub
-- Visual Studio Code
-- Jupyter Notebook
+    Career --> RF[Random Forest Model]
 
-## Project Structure
+    Mentor --> CF[Cloudflare Workers AI]
+    Mentor -. Local Development .-> Ollama[Ollama]
+```
+
+### Production Infrastructure
+
+| Service | Hosting |
+|---|---|
+| Frontend | Cloudflare Pages |
+| Backend API | Microsoft Azure Virtual Machine |
+| Database | Neon PostgreSQL |
+| AI inference | Cloudflare Workers AI |
+| Source code | GitHub |
+
+The frontend is accessible at https://careerforgeapp.me.
+
+The backend exposes the application's API at https://api.careerforgeapp.me.
+
+The Random Forest recommendation model runs within the backend application, while conversational AI requests are sent to the configured inference provider.
+
+## Repository Structure
 
 ```text
 careerforge/
-│
-├── app/
-│   ├── main.py
-│   ├── models/
-│   ├── schemas/
-│   ├── routes/
-│   ├── services/
-│   └── database/
-│
 ├── src/
+│   ├── backend/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   ├── core/
+│   │   │   ├── database/
+│   │   │   ├── schemas/
+│   │   │   └── services/
+│   │   └── README.md
+│   │
+│   ├── frontend/
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   ├── context/
+│   │   │   ├── lib/
+│   │   │   └── pages/
+│   │   ├── package.json
+│   │   └── README.md
+│   │
 │   ├── preprocessing/
 │   └── recommendation/
 │
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── alembic/
-│
+├── migrations/
+├── scripts/
 ├── tests/
-│
-├── .gitignore
+├── data/
+├── .env.example
+├── docker-compose.yml
 ├── alembic.ini
 ├── requirements.txt
 └── README.md
 ```
 
-The exact structure may change as development continues.
+The backend contains the API, business logic, data access, authentication, and AI integration services.
 
-## Database Design
+The frontend contains the user interface, routing, state management, API clients, and visual components.
 
-The PostgreSQL database contains the main entities required by the CareerForge system.
+The preprocessing and recommendation packages provide functionality for extracting skills and generating machine learning predictions.
 
-Current database tables include:
+## Getting Started
 
-- `users`
-- `resumes`
-- `careers`
-- `skills`
-- `career_skills`
-- `user_skills`
-- `recommendations`
-- `skill_gaps`
-- `learning_resources`
-- `learning_resource_skills`
-- `mentor_conversations`
-- `mentor_messages`
-- `alembic_version`
+These instructions provide an overview of local setup. Refer to the component-specific documentation for detailed configuration and troubleshooting.
 
-SQLAlchemy is used as the Object Relational Mapper (ORM), while Alembic manages database schema migrations.
+### Prerequisites
 
-## Career Recommendation Model
+Install the following tools:
 
-CareerForge uses a machine learning classifier to predict career categories from processed resume information.
+- Python and pip
+- Node.js and npm
+- Git
+- PostgreSQL, or Docker with Docker Compose
+- Ollama, if using local AI inference
 
-The current recommendation pipeline uses a **Random Forest classifier** as the primary model.
+A compatible Python environment and the required trained model artifacts and database records are necessary for the full recommendation functionality.
 
-Resume text is transformed into numerical features before being passed to the classifier. The model produces probabilities for possible career categories, allowing the system to return multiple career recommendations rather than only a single prediction.
-
-The model is evaluated using metrics including:
-
-- Accuracy
-- Balanced Accuracy
-- Macro F1 Score
-- Weighted F1 Score
-- Top-3 Accuracy
-- Log Loss
-
-Several Random Forest configurations have been tested to compare generalization performance and reduce overfitting.
-
-## Data Sources
-
-CareerForge uses multiple datasets to support career recommendation, skill mapping, and career information.
-
-### Resume Dataset
-
-A resume dataset containing approximately 22,000 samples is used for developing the career recommendation model.
-
-The dataset contains resume-related text and associated career information that can be transformed into training data for the recommendation system.
-
-### O*NET
-
-O*NET data is used as a source of structured occupational information, including:
-
-- Occupations
-- Skills
-- Knowledge areas
-- Abilities
-- Career requirements
-
-This information supports career-to-skill mapping and skill-gap analysis.
-
-### Stack Overflow Developer Data
-
-Stack Overflow developer data can be used to supplement technical career and skill information, particularly for computing and software-related career paths.
-
-## Resume Processing
-
-The resume processing pipeline is responsible for preparing resume information for analysis.
-
-The general workflow is:
-
-```text
-Resume Upload
-      |
-      v
-Text Extraction
-      |
-      v
-Text Cleaning and Preprocessing
-      |
-      v
-Feature Extraction
-      |
-      v
-Career Recommendation Model
-      |
-      v
-Top Career Recommendations
-```
-
-The extracted information can also be used to identify user skills and compare them against the requirements of recommended careers.
-
-## Skill Gap Analysis
-
-CareerForge compares the skills identified from a user's profile with the skills associated with a recommended career.
-
-Conceptually:
-
-```text
-Required Career Skills
-          -
-Current User Skills
-          =
-Missing Skills
-```
-
-The resulting missing skills form the user's skill gap.
-
-CareerForge can then associate these gaps with relevant learning resources to help users understand what they need to learn to move toward a particular career.
-
-## Recommendation Workflow
-
-The intended recommendation process is:
-
-```text
-User
-  |
-  v
-Upload Resume
-  |
-  v
-Resume Text Extraction
-  |
-  v
-Resume Preprocessing
-  |
-  v
-Career Recommendation Model
-  |
-  v
-Top Career Predictions
-  |
-  v
-Career and Skill Mapping
-  |
-  v
-Skill Gap Analysis
-  |
-  v
-Learning Resources
-  |
-  v
-AI Career Mentor
-```
-
-## Current Development Status
-
-CareerForge is currently under active development.
-
-Implemented or actively developed components include:
-
-- Backend project structure
-- PostgreSQL database
-- SQLAlchemy database models
-- Alembic migrations
-- Career and skill database entities
-- Dataset loading and preprocessing
-- Resume dataset exploration
-- Career recommendation model experimentation
-- Random Forest model training and evaluation
-- Resume text extraction pipeline
-
-Additional components will be integrated as development progresses.
-
-## Planned Features
-
-Future development includes:
-
-- Complete frontend integration
-- User authentication and profile management
-- Resume upload interface
-- Automated skill extraction
-- Top career recommendation display
-- Career confidence scores
-- Skill-gap visualization
-- Learning resource recommendations
-- AI career mentor integration
-- Recommendation history
-- Administrative dashboard
-- End-to-end system integration and testing
-
-## Installation
-
-Clone the repository:
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/justpmn/careerforge.git
 cd careerforge
 ```
+
+### 2. Set Up the Python Environment
 
 Create a virtual environment:
 
@@ -299,79 +220,232 @@ Create a virtual environment:
 python -m venv .venv
 ```
 
-Activate the virtual environment on Windows:
+Activate it on Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+Or on Linux/macOS:
 
 ```bash
-.venv\Scripts\activate
+source .venv/bin/activate
 ```
 
-Install the required dependencies:
+Install the backend dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## Database Setup
+### 3. Configure Environment Variables
 
-CareerForge uses PostgreSQL.
+Create a local environment file from the provided example.
 
-Create a PostgreSQL database for the project and configure the required database credentials using the project's environment configuration.
+Windows PowerShell:
 
-Run the Alembic migrations:
+```powershell
+Copy-Item .env.example .env
+```
+
+Linux/macOS:
 
 ```bash
-alembic upgrade head
+cp .env.example .env
 ```
 
-This creates or updates the database schema to the latest version.
+Update the configuration values for your development environment.
 
-## Running the Backend
+Important configuration includes:
 
-Start the FastAPI development server:
+- PostgreSQL connection details
+- Authentication and OAuth secrets
+- Frontend origin and cookie settings
+- Email delivery configuration
+- AI inference provider settings
+
+A secure `OAUTH_STATE_SECRET_KEY` must be configured before the backend can start.
+
+Do not commit `.env`, API tokens, passwords, or other secrets to version control.
+
+### 4. Start PostgreSQL
+
+If using Docker Compose, configure the PostgreSQL values in `.env`, then run:
 
 ```bash
-uvicorn app.main:app --reload
+docker compose up -d postgres
 ```
 
-The backend will then be available locally through the configured FastAPI development server.
+Ensure that `DATABASE_URL` matches the running PostgreSQL instance.
 
-FastAPI's interactive API documentation can be used during development to inspect and test available endpoints.
+Apply database migrations:
 
-## Development Workflow
-
-Development is organized using feature branches for the major components of the system.
-
-Examples include:
-
-```text
-feat/backend
-feat/database
-feat/dataset-preprocessing
-feat/recommendation-model
-feat/resume-text-extraction
-feat/frontend
-feat/integration
-docs/README
+```bash
+python -m alembic upgrade head
 ```
 
-Changes are developed and tested within their respective branches before being integrated into the main branch.
+The application also requires appropriate career, skill, and learning-resource data. Refer to the backend documentation for data initialization.
 
-## Project Objectives
+### 5. Start the Backend
 
-The main objectives of CareerForge are to:
+From the repository root:
 
-1. Develop a system capable of analyzing resume information.
-2. Build a machine learning model for career recommendation.
-3. Identify skill gaps between users and recommended careers.
-4. Recommend relevant learning resources.
-5. Provide AI-assisted career mentorship.
-6. Maintain user recommendation and mentorship history.
-7. Provide an accessible interface for career exploration and guidance.
+```bash
+python -m uvicorn src.backend.app.main:app --reload --port 8000
+```
+
+The backend will run at:
+
+http://127.0.0.1:8000
+
+Interactive API documentation:
+
+http://127.0.0.1:8000/docs
+
+### 6. Start the Frontend
+
+Open another terminal:
+
+```bash
+cd src/frontend
+npm ci
+npm run dev
+```
+
+Access the frontend at:
+
+http://localhost:5173
+
+Vite proxies `/api` requests to the local FastAPI backend. The proxy target can be configured through the frontend environment settings.
+
+### 7. Configure AI Inference
+
+CareerForge supports local and cloud-hosted AI inference.
+
+For local development with Ollama:
+
+```dotenv
+LLM_PROVIDER=ollama
+OLLAMA_MODEL=qwen3.5:4b
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+```
+
+Ollama must be running with the configured model installed.
+
+For Cloudflare Workers AI:
+
+```dotenv
+LLM_PROVIDER=cloudflare
+CLOUDFLARE_ACCOUNT_ID=YOUR_ACCOUNT_ID
+CLOUDFLARE_AI_API_TOKEN=YOUR_PRIVATE_TOKEN
+CLOUDFLARE_MODEL=@cf/google/gemma-4-26b-a4b-it
+```
+
+Cloudflare inference requires a valid Cloudflare account and Workers AI API token.
+
+Keep provider credentials in the backend environment only. Never expose them through frontend variables.
+
+## Machine Learning Approach
+
+CareerForge uses a Random Forest classifier to generate ranked recommendations across 22 technology career categories.
+
+The recommendation workflow includes:
+
+1. Extracting technical skills from CV text.
+2. Matching identified skills against the model's feature vocabulary.
+3. Transforming matched skills into model-compatible features.
+4. Generating career classification scores.
+5. Ranking career recommendations and applying user preferences.
+6. Comparing documented skills against career competency requirements.
+
+### Data Sources
+
+The project uses structured career and technical skill information, including:
+
+- Stack Overflow Developer Survey data
+- O*NET occupational information
+- Curated technology career and competency mappings
+
+The training pipeline includes data preprocessing, skill normalization, feature engineering, and model evaluation.
+
+The Random Forest model provides recommendation signals rather than definitive judgments about career suitability or professional competence.
+
+## Testing
+
+CareerForge includes backend tests and frontend browser tests.
+
+### Backend
+
+From the repository root:
+
+```bash
+python -m pytest tests
+```
+
+Some integration tests require a dedicated test database or additional environment configuration.
+
+### Frontend
+
+From `src/frontend`:
+
+```bash
+npm run typecheck
+npm run build
+npx playwright test
+```
+
+Playwright also includes a separate configuration for tests involving the real FastAPI backend and a dedicated local PostgreSQL test database.
+
+Consult the frontend README before running database-backed end-to-end tests.
+
+## Documentation
+
+Detailed developer guides are available for each application component:
+
+- [Backend Documentation](src/backend/README.md) — API architecture, database setup, recommendation system, AI Mentor, testing, and deployment.
+- [Frontend Documentation](src/frontend/README.md) — React architecture, application pages, components, themes, routing, caching, and testing.
+
+## Security and Responsible AI
+
+CareerForge processes user-provided career information, including CV content and recorded skills.
+
+The platform includes authentication, account access controls, administrative MFA, and configuration-based secret management.
+
+Depending on the configured AI inference provider, relevant career and assessment context may be transmitted to that provider to generate mentor responses.
+
+CareerForge distinguishes recorded skill information, user-reported learning progress, and competency evidence from independently verified proficiency.
+
+AI-generated recommendations may contain inaccuracies and should be reviewed critically.
+
+Users should avoid submitting unnecessary sensitive information.
+
+## Current Status and Future Work
+
+CareerForge is deployed and remains under active development.
+
+Current development priorities include:
+
+- Improving profile caching and selective data preloading.
+- Refining competency assessment consistency.
+- Improving learning-resource retrieval and recommendation grounding.
+- Evaluating AI Mentor response quality and inference latency.
+- Expanding automated testing and production monitoring.
+- Improving accessibility, performance, and reliability.
+
+## Contributing
+
+Issues and pull requests can be submitted through GitHub.
+
+Contributors should use descriptive commit messages, document significant changes, and run relevant tests before submitting pull requests.
+
+New features and fixes should generally be developed in separate branches before merging into `main`.
 
 ## Disclaimer
 
-CareerForge is an academic project and is currently under development. Career recommendations generated by the system are intended to provide guidance and should not be treated as definitive career decisions.
+CareerForge is an academic software project intended to support career exploration and learning decisions.
+
+Machine learning predictions, competency assessments, and AI-generated guidance are advisory and do not guarantee employment, professional qualification, or career suitability.
 
 ## License
 
-This project is currently developed for academic purposes.
+This repository does not currently include a published open-source license. Permission for reuse or redistribution should be obtained from the project maintainer.
